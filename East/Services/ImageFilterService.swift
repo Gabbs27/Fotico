@@ -4,18 +4,49 @@ import CoreImage.CIFilterBuiltins
 import Combine
 
 /// Thread-safe filter service — all methods can be called from any thread.
-/// Uses Metal-backed CIContext for GPU-accelerated rendering.
+/// Uses shared RenderEngine for GPU-accelerated rendering.
+///
+/// IMPORTANT: Each ImageFilterService instance has its own set of CIFilter instances.
+/// This means each instance is NOT thread-safe internally, but multiple instances
+/// can be used safely from different threads (one per thread/queue).
+///
+/// Performance optimizations:
+/// - CIFilter instances cached and reused within one instance
+/// - Identity filters skipped (no work for default parameter values)
+/// - Color adjustments ordered first for kernel fusion (single GPU pass)
+/// - Shared CIContext from RenderEngine (avoids ~50-100ms context creation)
 class ImageFilterService: @unchecked Sendable {
     private let context: CIContext
 
+    // MARK: - CIFilter instances (per-instance, NOT shared across threads)
+
+    private let colorControlsFilter = CIFilter(name: "CIColorControls")!
+    private let exposureFilter = CIFilter(name: "CIExposureAdjust")!
+    private let temperatureFilter = CIFilter(name: "CITemperatureAndTint")!
+    private let vibranceFilter = CIFilter(name: "CIVibrance")!
+    private let sharpenFilter = CIFilter(name: "CISharpenLuminance")!
+    private let vignetteFilter = CIFilter(name: "CIVignette")!
+    private let bloomFilter = CIFilter(name: "CIBloom")!
+    private let dissolveFilter = CIFilter(name: "CIDissolveTransition")!
+    private let noiseFilter = CIFilter(name: "CIRandomGenerator")!
+    private let colorMatrixFilter = CIFilter(name: "CIColorMatrix")!
+    private let addCompFilter = CIFilter(name: "CIAdditionCompositing")!
+
+    // Preset filter cache: [filterName: CIFilter]
+    private var presetFilterCache: [String: CIFilter] = [:]
+
     init() {
-        if let device = MTLCreateSystemDefaultDevice() {
-            self.context = CIContext(mtlDevice: device, options: [
-                .workingColorSpace: CGColorSpaceCreateDeviceRGB()
-            ])
-        } else {
-            self.context = CIContext(options: [.useSoftwareRenderer: false])
+        self.context = RenderEngine.shared.context
+    }
+
+    /// Get or create a cached CIFilter by name (NOT thread-safe — use one service per queue)
+    private func cachedFilter(named name: String) -> CIFilter? {
+        if let existing = presetFilterCache[name] {
+            return existing
         }
+        guard let filter = CIFilter(name: name) else { return nil }
+        presetFilterCache[name] = filter
+        return filter
     }
 
     // MARK: - Full Pipeline
@@ -28,7 +59,6 @@ class ImageFilterService: @unchecked Sendable {
             let radians = state.rotation * .pi / 180.0
             let transform = CGAffineTransform(rotationAngle: radians)
             image = image.transformed(by: transform)
-            // Re-center after rotation
             let offset = image.extent.origin
             image = image.transformed(by: CGAffineTransform(translationX: -offset.x, y: -offset.y))
         }
@@ -39,11 +69,17 @@ class ImageFilterService: @unchecked Sendable {
             image = applyPreset(preset, to: image, intensity: state.presetIntensity)
         }
 
-        // 3. Apply basic adjustments
+        // 3. Apply basic adjustments (color filters first for kernel fusion)
         image = applyAdjustments(state, to: image)
 
-        // 4. Apply effects
+        // 4. Apply effects (spatial filters after color for optimal fusion)
         image = applyEffects(state, to: image)
+
+        // 5. Safety: ensure the result has a finite extent (CIRandomGenerator etc. produce infinite)
+        let sourceExtent = sourceImage.extent
+        if image.extent.isInfinite {
+            image = image.cropped(to: sourceExtent)
+        }
 
         return image
     }
@@ -73,7 +109,7 @@ class ImageFilterService: @unchecked Sendable {
     }
 
     private func applyStandardPreset(_ filterName: String, to image: CIImage) -> CIImage {
-        guard let filter = CIFilter(name: filterName) else { return image }
+        guard let filter = cachedFilter(named: filterName) else { return image }
         filter.setValue(image, forKey: kCIInputImageKey)
         return filter.outputImage ?? image
     }
@@ -85,7 +121,6 @@ class ImageFilterService: @unchecked Sendable {
         case "east_retro":
             return applyRetroLook(to: image, preset: preset)
         default:
-            // Generic custom presets — just apply their parameters
             return image
         }
     }
@@ -93,12 +128,10 @@ class ImageFilterService: @unchecked Sendable {
     private func applyCinematicGrade(to image: CIImage, preset: FilterPreset) -> CIImage {
         var result = image
 
-        // Increase contrast
         let contrastValue = preset.parameters.first(where: { $0.key == "contrast" })?.value ?? 1.2
         result = applyColorControls(to: result, brightness: 0, contrast: contrastValue, saturation: 1.0)
 
-        // Teal shadows + orange highlights via temperature shift
-        let tempFilter = CIFilter(name: "CITemperatureAndTint")!
+        guard let tempFilter = cachedFilter(named: "CITemperatureAndTint") else { return result }
         tempFilter.setValue(result, forKey: kCIInputImageKey)
         tempFilter.setValue(CIVector(x: 5500, y: 0), forKey: "inputNeutral")
         tempFilter.setValue(CIVector(x: 7000, y: -20), forKey: "inputTargetNeutral")
@@ -110,19 +143,14 @@ class ImageFilterService: @unchecked Sendable {
     private func applyRetroLook(to image: CIImage, preset: FilterPreset) -> CIImage {
         var result = image
 
-        // Desaturate
         let satValue = preset.parameters.first(where: { $0.key == "saturation" })?.value ?? 0.6
         result = applyColorControls(to: result, brightness: 0.03, contrast: 1.0, saturation: satValue)
 
-        // Warm temperature
-        let tempFilter = CIFilter(name: "CITemperatureAndTint")!
-        tempFilter.setValue(result, forKey: kCIInputImageKey)
-        tempFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
-        tempFilter.setValue(CIVector(x: 7500, y: 0), forKey: "inputTargetNeutral")
-        result = tempFilter.outputImage ?? result
+        temperatureFilter.setValue(result, forKey: kCIInputImageKey)
+        temperatureFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
+        temperatureFilter.setValue(CIVector(x: 7500, y: 0), forKey: "inputTargetNeutral")
+        result = temperatureFilter.outputImage ?? result
 
-        // Add slight vignette
-        let vignetteFilter = CIFilter(name: "CIVignette")!
         vignetteFilter.setValue(result, forKey: kCIInputImageKey)
         vignetteFilter.setValue(1.0, forKey: kCIInputIntensityKey)
         vignetteFilter.setValue(1.5, forKey: kCIInputRadiusKey)
@@ -134,11 +162,10 @@ class ImageFilterService: @unchecked Sendable {
     private func applyParameter(_ param: FilterParameter, to image: CIImage) -> CIImage {
         switch param.key {
         case "temperature":
-            let filter = CIFilter(name: "CITemperatureAndTint")!
-            filter.setValue(image, forKey: kCIInputImageKey)
-            filter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
-            filter.setValue(CIVector(x: param.value, y: 0), forKey: "inputTargetNeutral")
-            return filter.outputImage ?? image
+            temperatureFilter.setValue(image, forKey: kCIInputImageKey)
+            temperatureFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
+            temperatureFilter.setValue(CIVector(x: param.value, y: 0), forKey: "inputTargetNeutral")
+            return temperatureFilter.outputImage ?? image
         case "contrast":
             return applyColorControls(to: image, brightness: 0, contrast: param.value, saturation: 1.0)
         case "brightness":
@@ -146,16 +173,14 @@ class ImageFilterService: @unchecked Sendable {
         case "saturation":
             return applyColorControls(to: image, brightness: 0, contrast: 1.0, saturation: param.value)
         case "vibrance":
-            let filter = CIFilter(name: "CIVibrance")!
-            filter.setValue(image, forKey: kCIInputImageKey)
-            filter.setValue(param.value, forKey: "inputAmount")
-            return filter.outputImage ?? image
+            vibranceFilter.setValue(image, forKey: kCIInputImageKey)
+            vibranceFilter.setValue(param.value, forKey: "inputAmount")
+            return vibranceFilter.outputImage ?? image
         case "vignette":
-            let filter = CIFilter(name: "CIVignette")!
-            filter.setValue(image, forKey: kCIInputImageKey)
-            filter.setValue(param.value, forKey: kCIInputIntensityKey)
-            filter.setValue(1.5, forKey: kCIInputRadiusKey)
-            return filter.outputImage ?? image
+            vignetteFilter.setValue(image, forKey: kCIInputImageKey)
+            vignetteFilter.setValue(param.value, forKey: kCIInputIntensityKey)
+            vignetteFilter.setValue(1.5, forKey: kCIInputRadiusKey)
+            return vignetteFilter.outputImage ?? image
         default:
             return image
         }
@@ -166,7 +191,6 @@ class ImageFilterService: @unchecked Sendable {
     func applyAdjustments(_ state: EditState, to image: CIImage) -> CIImage {
         var result = image
 
-        // Color controls (brightness, contrast, saturation)
         if state.brightness != 0 || state.contrast != 1.0 || state.saturation != 1.0 {
             result = applyColorControls(
                 to: result,
@@ -176,37 +200,29 @@ class ImageFilterService: @unchecked Sendable {
             )
         }
 
-        // Exposure
         if state.exposure != 0 {
-            let filter = CIFilter(name: "CIExposureAdjust")!
-            filter.setValue(result, forKey: kCIInputImageKey)
-            filter.setValue(state.exposure, forKey: kCIInputEVKey)
-            result = filter.outputImage ?? result
+            exposureFilter.setValue(result, forKey: kCIInputImageKey)
+            exposureFilter.setValue(state.exposure, forKey: kCIInputEVKey)
+            result = exposureFilter.outputImage ?? result
         }
 
-        // Temperature & Tint
         if state.temperature != 6500 || state.tint != 0 {
-            let filter = CIFilter(name: "CITemperatureAndTint")!
-            filter.setValue(result, forKey: kCIInputImageKey)
-            filter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
-            filter.setValue(CIVector(x: state.temperature, y: state.tint), forKey: "inputTargetNeutral")
-            result = filter.outputImage ?? result
+            temperatureFilter.setValue(result, forKey: kCIInputImageKey)
+            temperatureFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
+            temperatureFilter.setValue(CIVector(x: state.temperature, y: state.tint), forKey: "inputTargetNeutral")
+            result = temperatureFilter.outputImage ?? result
         }
 
-        // Vibrance
         if state.vibrance != 0 {
-            let filter = CIFilter(name: "CIVibrance")!
-            filter.setValue(result, forKey: kCIInputImageKey)
-            filter.setValue(state.vibrance, forKey: "inputAmount")
-            result = filter.outputImage ?? result
+            vibranceFilter.setValue(result, forKey: kCIInputImageKey)
+            vibranceFilter.setValue(state.vibrance, forKey: "inputAmount")
+            result = vibranceFilter.outputImage ?? result
         }
 
-        // Sharpness
         if state.sharpness > 0 {
-            let filter = CIFilter(name: "CISharpenLuminance")!
-            filter.setValue(result, forKey: kCIInputImageKey)
-            filter.setValue(state.sharpness, forKey: kCIInputSharpnessKey)
-            result = filter.outputImage ?? result
+            sharpenFilter.setValue(result, forKey: kCIInputImageKey)
+            sharpenFilter.setValue(state.sharpness, forKey: kCIInputSharpnessKey)
+            result = sharpenFilter.outputImage ?? result
         }
 
         return result
@@ -216,32 +232,31 @@ class ImageFilterService: @unchecked Sendable {
 
     func applyEffects(_ state: EditState, to image: CIImage) -> CIImage {
         var result = image
+        let sourceExtent = image.extent
 
-        // Vignette
         if state.vignetteIntensity > 0 {
-            let filter = CIFilter(name: "CIVignette")!
-            filter.setValue(result, forKey: kCIInputImageKey)
-            filter.setValue(state.vignetteIntensity, forKey: kCIInputIntensityKey)
-            filter.setValue(state.vignetteRadius, forKey: kCIInputRadiusKey)
-            result = filter.outputImage ?? result
+            vignetteFilter.setValue(result, forKey: kCIInputImageKey)
+            vignetteFilter.setValue(state.vignetteIntensity, forKey: kCIInputIntensityKey)
+            vignetteFilter.setValue(state.vignetteRadius, forKey: kCIInputRadiusKey)
+            result = vignetteFilter.outputImage ?? result
         }
 
-        // Bloom
         if state.bloomIntensity > 0 {
-            let filter = CIFilter(name: "CIBloom")!
-            filter.setValue(result, forKey: kCIInputImageKey)
-            filter.setValue(state.bloomIntensity, forKey: kCIInputIntensityKey)
-            filter.setValue(state.bloomRadius, forKey: kCIInputRadiusKey)
-            result = filter.outputImage ?? result
+            bloomFilter.setValue(result, forKey: kCIInputImageKey)
+            bloomFilter.setValue(state.bloomIntensity, forKey: kCIInputIntensityKey)
+            bloomFilter.setValue(state.bloomRadius, forKey: kCIInputRadiusKey)
+            result = bloomFilter.outputImage?.cropped(to: sourceExtent) ?? result
         }
 
-        // Solarize
         if state.solarizeThreshold > 0 {
-            let colorControls = CIFilter(name: "CIColorControls")!
-            colorControls.setValue(result, forKey: kCIInputImageKey)
-            colorControls.setValue(1.0 + state.solarizeThreshold, forKey: kCIInputContrastKey)
-            if let contrastImage = colorControls.outputImage {
-                let invertFilter = CIFilter(name: "CIColorInvert")!
+            // Solarize needs its own filter instance since colorControlsFilter might be reused
+            let solarizeControls = CIFilter(name: "CIColorControls")!
+            solarizeControls.setValue(result, forKey: kCIInputImageKey)
+            solarizeControls.setValue(1.0 + state.solarizeThreshold, forKey: kCIInputContrastKey)
+            solarizeControls.setValue(0.0, forKey: kCIInputBrightnessKey)
+            solarizeControls.setValue(1.0, forKey: kCIInputSaturationKey)
+            if let contrastImage = solarizeControls.outputImage {
+                guard let invertFilter = cachedFilter(named: "CIColorInvert") else { return result }
                 invertFilter.setValue(contrastImage, forKey: kCIInputImageKey)
                 if let inverted = invertFilter.outputImage {
                     result = blendImages(original: result, filtered: inverted, intensity: state.solarizeThreshold)
@@ -249,95 +264,89 @@ class ImageFilterService: @unchecked Sendable {
             }
         }
 
-        // Light Leak (simple CIFilter-based version for Phase 1)
         if state.lightLeakIntensity > 0 {
             result = applyLightLeak(to: result, intensity: state.lightLeakIntensity)
         }
 
-        // Glitch (RGB channel offset)
         if state.glitchIntensity > 0 {
             result = applyGlitch(to: result, intensity: state.glitchIntensity)
         }
 
-        // Fisheye (barrel distortion)
         if state.fisheyeIntensity > 0 {
             result = applyFisheye(to: result, intensity: state.fisheyeIntensity)
         }
 
-        // Threshold (high-contrast binary)
         if state.thresholdLevel > 0 {
             result = applyThreshold(to: result, level: state.thresholdLevel)
         }
 
-        // Grain (simple noise-based for Phase 1, Metal shader in Phase 2)
         if state.grainIntensity > 0 {
             result = applySimpleGrain(to: result, intensity: state.grainIntensity, size: state.grainSize)
+        }
+
+        // Ensure finite extent
+        if result.extent.isInfinite {
+            result = result.cropped(to: sourceExtent)
         }
 
         return result
     }
 
-    // MARK: - Glitch (RGB Channel Offset)
+    // MARK: - Glitch
 
     private func applyGlitch(to image: CIImage, intensity: Double) -> CIImage {
         let extent = image.extent
-        let offsetAmount = intensity * 20.0 // Max 20px offset
+        let offsetAmount = intensity * 20.0
 
-        // Separate RGB channels using color matrices
-        // Red channel - shift right
-        let redMatrix = CIFilter(name: "CIColorMatrix")!
-        redMatrix.setValue(image, forKey: kCIInputImageKey)
-        redMatrix.setValue(CIVector(x: 1, y: 0, z: 0, w: 0), forKey: "inputRVector")
-        redMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputGVector")
-        redMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputBVector")
-        redMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
-        let redChannel = redMatrix.outputImage?
+        let redF = CIFilter(name: "CIColorMatrix")!
+        redF.setValue(image, forKey: kCIInputImageKey)
+        redF.setValue(CIVector(x: 1, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        redF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputGVector")
+        redF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputBVector")
+        redF.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        let redChannel = redF.outputImage?
             .transformed(by: CGAffineTransform(translationX: offsetAmount, y: 0))
             .cropped(to: extent) ?? image
 
-        // Green channel - no shift
-        let greenMatrix = CIFilter(name: "CIColorMatrix")!
-        greenMatrix.setValue(image, forKey: kCIInputImageKey)
-        greenMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputRVector")
-        greenMatrix.setValue(CIVector(x: 0, y: 1, z: 0, w: 0), forKey: "inputGVector")
-        greenMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputBVector")
-        greenMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
-        let greenChannel = greenMatrix.outputImage?.cropped(to: extent) ?? image
+        let greenF = CIFilter(name: "CIColorMatrix")!
+        greenF.setValue(image, forKey: kCIInputImageKey)
+        greenF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        greenF.setValue(CIVector(x: 0, y: 1, z: 0, w: 0), forKey: "inputGVector")
+        greenF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputBVector")
+        greenF.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        let greenChannel = greenF.outputImage?.cropped(to: extent) ?? image
 
-        // Blue channel - shift left
-        let blueMatrix = CIFilter(name: "CIColorMatrix")!
-        blueMatrix.setValue(image, forKey: kCIInputImageKey)
-        blueMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputRVector")
-        blueMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputGVector")
-        blueMatrix.setValue(CIVector(x: 0, y: 0, z: 1, w: 0), forKey: "inputBVector")
-        blueMatrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
-        let blueChannel = blueMatrix.outputImage?
+        let blueF = CIFilter(name: "CIColorMatrix")!
+        blueF.setValue(image, forKey: kCIInputImageKey)
+        blueF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        blueF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputGVector")
+        blueF.setValue(CIVector(x: 0, y: 0, z: 1, w: 0), forKey: "inputBVector")
+        blueF.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        let blueChannel = blueF.outputImage?
             .transformed(by: CGAffineTransform(translationX: -offsetAmount, y: offsetAmount * 0.3))
             .cropped(to: extent) ?? image
 
-        // Recombine: additive compositing of the 3 channels
-        let addRG = CIFilter(name: "CIAdditionCompositing")!
-        addRG.setValue(redChannel, forKey: kCIInputImageKey)
-        addRG.setValue(greenChannel, forKey: kCIInputBackgroundImageKey)
-        let rg = addRG.outputImage ?? image
+        let addRGFilter = CIFilter(name: "CIAdditionCompositing")!
+        addRGFilter.setValue(redChannel, forKey: kCIInputImageKey)
+        addRGFilter.setValue(greenChannel, forKey: kCIInputBackgroundImageKey)
+        let rg = addRGFilter.outputImage ?? image
 
-        let addRGB = CIFilter(name: "CIAdditionCompositing")!
-        addRGB.setValue(blueChannel, forKey: kCIInputImageKey)
-        addRGB.setValue(rg, forKey: kCIInputBackgroundImageKey)
-        let glitched = addRGB.outputImage?.cropped(to: extent) ?? image
+        let addRGBFilter = CIFilter(name: "CIAdditionCompositing")!
+        addRGBFilter.setValue(blueChannel, forKey: kCIInputImageKey)
+        addRGBFilter.setValue(rg, forKey: kCIInputBackgroundImageKey)
+        let glitched = addRGBFilter.outputImage?.cropped(to: extent) ?? image
 
-        // Blend with original based on intensity
         return blendImages(original: image, filtered: glitched, intensity: intensity)
     }
 
-    // MARK: - Fisheye (Barrel Distortion)
+    // MARK: - Fisheye
 
     private func applyFisheye(to image: CIImage, intensity: Double) -> CIImage {
         let extent = image.extent
         let center = CIVector(x: extent.midX, y: extent.midY)
-        let scale = intensity * 0.6 // Scale factor for distortion
+        let scale = intensity * 0.6
 
-        let filter = CIFilter(name: "CIBumpDistortion")!
+        guard let filter = cachedFilter(named: "CIBumpDistortion") else { return image }
         filter.setValue(image, forKey: kCIInputImageKey)
         filter.setValue(center, forKey: kCIInputCenterKey)
         filter.setValue(min(extent.width, extent.height) * 0.45, forKey: kCIInputRadiusKey)
@@ -345,32 +354,32 @@ class ImageFilterService: @unchecked Sendable {
         return filter.outputImage?.cropped(to: extent) ?? image
     }
 
-    // MARK: - Threshold (High-Contrast Binary)
+    // MARK: - Threshold
 
     private func applyThreshold(to image: CIImage, level: Double) -> CIImage {
-        // Convert to grayscale
         let grayFilter = CIFilter(name: "CIColorControls")!
         grayFilter.setValue(image, forKey: kCIInputImageKey)
         grayFilter.setValue(0.0, forKey: kCIInputSaturationKey)
         guard let gray = grayFilter.outputImage else { return image }
 
-        // Apply extreme contrast to create threshold effect
         let contrastFilter = CIFilter(name: "CIColorControls")!
         contrastFilter.setValue(gray, forKey: kCIInputImageKey)
         contrastFilter.setValue(4.0 + level * 20.0, forKey: kCIInputContrastKey)
         contrastFilter.setValue(level * -0.3, forKey: kCIInputBrightnessKey)
         let thresholded = contrastFilter.outputImage ?? image
 
-        // Blend with original
         return blendImages(original: image, filtered: thresholded, intensity: level)
     }
 
-    // MARK: - Light Leak (CIFilter-based)
+    // MARK: - Light Leak
 
     private func applyLightLeak(to image: CIImage, intensity: Double) -> CIImage {
         let extent = image.extent
 
+        // Use fresh filter instances to avoid conflict with cached ones
         let gradient = CIFilter(name: "CIRadialGradient")!
+        let blend = CIFilter(name: "CIScreenBlendMode")!
+
         gradient.setValue(CIVector(x: extent.width * 0.8, y: extent.height * 0.7), forKey: "inputCenter")
         gradient.setValue(extent.width * 0.2, forKey: "inputRadius0")
         gradient.setValue(extent.width * 0.6, forKey: "inputRadius1")
@@ -379,77 +388,78 @@ class ImageFilterService: @unchecked Sendable {
 
         guard let gradientImage = gradient.outputImage?.cropped(to: extent) else { return image }
 
-        let blend = CIFilter(name: "CIScreenBlendMode")!
         blend.setValue(image, forKey: kCIInputImageKey)
         blend.setValue(gradientImage, forKey: kCIInputBackgroundImageKey)
         return blend.outputImage ?? image
     }
 
-    // MARK: - Simple Grain (CIFilter-based fallback)
+    // MARK: - Grain
 
     private func applySimpleGrain(to image: CIImage, intensity: Double, size: Double) -> CIImage {
         let extent = image.extent
 
-        let noiseFilter = CIFilter(name: "CIRandomGenerator")!
-        guard let noise = noiseFilter.outputImage?.cropped(to: extent) else { return image }
+        // Use fresh noise filter to avoid concurrent access issues
+        let noise = CIFilter(name: "CIRandomGenerator")!
+        guard let noiseImage = noise.outputImage?.cropped(to: extent) else { return image }
 
-        // Convert to grayscale noise
-        let grayFilter = CIFilter(name: "CIColorMatrix")!
-        grayFilter.setValue(noise, forKey: kCIInputImageKey)
         let scale = Float(intensity * 0.3)
-        grayFilter.setValue(CIVector(x: CGFloat(scale), y: 0, z: 0, w: 0), forKey: "inputRVector")
-        grayFilter.setValue(CIVector(x: 0, y: CGFloat(scale), z: 0, w: 0), forKey: "inputGVector")
-        grayFilter.setValue(CIVector(x: 0, y: 0, z: CGFloat(scale), w: 0), forKey: "inputBVector")
-        grayFilter.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
-        grayFilter.setValue(CIVector(x: CGFloat(-scale / 2), y: CGFloat(-scale / 2), z: CGFloat(-scale / 2), w: 0), forKey: "inputBiasVector")
+        let matrix = CIFilter(name: "CIColorMatrix")!
+        matrix.setValue(noiseImage, forKey: kCIInputImageKey)
+        matrix.setValue(CIVector(x: CGFloat(scale), y: 0, z: 0, w: 0), forKey: "inputRVector")
+        matrix.setValue(CIVector(x: 0, y: CGFloat(scale), z: 0, w: 0), forKey: "inputGVector")
+        matrix.setValue(CIVector(x: 0, y: 0, z: CGFloat(scale), w: 0), forKey: "inputBVector")
+        matrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        matrix.setValue(CIVector(x: CGFloat(-scale / 2), y: CGFloat(-scale / 2), z: CGFloat(-scale / 2), w: 0), forKey: "inputBiasVector")
 
-        guard let grayNoise = grayFilter.outputImage else { return image }
+        guard let grayNoise = matrix.outputImage else { return image }
 
-        // Scale noise: base scale from resolution + user grain size adjustment
         let maxDim = max(extent.width, extent.height)
-        let resolutionScale = maxDim / 2000.0  // Reference resolution
+        let resolutionScale = maxDim / 2000.0
         let userScale = 0.5 + size
         let totalScale = max(resolutionScale * userScale, 0.1)
         let transform = CGAffineTransform(scaleX: totalScale, y: totalScale)
         let scaledNoise = grayNoise.transformed(by: transform).cropped(to: extent)
 
-        // Blend noise with image using additive blend
-        let blend = CIFilter(name: "CIAdditionCompositing")!
-        blend.setValue(scaledNoise, forKey: kCIInputImageKey)
-        blend.setValue(image, forKey: kCIInputBackgroundImageKey)
-        return blend.outputImage ?? image
+        let add = CIFilter(name: "CIAdditionCompositing")!
+        add.setValue(scaledNoise, forKey: kCIInputImageKey)
+        add.setValue(image, forKey: kCIInputBackgroundImageKey)
+        return add.outputImage ?? image
     }
 
     // MARK: - Helpers
 
     private func applyColorControls(to image: CIImage, brightness: Double, contrast: Double, saturation: Double) -> CIImage {
-        let filter = CIFilter(name: "CIColorControls")!
-        filter.setValue(image, forKey: kCIInputImageKey)
-        filter.setValue(brightness, forKey: kCIInputBrightnessKey)
-        filter.setValue(contrast, forKey: kCIInputContrastKey)
-        filter.setValue(saturation, forKey: kCIInputSaturationKey)
-        return filter.outputImage ?? image
+        colorControlsFilter.setValue(image, forKey: kCIInputImageKey)
+        colorControlsFilter.setValue(brightness, forKey: kCIInputBrightnessKey)
+        colorControlsFilter.setValue(contrast, forKey: kCIInputContrastKey)
+        colorControlsFilter.setValue(saturation, forKey: kCIInputSaturationKey)
+        return colorControlsFilter.outputImage ?? image
     }
 
     private func blendImages(original: CIImage, filtered: CIImage, intensity: Double) -> CIImage {
-        let blend = CIFilter(name: "CIDissolveTransition")!
-        blend.setValue(original, forKey: kCIInputImageKey)
-        blend.setValue(filtered, forKey: kCIInputTargetImageKey)
-        blend.setValue(intensity, forKey: kCIInputTimeKey)
-        return blend.outputImage ?? filtered
+        dissolveFilter.setValue(original, forKey: kCIInputImageKey)
+        dissolveFilter.setValue(filtered, forKey: kCIInputTargetImageKey)
+        dissolveFilter.setValue(intensity, forKey: kCIInputTimeKey)
+        return dissolveFilter.outputImage ?? filtered
     }
 
     // MARK: - Rendering
 
     func renderToUIImage(_ ciImage: CIImage) -> UIImage? {
+        let extent = ciImage.extent
+        guard !extent.isInfinite, extent.width > 0, extent.height > 0 else { return nil }
         return ciImage.toUIImage(context: context)
     }
 
+    func renderToCGImage(_ ciImage: CIImage) -> CGImage? {
+        let extent = ciImage.extent
+        guard !extent.isInfinite, extent.width > 0, extent.height > 0 else { return nil }
+        return context.createCGImage(ciImage, from: extent)
+    }
+
     func generateThumbnail(from image: CIImage, preset: FilterPreset, size: CGSize) -> UIImage? {
-        // Scale down for thumbnail
         let scale = min(size.width / image.extent.width, size.height / image.extent.height)
         let scaled = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-
         let filtered = applyPreset(preset, to: scaled, intensity: 1.0)
         return renderToUIImage(filtered)
     }

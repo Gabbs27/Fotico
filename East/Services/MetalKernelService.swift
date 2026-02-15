@@ -1,10 +1,12 @@
 import Metal
 import CoreImage
 
+/// Metal compute shader service for custom GPU effects.
+/// Uses shared RenderEngine device and command queue.
 @MainActor
 class MetalKernelService {
-    private let device: MTLDevice?
-    private let commandQueue: MTLCommandQueue?
+    private let device: MTLDevice
+    private let commandQueue: MTLCommandQueue
     private let library: MTLLibrary?
 
     private var grainPipeline: MTLComputePipelineState?
@@ -13,16 +15,20 @@ class MetalKernelService {
     private var bloomBlurPipeline: MTLComputePipelineState?
     private var bloomCompositePipeline: MTLComputePipelineState?
 
+    // Texture pool for reuse (avoids per-frame allocation)
+    private var texturePool: [String: MTLTexture] = [:]
+
     init() {
-        self.device = MTLCreateSystemDefaultDevice()
-        self.commandQueue = device?.makeCommandQueue()
-        self.library = device?.makeDefaultLibrary()
+        let engine = RenderEngine.shared
+        self.device = engine.device
+        self.commandQueue = engine.commandQueue
+        self.library = device.makeDefaultLibrary()
 
         setupPipelines()
     }
 
     private func setupPipelines() {
-        guard let library = library, let device = device else { return }
+        guard let library = library else { return }
 
         if let fn = library.makeFunction(name: "grainKernel") {
             grainPipeline = try? device.makeComputePipelineState(function: fn)
@@ -44,15 +50,13 @@ class MetalKernelService {
     // MARK: - Grain Effect
 
     func applyGrain(to ciImage: CIImage, intensity: Float, grainSize: Float, context: CIContext) -> CIImage {
-        guard let device = device,
-              let commandQueue = commandQueue,
-              let pipeline = grainPipeline else { return ciImage }
+        guard let pipeline = grainPipeline else { return ciImage }
 
         let width = Int(ciImage.extent.width)
         let height = Int(ciImage.extent.height)
 
-        guard let inTexture = makeTexture(from: ciImage, context: context, device: device),
-              let outTexture = makeEmptyTexture(width: width, height: height, device: device) else {
+        guard let inTexture = makeTexture(from: ciImage, context: context),
+              let outTexture = getPooledTexture(width: width, height: height, key: "grainOut") else {
             return ciImage
         }
 
@@ -64,7 +68,7 @@ class MetalKernelService {
         encoder.setTexture(outTexture, index: 1)
 
         var intensityVal = intensity
-        var grainSizeVal = max(grainSize * 40.0, 1.0) // Scale to pixel size
+        var grainSizeVal = max(grainSize * 40.0, 1.0)
         var seed = Float.random(in: 0...100)
         encoder.setBytes(&intensityVal, length: MemoryLayout<Float>.size, index: 0)
         encoder.setBytes(&grainSizeVal, length: MemoryLayout<Float>.size, index: 1)
@@ -72,6 +76,8 @@ class MetalKernelService {
 
         dispatchThreads(encoder: encoder, pipeline: pipeline, width: width, height: height)
         encoder.endEncoding()
+
+        // Use completion handler instead of synchronous wait
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
 
@@ -80,7 +86,19 @@ class MetalKernelService {
 
     // MARK: - Texture Helpers
 
-    private func makeTexture(from ciImage: CIImage, context: CIContext, device: MTLDevice) -> MTLTexture? {
+    /// Get or create a pooled texture — avoids per-frame allocation
+    private func getPooledTexture(width: Int, height: Int, key: String) -> MTLTexture? {
+        let poolKey = "\(key)_\(width)x\(height)"
+        if let existing = texturePool[poolKey],
+           existing.width == width, existing.height == height {
+            return existing
+        }
+        guard let texture = makeEmptyTexture(width: width, height: height) else { return nil }
+        texturePool[poolKey] = texture
+        return texture
+    }
+
+    private func makeTexture(from ciImage: CIImage, context: CIContext) -> MTLTexture? {
         let width = Int(ciImage.extent.width)
         let height = Int(ciImage.extent.height)
 
@@ -105,7 +123,7 @@ class MetalKernelService {
         return texture
     }
 
-    private func makeEmptyTexture(width: Int, height: Int, device: MTLDevice) -> MTLTexture? {
+    private func makeEmptyTexture(width: Int, height: Int) -> MTLTexture? {
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .rgba8Unorm,
             width: width,

@@ -48,6 +48,8 @@
 		F55FF2C77EA92AFD33724ED8 /* ImageFilterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE77CC2D7DA2B378FDE452C /* ImageFilterService.swift */; };
 		F56657F9BE138D29001162C4 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320E8FDD1018D987BF801EE1 /* HapticManager.swift */; };
 		F81E6E2B73CE539799F9DF1E /* EastSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F79FC8428D49431094CB449 /* EastSlider.swift */; };
+		DD4455667788990011223344 /* MetalImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2233445566778899001122 /* MetalImageView.swift */; };
+		CC3344556677889900112233 /* RenderEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1122334455667788990011 /* RenderEngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -93,6 +95,8 @@
 		FD292F79353780067432BDC3 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		FD4823F556016CE6E9E27B14 /* GalleryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryViewModel.swift; sourceTree = "<group>"; };
 		FDE77CC2D7DA2B378FDE452C /* ImageFilterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterService.swift; sourceTree = "<group>"; };
+		BB2233445566778899001122 /* MetalImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalImageView.swift; sourceTree = "<group>"; };
+		AA1122334455667788990011 /* RenderEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderEngine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +172,7 @@
 				BC9F515D40A563F788348AD1 /* PhotoLibraryService.swift */,
 				95C03C518431A83912F0FE27 /* ProjectStorageService.swift */,
 				8390987642994CDC66477B0D /* CameraService.swift */,
+				AA1122334455667788990011 /* RenderEngine.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -257,6 +262,7 @@
 			children = (
 				4F79FC8428D49431094CB449 /* EastSlider.swift */,
 				FD292F79353780067432BDC3 /* EmptyStateView.swift */,
+				BB2233445566778899001122 /* MetalImageView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -369,6 +375,8 @@
 				F537B69E8A7220763FB3EBFF /* CameraView.swift in Sources */,
 				987C3D52488B5A6C68C936C5 /* CaptureButtonView.swift in Sources */,
 				A1B2C3D4E5F60718192A3B4C /* CameraPresetStripView.swift in Sources */,
+				CC3344556677889900112233 /* RenderEngine.swift in Sources */,
+				DD4455667788990011223344 /* MetalImageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

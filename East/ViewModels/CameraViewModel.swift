@@ -1,5 +1,5 @@
 import SwiftUI
-import CoreImage
+@preconcurrency import CoreImage
 import CoreImage.CIFilterBuiltins
 import Combine
 
@@ -24,7 +24,7 @@ enum CameraMode: String, CaseIterable, Sendable {
 
 @MainActor
 class CameraViewModel: ObservableObject {
-    @Published var processedPreviewImage: UIImage?
+    @Published var processedPreviewCIImage: CIImage?   // CIImage for MetalImageView (no CGImage!)
     @Published var capturedImage: UIImage?
     @Published var selectedPreset: FilterPreset? = FilterPreset.allPresets.first
     @Published var showEditor = false
@@ -38,15 +38,13 @@ class CameraViewModel: ObservableObject {
     private let ciContext: CIContext
     private let processingQueue = DispatchQueue(label: "com.east.processing", qos: .userInitiated)
     private var previewCancellable: AnyCancellable?
-    private var frameSkipCounter = 0
-    private var isProcessingPreview = false
+
+    // Semaphore-based frame dropping: if GPU is busy, drop the frame.
+    // Value of 1 = at most one preview frame being processed at a time.
+    private let frameSemaphore = DispatchSemaphore(value: 1)
 
     init() {
-        if let device = MTLCreateSystemDefaultDevice() {
-            self.ciContext = CIContext(mtlDevice: device)
-        } else {
-            self.ciContext = CIContext()
-        }
+        self.ciContext = RenderEngine.shared.cameraContext
     }
 
     // MARK: - Lifecycle
@@ -61,8 +59,6 @@ class CameraViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] ciImage in
                 guard let self, let ciImage else { return }
-                self.frameSkipCounter += 1
-                guard self.frameSkipCounter % 3 == 0, !self.isProcessingPreview else { return }
                 self.processPreviewFrame(ciImage)
             }
     }
@@ -72,16 +68,27 @@ class CameraViewModel: ObservableObject {
         cameraService.stopSession()
     }
 
-    // MARK: - Live Preview Processing (off main thread)
+    // MARK: - Live Preview Processing (semaphore-gated)
+    //
+    // Uses semaphore instead of frame skip counter:
+    // - If processing slot is free → process this frame
+    // - If still processing previous frame → drop this frame
+    // This adapts to GPU speed: fast GPU = no drops, slow GPU = drops excess frames.
 
     private func processPreviewFrame(_ ciImage: CIImage) {
-        isProcessingPreview = true
+        // Non-blocking check: if already processing, drop this frame
+        guard frameSemaphore.wait(timeout: .now()) == .success else { return }
+
         let mode = cameraMode
         let preset = selectedPreset
         let grain = grainOnPreview
-        let ctx = ciContext
 
         processingQueue.async { [weak self] in
+            guard let self else {
+                self?.frameSemaphore.signal()
+                return
+            }
+
             var result = ciImage
 
             // Downscale preview for faster processing
@@ -101,14 +108,13 @@ class CameraViewModel: ObservableObject {
                 }
             }
 
-            guard let cgImage = ctx.createCGImage(result, from: result.extent) else {
-                DispatchQueue.main.async { [weak self] in self?.isProcessingPreview = false }
-                return
-            }
-            let uiImage = UIImage(cgImage: cgImage)
+            // Pass CIImage directly — MetalImageView will render it on GPU
+            // No createCGImage needed!
+            let finalImage = result
+
             DispatchQueue.main.async { [weak self] in
-                self?.processedPreviewImage = uiImage
-                self?.isProcessingPreview = false
+                self?.processedPreviewCIImage = finalImage
+                self?.frameSemaphore.signal()
             }
         }
     }
@@ -184,7 +190,15 @@ class CameraViewModel: ObservableObject {
 
 /// Extracted filter processing to a separate enum to avoid @MainActor inheritance.
 /// All methods are safe to call from any thread.
+/// Uses cached filter instances where possible to avoid per-frame allocation.
 enum CameraFilters {
+    // Cached filter instances for live preview (reused every frame)
+    private static let tempTintFilter = CIFilter(name: "CITemperatureAndTint")!
+    private static let colorControlsFilter = CIFilter(name: "CIColorControls")!
+    private static let noiseFilter = CIFilter(name: "CIRandomGenerator")!
+    private static let colorMatrixFilter = CIFilter(name: "CIColorMatrix")!
+    private static let addCompFilter = CIFilter(name: "CIAdditionCompositing")!
+
     static func applyLivePreset(_ preset: FilterPreset, to image: CIImage) -> CIImage {
         if let filterName = preset.ciFilterName {
             guard let filter = CIFilter(name: filterName) else { return image }
@@ -193,17 +207,15 @@ enum CameraFilters {
         }
         switch preset.id {
         case "east_cine":
-            let temp = CIFilter(name: "CITemperatureAndTint")!
-            temp.setValue(image, forKey: kCIInputImageKey)
-            temp.setValue(CIVector(x: 5500, y: 0), forKey: "inputNeutral")
-            temp.setValue(CIVector(x: 7000, y: -20), forKey: "inputTargetNeutral")
-            return temp.outputImage ?? image
+            tempTintFilter.setValue(image, forKey: kCIInputImageKey)
+            tempTintFilter.setValue(CIVector(x: 5500, y: 0), forKey: "inputNeutral")
+            tempTintFilter.setValue(CIVector(x: 7000, y: -20), forKey: "inputTargetNeutral")
+            return tempTintFilter.outputImage ?? image
         case "east_retro":
-            let color = CIFilter(name: "CIColorControls")!
-            color.setValue(image, forKey: kCIInputImageKey)
-            color.setValue(0.6, forKey: kCIInputSaturationKey)
-            color.setValue(0.03, forKey: kCIInputBrightnessKey)
-            return color.outputImage ?? image
+            colorControlsFilter.setValue(image, forKey: kCIInputImageKey)
+            colorControlsFilter.setValue(0.6, forKey: kCIInputSaturationKey)
+            colorControlsFilter.setValue(0.03, forKey: kCIInputBrightnessKey)
+            return colorControlsFilter.outputImage ?? image
         default:
             return image
         }
@@ -277,7 +289,7 @@ enum CameraFilters {
     /// the same whether the image is 900px preview or 4032px full-res.
     static func addFilmGrain(to image: CIImage, intensity: CGFloat) -> CIImage {
         let extent = image.extent
-        let noiseFilter = CIFilter(name: "CIRandomGenerator")!
+        noiseFilter.setValue(nil, forKey: kCIInputImageKey)
         guard let rawNoise = noiseFilter.outputImage else { return image }
 
         // Scale noise to match a reference resolution of ~2000px
@@ -293,18 +305,16 @@ enum CameraFilters {
         }
         scaledNoise = scaledNoise.cropped(to: extent)
 
-        let gray = CIFilter(name: "CIColorMatrix")!
-        gray.setValue(scaledNoise, forKey: kCIInputImageKey)
-        gray.setValue(CIVector(x: intensity, y: 0, z: 0, w: 0), forKey: "inputRVector")
-        gray.setValue(CIVector(x: 0, y: intensity, z: 0, w: 0), forKey: "inputGVector")
-        gray.setValue(CIVector(x: 0, y: 0, z: intensity, w: 0), forKey: "inputBVector")
-        gray.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
-        gray.setValue(CIVector(x: -intensity/2, y: -intensity/2, z: -intensity/2, w: 0), forKey: "inputBiasVector")
-        guard let grayNoise = gray.outputImage else { return image }
+        colorMatrixFilter.setValue(scaledNoise, forKey: kCIInputImageKey)
+        colorMatrixFilter.setValue(CIVector(x: intensity, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        colorMatrixFilter.setValue(CIVector(x: 0, y: intensity, z: 0, w: 0), forKey: "inputGVector")
+        colorMatrixFilter.setValue(CIVector(x: 0, y: 0, z: intensity, w: 0), forKey: "inputBVector")
+        colorMatrixFilter.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        colorMatrixFilter.setValue(CIVector(x: -intensity/2, y: -intensity/2, z: -intensity/2, w: 0), forKey: "inputBiasVector")
+        guard let grayNoise = colorMatrixFilter.outputImage else { return image }
 
-        let blend = CIFilter(name: "CIAdditionCompositing")!
-        blend.setValue(grayNoise, forKey: kCIInputImageKey)
-        blend.setValue(image, forKey: kCIInputBackgroundImageKey)
-        return blend.outputImage ?? image
+        addCompFilter.setValue(grayNoise, forKey: kCIInputImageKey)
+        addCompFilter.setValue(image, forKey: kCIInputBackgroundImageKey)
+        return addCompFilter.outputImage ?? image
     }
 }

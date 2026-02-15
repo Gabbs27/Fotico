@@ -11,11 +11,9 @@ struct CameraView: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            // Live preview
-            if let image = viewModel.processedPreviewImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
+            // Live preview — GPU-rendered via MetalImageView (no CGImage creation)
+            if let ciImage = viewModel.processedPreviewCIImage {
+                MetalImageView(ciImage: ciImage, usesCameraContext: true)
                     .ignoresSafeArea()
             } else if !viewModel.cameraService.permissionGranted {
                 permissionDeniedView

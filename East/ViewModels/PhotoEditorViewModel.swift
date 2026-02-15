@@ -5,7 +5,8 @@ import Combine
 @MainActor
 class PhotoEditorViewModel: ObservableObject {
     @Published var originalImage: UIImage?
-    @Published var editedImage: UIImage?
+    @Published var editedCIImage: CIImage?         // CIImage for MetalImageView (no CGImage creation!)
+    @Published var editedImage: UIImage?            // UIImage fallback for export preview
     @Published var editState = EditState()
     @Published var isProcessing = false
     @Published var presetThumbnails: [String: UIImage] = [:]
@@ -16,12 +17,15 @@ class PhotoEditorViewModel: ObservableObject {
     @Published var exportSuccess = false
 
     private let filterService = ImageFilterService()
-    private let metalService = MetalKernelService()
-    private let libraryService = PhotoLibraryService()
     private var originalCIImage: CIImage?
     private var proxyCIImage: CIImage?       // Downscaled for live editing
-    private var renderTask: Task<Void, Never>?
+
+    // Render coalescing: only the LATEST edit state renders.
+    // While a render is in-flight, new requests queue up and only the last one executes.
+    private var isRendering = false
+    private var pendingRender = false
     private let renderQueue = DispatchQueue(label: "com.east.render", qos: .userInteractive)
+    private let exportQueue = DispatchQueue(label: "com.east.export", qos: .userInitiated)
 
     // Undo/Redo
     private var undoStack: [EditState] = []
@@ -37,9 +41,10 @@ class PhotoEditorViewModel: ObservableObject {
         originalImage = image
         originalCIImage = image.toCIImage()
 
-        // Create proxy (downscaled) for fast live editing
+        // Create materialized proxy — render to CVPixelBuffer so the downscale
+        // is computed once, not re-evaluated on every filter pass.
         if let ciImage = originalCIImage {
-            proxyCIImage = Self.createProxy(from: ciImage)
+            proxyCIImage = Self.createMaterializedProxy(from: ciImage)
         }
 
         editState = EditState()
@@ -48,15 +53,49 @@ class PhotoEditorViewModel: ObservableObject {
         canUndo = false
         canRedo = false
         editedImage = image
+        editedCIImage = originalCIImage
         generatePresetThumbnails()
     }
 
-    nonisolated private static func createProxy(from ciImage: CIImage) -> CIImage {
+    /// Creates a downscaled proxy and materializes it to a CVPixelBuffer.
+    /// Without materialization, the downscale transform is re-evaluated on every render.
+    nonisolated private static func createMaterializedProxy(from ciImage: CIImage) -> CIImage {
         let extent = ciImage.extent
         let maxDim = max(extent.width, extent.height)
         if maxDim <= 1200 { return ciImage }
         let scale = 1200.0 / maxDim
-        return ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+
+        // Use CILanczosScaleTransform for highest quality downscale
+        guard let scaleFilter = CIFilter(name: "CILanczosScaleTransform") else {
+            return ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        }
+        scaleFilter.setValue(ciImage, forKey: kCIInputImageKey)
+        scaleFilter.setValue(scale, forKey: kCIInputScaleKey)
+        scaleFilter.setValue(1.0, forKey: kCIInputAspectRatioKey)
+        guard let scaled = scaleFilter.outputImage else {
+            return ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        }
+
+        // Materialize to CVPixelBuffer — prevents re-computation on every edit
+        let proxySize = scaled.extent.size
+        var pixelBuffer: CVPixelBuffer?
+        let attrs: [String: Any] = [
+            kCVPixelBufferMetalCompatibilityKey as String: true,
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:] as [String: Any],
+        ]
+        CVPixelBufferCreate(
+            kCFAllocatorDefault,
+            Int(proxySize.width), Int(proxySize.height),
+            kCVPixelFormatType_32BGRA,
+            attrs as CFDictionary,
+            &pixelBuffer
+        )
+
+        if let pb = pixelBuffer {
+            RenderEngine.shared.context.render(scaled, to: pb)
+            return CIImage(cvPixelBuffer: pb)
+        }
+        return scaled
     }
 
     // MARK: - Preset Application
@@ -70,25 +109,25 @@ class PhotoEditorViewModel: ObservableObject {
             editState.selectedPresetId = preset.id
             editState.presetIntensity = preset.defaultIntensity
         }
-        applyEditsDebounced()
+        requestRender()
     }
 
     func deselectPreset() {
         pushUndo()
         editState.selectedPresetId = nil
         editState.presetIntensity = 1.0
-        applyEditsDebounced()
+        requestRender()
     }
 
     func updatePresetIntensity(_ intensity: Double) {
         editState.presetIntensity = intensity
-        applyEditsDebounced()
+        requestRender()
     }
 
     // MARK: - Adjustments
 
     func updateAdjustment() {
-        applyEditsDebounced()
+        requestRender()
     }
 
     func commitAdjustment() {
@@ -99,7 +138,7 @@ class PhotoEditorViewModel: ObservableObject {
 
     func updateRotation(_ degrees: Double) {
         editState.rotation = degrees
-        applyEditsDebounced()
+        requestRender()
     }
 
     func commitRotation() {
@@ -119,7 +158,7 @@ class PhotoEditorViewModel: ObservableObject {
         case .fisheye: editState.fisheyeIntensity = intensity
         case .threshold: editState.thresholdLevel = intensity
         }
-        applyEditsDebounced()
+        requestRender()
     }
 
     func effectIntensity(for effect: EffectType) -> Double {
@@ -135,73 +174,93 @@ class PhotoEditorViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Rendering (background thread with proxy)
+    // MARK: - Rendering (Coalescing Throttle)
+    //
+    // Instead of debounce (which adds latency), we use a coalescing pattern:
+    // - At most one render in flight at a time
+    // - If a new request comes while rendering, it's marked as pending
+    // - When the current render finishes, the pending render executes with the LATEST state
+    // This guarantees: (a) max one render in flight, (b) latest state always renders, (c) no delay
 
-    private func applyEditsDebounced() {
-        renderTask?.cancel()
-        renderTask = Task {
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms debounce
-            guard !Task.isCancelled else { return }
-            await applyEditsInBackground()
+    private func requestRender() {
+        if isRendering {
+            pendingRender = true
+            return
         }
+        executeRender()
     }
 
-    private func applyEditsInBackground() async {
+    private func executeRender() {
         guard let proxyImage = proxyCIImage else { return }
+        isRendering = true
         isProcessing = true
 
         let state = editState
         let service = filterService
-        let queue = renderQueue
 
-        let rendered: UIImage? = await withCheckedContinuation { continuation in
-            queue.async {
-                let result = service.applyEdits(
-                    to: proxyImage,
-                    state: state,
-                    presets: FilterPreset.allPresets
-                )
-                let image = service.renderToUIImage(result)
-                continuation.resume(returning: image)
+        // Build lazy CIImage pipeline on background thread
+        renderQueue.async { [weak self] in
+            let result = service.applyEdits(
+                to: proxyImage,
+                state: state,
+                presets: FilterPreset.allPresets
+            )
+
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                // Update CIImage directly — MetalImageView renders it without CGImage conversion
+                self.editedCIImage = result
+                self.isProcessing = false
+                self.isRendering = false
+
+                // If a new request came in during render, execute it now
+                if self.pendingRender {
+                    self.pendingRender = false
+                    self.executeRender()
+                }
             }
         }
-
-        guard !Task.isCancelled else { return }
-        if let rendered {
-            editedImage = rendered
-        }
-        isProcessing = false
     }
 
-    // MARK: - Thumbnails (background)
+    // MARK: - Thumbnails (concurrent generation)
 
     private func generatePresetThumbnails() {
         guard let ciImage = originalCIImage else { return }
-        let service = filterService
-        let queue = renderQueue
+        let allPresets = FilterPreset.allPresets
 
         Task {
-            let thumbnails: [String: UIImage] = await withCheckedContinuation { continuation in
-                queue.async {
-                    var results: [String: UIImage] = [:]
-                    let thumbnailSize = CGSize(width: 80, height: 80)
-                    for preset in FilterPreset.allPresets {
-                        if let thumbnail = service.generateThumbnail(
+            let thumbnails = await withCheckedContinuation { (continuation: CheckedContinuation<[String: UIImage], Never>) in
+                let thumbnailSize = CGSize(width: 80, height: 80)
+                // Use thread-safe wrapper to collect results
+                let collector = ThumbnailCollector()
+                let group = DispatchGroup()
+
+                for preset in allPresets {
+                    group.enter()
+                    DispatchQueue.global(qos: .utility).async {
+                        // Each thread gets its own ImageFilterService instance
+                        // because CIFilter is NOT thread-safe
+                        let threadService = ImageFilterService()
+                        if let thumbnail = threadService.generateThumbnail(
                             from: ciImage,
                             preset: preset,
                             size: thumbnailSize
                         ) {
-                            results[preset.id] = thumbnail
+                            collector.set(preset.id, thumbnail: thumbnail)
                         }
+                        group.leave()
                     }
-                    continuation.resume(returning: results)
+                }
+
+                group.notify(queue: .main) {
+                    continuation.resume(returning: collector.results)
                 }
             }
             self.presetThumbnails = thumbnails
         }
     }
 
-    // MARK: - Export (full resolution on background)
+    // MARK: - Export (full resolution, separate queue)
 
     func exportImage() async {
         guard let fullImage = originalCIImage else { return }
@@ -209,7 +268,7 @@ class PhotoEditorViewModel: ObservableObject {
 
         let state = editState
         let service = filterService
-        let queue = renderQueue
+        let queue = exportQueue
 
         let rendered: UIImage? = await withCheckedContinuation { continuation in
             queue.async {
@@ -230,6 +289,7 @@ class PhotoEditorViewModel: ObservableObject {
         }
 
         do {
+            let libraryService = PhotoLibraryService()
             try await libraryService.saveToPhotoLibrary(exportImage)
             exportSuccess = true
             HapticManager.notification(.success)
@@ -256,7 +316,7 @@ class PhotoEditorViewModel: ObservableObject {
         editState = previousState
         canUndo = !undoStack.isEmpty
         canRedo = true
-        applyEditsDebounced()
+        requestRender()
     }
 
     func redo() {
@@ -265,7 +325,7 @@ class PhotoEditorViewModel: ObservableObject {
         editState = nextState
         canUndo = true
         canRedo = !redoStack.isEmpty
-        applyEditsDebounced()
+        requestRender()
     }
 
     // MARK: - Reset
@@ -273,12 +333,13 @@ class PhotoEditorViewModel: ObservableObject {
     func resetEdits() {
         pushUndo()
         editState.reset()
-        applyEditsDebounced()
+        requestRender()
     }
 
     func clearImage() {
         originalImage = nil
         editedImage = nil
+        editedCIImage = nil
         originalCIImage = nil
         proxyCIImage = nil
         editState = EditState()
@@ -287,6 +348,25 @@ class PhotoEditorViewModel: ObservableObject {
         redoStack = []
         canUndo = false
         canRedo = false
+        RenderEngine.shared.clearCaches()
+    }
+}
+
+/// Thread-safe thumbnail collector for concurrent generation
+private final class ThumbnailCollector: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _results: [String: UIImage] = [:]
+
+    var results: [String: UIImage] {
+        lock.lock()
+        defer { lock.unlock() }
+        return _results
+    }
+
+    func set(_ key: String, thumbnail: UIImage) {
+        lock.lock()
+        _results[key] = thumbnail
+        lock.unlock()
     }
 }
 

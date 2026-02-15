@@ -55,8 +55,8 @@ struct MainEditorView: View {
             // Top toolbar
             topToolbar
 
-            // Image preview
-            ImagePreviewView(image: editorVM.editedImage, isProcessing: editorVM.isProcessing)
+            // Image preview — GPU-rendered via MetalImageView (no CGImage creation)
+            ImagePreviewView(ciImage: editorVM.editedCIImage, uiImage: editorVM.editedImage, isProcessing: editorVM.isProcessing)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             // Tool panels
