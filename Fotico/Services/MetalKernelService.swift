@@ -1,5 +1,6 @@
 import Metal
 import CoreImage
+import UIKit
 
 /// Metal compute shader service for custom GPU effects.
 /// Uses shared RenderEngine device and command queue.
@@ -16,7 +17,10 @@ class MetalKernelService {
     private var bloomCompositePipeline: MTLComputePipelineState?
 
     // Texture pool for reuse (avoids per-frame allocation)
+    // Capped at maxPoolSize to prevent unbounded GPU memory growth.
+    private static let maxPoolSize = 6
     private var texturePool: [String: MTLTexture] = [:]
+    private var texturePoolOrder: [String] = []  // LRU eviction order
 
     init() {
         let engine = RenderEngine.shared
@@ -25,6 +29,20 @@ class MetalKernelService {
         self.library = device.makeDefaultLibrary()
 
         setupPipelines()
+
+        // Clear texture pool on memory warning
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.clearTexturePool()
+        }
+    }
+
+    func clearTexturePool() {
+        texturePool.removeAll()
+        texturePoolOrder.removeAll()
     }
 
     private func setupPipelines() {
@@ -92,15 +110,29 @@ class MetalKernelService {
 
     // MARK: - Texture Helpers
 
-    /// Get or create a pooled texture — avoids per-frame allocation
+    /// Get or create a pooled texture — avoids per-frame allocation.
+    /// Uses LRU eviction when pool exceeds maxPoolSize.
     private func getPooledTexture(width: Int, height: Int, key: String) -> MTLTexture? {
         let poolKey = "\(key)_\(width)x\(height)"
         if let existing = texturePool[poolKey],
            existing.width == width, existing.height == height {
+            // Move to end of LRU order (most recently used)
+            if let idx = texturePoolOrder.firstIndex(of: poolKey) {
+                texturePoolOrder.remove(at: idx)
+            }
+            texturePoolOrder.append(poolKey)
             return existing
         }
+
+        // Evict oldest entries if pool is full
+        while texturePool.count >= Self.maxPoolSize, let oldest = texturePoolOrder.first {
+            texturePool.removeValue(forKey: oldest)
+            texturePoolOrder.removeFirst()
+        }
+
         guard let texture = makeEmptyTexture(width: width, height: height) else { return nil }
         texturePool[poolKey] = texture
+        texturePoolOrder.append(poolKey)
         return texture
     }
 

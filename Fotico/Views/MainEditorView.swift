@@ -1,6 +1,5 @@
 import SwiftUI
 import PhotosUI
-import Combine
 
 struct MainEditorView: View {
     @StateObject private var editorVM = PhotoEditorViewModel()
@@ -22,9 +21,20 @@ struct MainEditorView: View {
         .onChange(of: pickerItem) { _, newValue in
             guard let item = newValue else { return }
             Task {
-                if let data = try? await item.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
+                do {
+                    guard let data = try await item.loadTransferable(type: Data.self) else {
+                        editorVM.errorMessage = "No se pudo cargar la imagen"
+                        pickerItem = nil
+                        return
+                    }
+                    guard let image = UIImage(data: data) else {
+                        editorVM.errorMessage = "La imagen no es valida"
+                        pickerItem = nil
+                        return
+                    }
                     editorVM.loadImage(image)
+                } catch {
+                    editorVM.errorMessage = "Error al cargar: \(error.localizedDescription)"
                 }
                 pickerItem = nil
             }
@@ -40,7 +50,7 @@ struct MainEditorView: View {
         .alert("Guardado", isPresented: $editorVM.exportSuccess) {
             Button("OK") {}
         } message: {
-            Text("La imagen se guardo en tu galeria")
+            Text("La imagen se guardó en tu galería")
         }
         .fullScreenCover(isPresented: $showCamera) {
             CameraView { capturedImage in
@@ -72,6 +82,7 @@ struct MainEditorView: View {
             toolPanel
                 .frame(height: 280)
                 .background(Color.foticoCardBg)
+                .animation(.easeInOut(duration: 0.2), value: editorVM.currentTool)
 
             // Bottom toolbar
             ToolBarView(selectedTool: $editorVM.currentTool)
@@ -93,6 +104,7 @@ struct MainEditorView: View {
                     .font(.title3)
                     .foregroundColor(.white)
             }
+            .accessibilityLabel("Cerrar")
 
             Spacer()
 
@@ -104,6 +116,7 @@ struct MainEditorView: View {
                         .foregroundColor(editorVM.canUndo ? .white : .gray)
                 }
                 .disabled(!editorVM.canUndo)
+                .accessibilityLabel("Deshacer")
 
                 Button {
                     editorVM.redo()
@@ -112,6 +125,7 @@ struct MainEditorView: View {
                         .foregroundColor(editorVM.canRedo ? .white : .gray)
                 }
                 .disabled(!editorVM.canRedo)
+                .accessibilityLabel("Rehacer")
             }
 
             Spacer()
@@ -125,6 +139,7 @@ struct MainEditorView: View {
                             .font(.subheadline)
                             .foregroundColor(Color.foticoWarning)
                     }
+                    .accessibilityLabel("Restablecer ediciones")
                 }
 
                 Button {
@@ -134,6 +149,7 @@ struct MainEditorView: View {
                         .font(.title3)
                         .foregroundColor(Color.foticoPrimary)
                 }
+                .accessibilityLabel("Guardar imagen")
             }
         }
         .padding(.horizontal)
@@ -196,7 +212,7 @@ struct MainEditorView: View {
             } label: {
                 HStack {
                     Image(systemName: "camera.fill")
-                    Text("Camara")
+                    Text("Cámara")
                 }
                 .font(.headline)
                 .foregroundColor(.black)
@@ -210,7 +226,7 @@ struct MainEditorView: View {
             PhotosPicker(selection: $pickerItem, matching: .images) {
                 HStack {
                     Image(systemName: "photo.badge.plus")
-                    Text("Galeria")
+                    Text("Galería")
                 }
                 .font(.headline)
                 .foregroundColor(.white)

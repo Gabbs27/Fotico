@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 
 struct PresetStripView: View {
     let presets: [FilterPreset]

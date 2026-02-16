@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 
 struct EffectsPanelView: View {
     @ObservedObject var editorVM: PhotoEditorViewModel

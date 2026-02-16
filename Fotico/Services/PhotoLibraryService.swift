@@ -2,7 +2,6 @@ import UIKit
 import SwiftUI
 import PhotosUI
 import Photos
-import Combine
 
 @MainActor
 class PhotoLibraryService: ObservableObject {
@@ -40,14 +39,12 @@ enum PhotoLibraryError: LocalizedError {
     case notAuthorized
     case loadFailed
     case invalidImage
-    case saveFailed
 
     var errorDescription: String? {
         switch self {
-        case .notAuthorized: return "No tienes permiso para acceder a la galeria"
+        case .notAuthorized: return "No tienes permiso para acceder a la galería"
         case .loadFailed: return "No se pudo cargar la imagen"
-        case .invalidImage: return "La imagen no es valida"
-        case .saveFailed: return "No se pudo guardar la imagen"
+        case .invalidImage: return "La imagen no es válida"
         }
     }
 }

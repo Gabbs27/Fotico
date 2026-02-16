@@ -20,7 +20,7 @@ struct ExportSheet: View {
                 // Image info
                 VStack(spacing: 8) {
                     HStack {
-                        Text("Resolucion")
+                        Text("Resolución")
                             .foregroundColor(.gray)
                         Spacer()
                         Text("\(Int(image.size.width))x\(Int(image.size.height))")
@@ -50,7 +50,7 @@ struct ExportSheet: View {
                             } else {
                                 Image(systemName: "square.and.arrow.down")
                             }
-                            Text("Guardar en Galeria")
+                            Text("Guardar en Galería")
                         }
                         .font(.headline)
                         .foregroundColor(.black)

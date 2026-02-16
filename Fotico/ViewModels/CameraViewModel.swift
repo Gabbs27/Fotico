@@ -115,7 +115,7 @@ class CameraViewModel: ObservableObject {
 
             DispatchQueue.main.async { [weak self] in
                 self?.processedPreviewCIImage = finalImage
-                self?.frameSemaphore.signal()
+                semaphore.signal()  // Use captured semaphore, not self?.frameSemaphore
             }
         }
     }

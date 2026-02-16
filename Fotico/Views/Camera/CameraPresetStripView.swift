@@ -8,23 +8,21 @@ struct CameraPresetStripView: View {
     let onDeselectPreset: () -> Void
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    // Original (deselect)
-                    chipButton(name: "Original", chipId: "original", isSelected: selectedPreset == nil) {
-                        onDeselectPreset()
-                    }
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                // Original (deselect)
+                chipButton(name: "Original", chipId: "original", isSelected: selectedPreset == nil) {
+                    onDeselectPreset()
+                }
 
-                    ForEach(FilterPreset.allPresets) { preset in
-                        chipButton(name: preset.displayName, chipId: preset.id, isSelected: selectedPreset?.id == preset.id) {
-                            onSelectPreset(preset)
-                        }
+                ForEach(FilterPreset.allPresets) { preset in
+                    chipButton(name: preset.displayName, chipId: preset.id, isSelected: selectedPreset?.id == preset.id) {
+                        onSelectPreset(preset)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
             }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
         }
         .background(Color.black.opacity(0.3))
     }

@@ -237,15 +237,13 @@ enum PresetCategory: String, CaseIterable, Sendable {
     case bw
     case vintage
     case cinematic
-    case custom
 
     nonisolated var displayName: String {
         switch self {
-        case .film: return "Pelicula"
+        case .film: return "Película"
         case .bw: return "B&W"
         case .vintage: return "Vintage"
         case .cinematic: return "Cine"
-        case .custom: return "Custom"
         }
     }
 
@@ -255,7 +253,6 @@ enum PresetCategory: String, CaseIterable, Sendable {
         case .bw: return "circle.lefthalf.filled"
         case .vintage: return "clock.arrow.circlepath"
         case .cinematic: return "theatermasks"
-        case .custom: return "slider.horizontal.3"
         }
     }
 }

@@ -49,6 +49,12 @@ struct CameraView: View {
         .onDisappear {
             viewModel.stopCamera()
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            viewModel.stopCamera()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            Task { await viewModel.startCamera() }
+        }
         .onChange(of: viewModel.showEditor) { _, showEditor in
             if showEditor, let image = viewModel.capturedImage {
                 onPhotoCaptured?(image)
@@ -72,6 +78,7 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.4))
                     .clipShape(Circle())
             }
+            .accessibilityLabel("Cerrar cámara")
 
             Spacer()
 
@@ -95,20 +102,14 @@ struct CameraView: View {
                 .background(Color.black.opacity(0.4))
                 .cornerRadius(20)
             }
+            .accessibilityLabel("Flash: \(viewModel.cameraService.flashMode.displayName)")
 
             Spacer()
 
-            // Switch camera
-            Button {
-                viewModel.cameraService.switchCamera()
-            } label: {
-                Image(systemName: "camera.rotate.fill")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .padding(12)
-                    .background(Color.black.opacity(0.4))
-                    .clipShape(Circle())
-            }
+            // Spacer to balance layout (switch camera button is in bottom controls)
+            Rectangle()
+                .fill(Color.clear)
+                .frame(width: 44, height: 44)
         }
         .padding(.horizontal)
         .padding(.top, 8)
@@ -214,6 +215,7 @@ struct CameraView: View {
                         .foregroundColor(viewModel.grainOnPreview ? .white : .white.opacity(0.5))
                         .frame(width: 50, height: 50)
                 }
+                .accessibilityLabel("Grano: \(viewModel.grainOnPreview ? "activado" : "desactivado")")
             } else {
                 Rectangle()
                     .fill(Color.clear)
@@ -228,6 +230,7 @@ struct CameraView: View {
                     await viewModel.capturePhoto()
                 }
             }
+            .accessibilityLabel("Tomar foto")
 
             Spacer()
 
@@ -243,6 +246,7 @@ struct CameraView: View {
                     .background(Color.white.opacity(0.15))
                     .clipShape(Circle())
             }
+            .accessibilityLabel("Cambiar cámara")
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 24)
@@ -256,11 +260,11 @@ struct CameraView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.gray)
 
-            Text("Acceso a la Camara")
+            Text("Acceso a la Cámara")
                 .font(.title2)
                 .foregroundColor(.white)
 
-            Text("Fotico necesita acceso a tu camara para tomar fotos con efectos vintage.")
+            Text("Fotico necesita acceso a tu cámara para tomar fotos con efectos vintage.")
                 .font(.subheadline)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)

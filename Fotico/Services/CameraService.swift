@@ -49,7 +49,7 @@ class CameraService: NSObject, ObservableObject {
             permissionGranted = await AVCaptureDevice.requestAccess(for: .video)
         default:
             permissionGranted = false
-            errorMessage = "Se necesita acceso a la camara. Activalo en Ajustes."
+            errorMessage = "Se necesita acceso a la cámara. Actívalo en Ajustes."
         }
     }
 
@@ -61,9 +61,13 @@ class CameraService: NSObject, ObservableObject {
         session.beginConfiguration()
         session.sessionPreset = .photo
 
+        // Remove stale inputs/outputs to make setupSession idempotent
+        for input in session.inputs { session.removeInput(input) }
+        for output in session.outputs { session.removeOutput(output) }
+
         // Camera input
         guard let device = bestCamera(for: cameraPosition) else {
-            errorMessage = "No se encontro camara disponible"
+            errorMessage = "No se encontró cámara disponible"
             session.commitConfiguration()
             return
         }
@@ -78,7 +82,7 @@ class CameraService: NSObject, ObservableObject {
                 session.addInput(input)
             }
         } catch {
-            errorMessage = "Error al configurar la camara"
+            errorMessage = "Error al configurar la cámara"
             session.commitConfiguration()
             return
         }
@@ -172,7 +176,7 @@ class CameraService: NSObject, ObservableObject {
                 session.addInput(input)
             }
         } catch {
-            errorMessage = "Error al cambiar camara"
+            errorMessage = "Error al cambiar cámara"
         }
 
         if let connection = videoOutput.connection(with: .video) {
@@ -265,7 +269,7 @@ class CameraService: NSObject, ObservableObject {
         // Force-apply zoom right before capture
         setZoom(currentZoom, animated: false)
 
-        return await withCheckedContinuation { continuation in
+        let image: UIImage? = await withCheckedContinuation { continuation in
             // Guard against rapid double-tap: if a previous continuation exists,
             // resume it with nil before overwriting to prevent a leaked continuation.
             if let existing = self.photoContinuation {
@@ -293,7 +297,20 @@ class CameraService: NSObject, ObservableObject {
             // the capture to return the full sensor ignoring zoom crop.
 
             photoOutput.capturePhoto(with: settings, delegate: self)
+
+            // Safety timeout: if the delegate is never called (e.g., session stopped),
+            // resume the continuation after 5 seconds to prevent hanging forever.
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(5))
+                if let continuation = self?.photoContinuation {
+                    self?.photoContinuation = nil
+                    continuation.resume(returning: nil)
+                    self?.errorMessage = "La captura tardó demasiado"
+                }
+            }
         }
+
+        return image
     }
 
     // MARK: - Helpers
@@ -380,8 +397,8 @@ enum FlashStyle: String, CaseIterable, Sendable {
 
     var displayName: String {
         switch self {
-        case .off: return "Off"
-        case .on: return "On"
+        case .off: return "Apagado"
+        case .on: return "Encendido"
         case .auto: return "Auto"
         case .vintage: return "Vintage"
         }

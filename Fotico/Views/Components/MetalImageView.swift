@@ -85,6 +85,11 @@ struct MetalImageView: UIViewRepresentable {
             }
 
             commandBuffer.present(drawable)
+            commandBuffer.addCompletedHandler { buffer in
+                if let error = buffer.error {
+                    print("[MetalImageView] GPU command buffer error: \(error.localizedDescription)")
+                }
+            }
             commandBuffer.commit()
         }
     }

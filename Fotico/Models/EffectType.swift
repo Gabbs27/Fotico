@@ -17,7 +17,7 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
         case .grain: return "Grano"
         case .lightLeak: return "Fuga de Luz"
         case .bloom: return "Bloom"
-        case .vignette: return "Vineta"
+        case .vignette: return "Viñeta"
         case .solarize: return "Solarizar"
         case .glitch: return "Glitch"
         case .fisheye: return "Ojo de Pez"

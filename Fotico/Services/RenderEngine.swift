@@ -23,7 +23,9 @@ final class RenderEngine: @unchecked Sendable {
     private init() {
         guard let device = MTLCreateSystemDefaultDevice(),
               let queue = device.makeCommandQueue() else {
-            fatalError("Metal is not supported on this device")
+            // All iOS devices since iPhone 5s (2013) support Metal.
+            // This should only fail in very old simulators without GPU support.
+            fatalError("Fotico requires Metal GPU support. Please use a device or simulator with Metal.")
         }
         self.device = device
         self.commandQueue = queue

@@ -11,8 +11,6 @@ class PhotoEditorViewModel: ObservableObject {
     @Published var isProcessing = false
     @Published var presetThumbnails: [String: UIImage] = [:]
     @Published var currentTool: EditorTool = .presets
-    @Published var showExportSheet = false
-    @Published var showImagePicker = false
     @Published var errorMessage: String?
     @Published var exportSuccess = false
 
@@ -26,6 +24,7 @@ class PhotoEditorViewModel: ObservableObject {
     // While a render is in-flight, new requests queue up and only the last one executes.
     private var isRendering = false
     private var pendingRender = false
+    private var renderGeneration = 0  // Incremented on clearImage to invalidate in-flight renders
     private let renderQueue = DispatchQueue(label: "com.fotico.render", qos: .userInteractive)
     private let exportQueue = DispatchQueue(label: "com.fotico.export", qos: .userInitiated)
 
@@ -199,6 +198,7 @@ class PhotoEditorViewModel: ObservableObject {
 
         let state = editState
         let service = filterService
+        let generation = renderGeneration  // Capture current generation
 
         // Build lazy CIImage pipeline on background thread
         renderQueue.async { [weak self] in
@@ -210,6 +210,14 @@ class PhotoEditorViewModel: ObservableObject {
 
             Task { @MainActor [weak self] in
                 guard let self else { return }
+
+                // If clearImage() was called during render, discard the result
+                guard self.renderGeneration == generation else {
+                    self.isRendering = false
+                    self.isProcessing = false
+                    return
+                }
+
                 // Update CIImage directly — MetalImageView renders it without CGImage conversion
                 self.editedCIImage = result
                 self.isProcessing = false
@@ -345,6 +353,7 @@ class PhotoEditorViewModel: ObservableObject {
     }
 
     func clearImage() {
+        renderGeneration += 1  // Invalidate any in-flight renders
         originalImage = nil
         editedImage = nil
         editedCIImage = nil
@@ -389,7 +398,7 @@ enum EditorTool: String, CaseIterable, Sendable {
         case .presets: return "Presets"
         case .adjust: return "Ajustes"
         case .effects: return "Efectos"
-        case .crop: return "Recortar"
+        case .crop: return "Rotar"
         }
     }
 

@@ -14,7 +14,7 @@ struct CropView: View {
                         .font(.caption)
                         .foregroundColor(.white)
 
-                    Text("Rotacion")
+                    Text("Rotación")
                         .font(.caption)
                         .foregroundColor(.gray)
 

@@ -64,19 +64,29 @@ class ImageFilterService: @unchecked Sendable {
             image = image.transformed(by: CGAffineTransform(translationX: -offset.x, y: -offset.y))
         }
 
-        // 2. Apply preset
+        // 2. Apply crop
+        if let crop = state.cropRect {
+            let cropCGRect = CGRect(x: crop.x, y: crop.y, width: crop.width, height: crop.height)
+            if !cropCGRect.isEmpty {
+                image = image.cropped(to: cropCGRect)
+                let cropOffset = image.extent.origin
+                image = image.transformed(by: CGAffineTransform(translationX: -cropOffset.x, y: -cropOffset.y))
+            }
+        }
+
+        // 3. Apply preset
         if let presetId = state.selectedPresetId,
            let preset = presets.first(where: { $0.id == presetId }) {
             image = applyPreset(preset, to: image, intensity: state.presetIntensity)
         }
 
-        // 3. Apply basic adjustments (color filters first for kernel fusion)
+        // 4. Apply basic adjustments (color filters first for kernel fusion)
         image = applyAdjustments(state, to: image)
 
-        // 4. Apply effects (spatial filters after color for optimal fusion)
+        // 5. Apply effects (spatial filters after color for optimal fusion)
         image = applyEffects(state, to: image)
 
-        // 5. Safety: ensure the result has a finite extent (CIRandomGenerator etc. produce infinite)
+        // 6. Safety: ensure the result has a finite extent (CIRandomGenerator etc. produce infinite)
         let sourceExtent = sourceImage.extent
         if image.extent.isInfinite {
             image = image.cropped(to: sourceExtent)

@@ -1,13 +1,12 @@
 import SwiftUI
-import Combine
 
 struct AdjustmentPanelView: View {
     @Binding var editState: EditState
     let onUpdate: () -> Void
     let onCommit: () -> Void
 
-    // Track whether any slider is being dragged — commit undo on release
-    @State private var isDragging = false
+    // Track whether any slider is being dragged — commit undo when drag starts
+    @State private var isEditing = false
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -27,14 +26,14 @@ struct AdjustmentPanelView: View {
                     defaultValue: 1.0
                 )
                 adjustmentSlider(
-                    label: "Saturacion",
+                    label: "Saturación",
                     icon: "drop.fill",
                     value: $editState.saturation,
                     range: 0.0...2.0,
                     defaultValue: 1.0
                 )
                 adjustmentSlider(
-                    label: "Exposicion",
+                    label: "Exposición",
                     icon: "plusminus.circle",
                     value: $editState.exposure,
                     range: -2.0...2.0,
@@ -100,6 +99,7 @@ struct AdjustmentPanelView: View {
 
                 if value.wrappedValue != defaultValue {
                     Button {
+                        onCommit()
                         value.wrappedValue = defaultValue
                         onUpdate()
                     } label: {
@@ -110,22 +110,19 @@ struct AdjustmentPanelView: View {
                 }
             }
 
-            Slider(value: value, in: range)
-                .tint(Color.foticoPrimary)
-                .onChange(of: value.wrappedValue) { _, _ in
-                    if !isDragging {
-                        // First change from a new drag — push undo before modifications
-                        isDragging = true
-                        onCommit()
-                    }
-                    onUpdate()
+            Slider(value: value, in: range, onEditingChanged: { editing in
+                if editing && !isEditing {
+                    // Drag started — push undo state before modifications
+                    isEditing = true
+                    onCommit()
+                } else if !editing {
+                    isEditing = false
                 }
-                .simultaneousGesture(
-                    DragGesture(minimumDistance: 0)
-                        .onEnded { _ in
-                            isDragging = false
-                        }
-                )
+            })
+            .tint(Color.foticoPrimary)
+            .onChange(of: value.wrappedValue) { _, _ in
+                onUpdate()
+            }
         }
     }
 
