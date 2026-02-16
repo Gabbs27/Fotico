@@ -268,6 +268,11 @@ class CameraService: NSObject, ObservableObject {
         setZoom(currentZoom, animated: false)
 
         return await withCheckedContinuation { continuation in
+            // Guard against rapid double-tap: if a previous continuation exists,
+            // resume it with nil before overwriting to prevent a leaked continuation.
+            if let existing = self.photoContinuation {
+                existing.resume(returning: nil)
+            }
             self.photoContinuation = continuation
 
             let settings = AVCapturePhotoSettings()

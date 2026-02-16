@@ -49,7 +49,9 @@ class MetalKernelService {
 
     // MARK: - Grain Effect
 
-    func applyGrain(to ciImage: CIImage, intensity: Float, grainSize: Float, context: CIContext) -> CIImage {
+    /// Applies grain effect using Metal compute shader.
+    /// Returns the result asynchronously to avoid blocking the main thread.
+    func applyGrain(to ciImage: CIImage, intensity: Float, grainSize: Float, context: CIContext) async -> CIImage {
         guard let pipeline = grainPipeline else { return ciImage }
 
         let width = Int(ciImage.extent.width)
@@ -77,9 +79,13 @@ class MetalKernelService {
         dispatchThreads(encoder: encoder, pipeline: pipeline, width: width, height: height)
         encoder.endEncoding()
 
-        // Use completion handler instead of synchronous wait
+        // Async wait — does NOT block the main thread
         commandBuffer.commit()
-        commandBuffer.waitUntilCompleted()
+        await withCheckedContinuation { continuation in
+            commandBuffer.addCompletedHandler { _ in
+                continuation.resume()
+            }
+        }
 
         return CIImage(mtlTexture: outTexture, options: [.colorSpace: CGColorSpaceCreateDeviceRGB()])?.oriented(.downMirrored) ?? ciImage
     }

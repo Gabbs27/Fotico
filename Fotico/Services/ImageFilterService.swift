@@ -3,12 +3,13 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 import Combine
 
-/// Thread-safe filter service — all methods can be called from any thread.
+/// Image filter pipeline using CIFilter chains for presets, adjustments, and effects.
 /// Uses shared RenderEngine for GPU-accelerated rendering.
 ///
-/// IMPORTANT: Each ImageFilterService instance has its own set of CIFilter instances.
-/// This means each instance is NOT thread-safe internally, but multiple instances
-/// can be used safely from different threads (one per thread/queue).
+/// ⚠️ NOT thread-safe internally — CIFilter instances are mutable and reused.
+/// Create ONE instance per serial DispatchQueue. Do NOT share across concurrent queues.
+/// Marked @unchecked Sendable to allow capture in DispatchQueue closures — the caller
+/// is responsible for ensuring single-queue access.
 ///
 /// Performance optimizations:
 /// - CIFilter instances cached and reused within one instance

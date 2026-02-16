@@ -16,7 +16,9 @@ class PhotoEditorViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var exportSuccess = false
 
-    private let filterService = ImageFilterService()
+    // Separate filter service per queue — CIFilter is NOT thread-safe
+    private let filterService = ImageFilterService()       // For renderQueue only
+    private let exportFilterService = ImageFilterService() // For exportQueue only
     private var originalCIImage: CIImage?
     private var proxyCIImage: CIImage?       // Downscaled for live editing
 
@@ -267,7 +269,7 @@ class PhotoEditorViewModel: ObservableObject {
         isProcessing = true
 
         let state = editState
-        let service = filterService
+        let service = exportFilterService  // Dedicated instance for export queue
         let queue = exportQueue
 
         let rendered: UIImage? = await withCheckedContinuation { continuation in

@@ -83,9 +83,10 @@ class CameraViewModel: ObservableObject {
         let preset = selectedPreset
         let grain = grainOnPreview
 
+        let semaphore = frameSemaphore  // Capture before weak self
         processingQueue.async { [weak self] in
             guard let self else {
-                self?.frameSemaphore.signal()
+                semaphore.signal()  // Signal even if self is deallocated
                 return
             }
 
@@ -190,14 +191,8 @@ class CameraViewModel: ObservableObject {
 
 /// Extracted filter processing to a separate enum to avoid @MainActor inheritance.
 /// All methods are safe to call from any thread.
-/// Uses cached filter instances where possible to avoid per-frame allocation.
+/// Uses fresh filter instances per call — CIFilter is NOT thread-safe.
 enum CameraFilters {
-    // Cached filter instances for live preview (reused every frame)
-    private static let tempTintFilter = CIFilter(name: "CITemperatureAndTint")!
-    private static let colorControlsFilter = CIFilter(name: "CIColorControls")!
-    private static let noiseFilter = CIFilter(name: "CIRandomGenerator")!
-    private static let colorMatrixFilter = CIFilter(name: "CIColorMatrix")!
-    private static let addCompFilter = CIFilter(name: "CIAdditionCompositing")!
 
     static func applyLivePreset(_ preset: FilterPreset, to image: CIImage) -> CIImage {
         if let filterName = preset.ciFilterName {
@@ -207,15 +202,17 @@ enum CameraFilters {
         }
         switch preset.id {
         case "fotico_cine":
-            tempTintFilter.setValue(image, forKey: kCIInputImageKey)
-            tempTintFilter.setValue(CIVector(x: 5500, y: 0), forKey: "inputNeutral")
-            tempTintFilter.setValue(CIVector(x: 7000, y: -20), forKey: "inputTargetNeutral")
-            return tempTintFilter.outputImage ?? image
+            let tempTint = CIFilter(name: "CITemperatureAndTint")!
+            tempTint.setValue(image, forKey: kCIInputImageKey)
+            tempTint.setValue(CIVector(x: 5500, y: 0), forKey: "inputNeutral")
+            tempTint.setValue(CIVector(x: 7000, y: -20), forKey: "inputTargetNeutral")
+            return tempTint.outputImage ?? image
         case "fotico_retro":
-            colorControlsFilter.setValue(image, forKey: kCIInputImageKey)
-            colorControlsFilter.setValue(0.6, forKey: kCIInputSaturationKey)
-            colorControlsFilter.setValue(0.03, forKey: kCIInputBrightnessKey)
-            return colorControlsFilter.outputImage ?? image
+            let controls = CIFilter(name: "CIColorControls")!
+            controls.setValue(image, forKey: kCIInputImageKey)
+            controls.setValue(0.6, forKey: kCIInputSaturationKey)
+            controls.setValue(0.03, forKey: kCIInputBrightnessKey)
+            return controls.outputImage ?? image
         default:
             return image
         }
@@ -289,8 +286,10 @@ enum CameraFilters {
     /// the same whether the image is 900px preview or 4032px full-res.
     static func addFilmGrain(to image: CIImage, intensity: CGFloat) -> CIImage {
         let extent = image.extent
-        noiseFilter.setValue(nil, forKey: kCIInputImageKey)
-        guard let rawNoise = noiseFilter.outputImage else { return image }
+
+        // Fresh instances per call — CIFilter is NOT thread-safe
+        let noise = CIFilter(name: "CIRandomGenerator")!
+        guard let rawNoise = noise.outputImage else { return image }
 
         // Scale noise to match a reference resolution of ~2000px
         let referenceSize: CGFloat = 2000.0
@@ -305,16 +304,18 @@ enum CameraFilters {
         }
         scaledNoise = scaledNoise.cropped(to: extent)
 
-        colorMatrixFilter.setValue(scaledNoise, forKey: kCIInputImageKey)
-        colorMatrixFilter.setValue(CIVector(x: intensity, y: 0, z: 0, w: 0), forKey: "inputRVector")
-        colorMatrixFilter.setValue(CIVector(x: 0, y: intensity, z: 0, w: 0), forKey: "inputGVector")
-        colorMatrixFilter.setValue(CIVector(x: 0, y: 0, z: intensity, w: 0), forKey: "inputBVector")
-        colorMatrixFilter.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
-        colorMatrixFilter.setValue(CIVector(x: -intensity/2, y: -intensity/2, z: -intensity/2, w: 0), forKey: "inputBiasVector")
-        guard let grayNoise = colorMatrixFilter.outputImage else { return image }
+        let matrix = CIFilter(name: "CIColorMatrix")!
+        matrix.setValue(scaledNoise, forKey: kCIInputImageKey)
+        matrix.setValue(CIVector(x: intensity, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        matrix.setValue(CIVector(x: 0, y: intensity, z: 0, w: 0), forKey: "inputGVector")
+        matrix.setValue(CIVector(x: 0, y: 0, z: intensity, w: 0), forKey: "inputBVector")
+        matrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        matrix.setValue(CIVector(x: -intensity/2, y: -intensity/2, z: -intensity/2, w: 0), forKey: "inputBiasVector")
+        guard let grayNoise = matrix.outputImage else { return image }
 
-        addCompFilter.setValue(grayNoise, forKey: kCIInputImageKey)
-        addCompFilter.setValue(image, forKey: kCIInputBackgroundImageKey)
-        return addCompFilter.outputImage ?? image
+        let add = CIFilter(name: "CIAdditionCompositing")!
+        add.setValue(grayNoise, forKey: kCIInputImageKey)
+        add.setValue(image, forKey: kCIInputBackgroundImageKey)
+        return add.outputImage ?? image
     }
 }
