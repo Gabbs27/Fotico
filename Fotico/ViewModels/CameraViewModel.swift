@@ -181,6 +181,9 @@ class CameraViewModel: ObservableObject {
         cameraMode = cameraMode == .normal ? .film : .normal
         if cameraMode == .normal {
             selectedPreset = nil
+        } else {
+            // Restore default preset when switching back to Film mode
+            selectedPreset = FilterPreset.allPresets.first
         }
         grainOnPreview = false
         HapticManager.selection()

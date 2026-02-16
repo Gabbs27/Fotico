@@ -65,9 +65,16 @@ struct MetalImageView: UIViewRepresentable {
             let offsetX = (drawableSize.width - scaledWidth) / 2
             let offsetY = (drawableSize.height - scaledHeight) / 2
 
+            // Compose the scaled image over a transparent-black background that fills the
+            // entire drawable. Without this, previous frame pixels remain visible around
+            // the edges when the image aspect ratio changes (e.g., after rotation).
+            let drawableRect = CGRect(x: 0, y: 0, width: drawableSize.width, height: drawableSize.height)
+            let clearImage = CIImage(color: .clear).cropped(to: drawableRect)
+
             let scaledImage = image
                 .transformed(by: CGAffineTransform(scaleX: scale, y: scale))
                 .transformed(by: CGAffineTransform(translationX: offsetX, y: offsetY))
+                .composited(over: clearImage)
 
             // CIRenderDestination — renders directly to the drawable texture
             let destination = CIRenderDestination(
