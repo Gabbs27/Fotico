@@ -13,6 +13,7 @@ struct ImagePreviewView: View {
     @State private var lastScale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
+    @State private var viewSize: CGSize = .zero
 
     init(ciImage: CIImage? = nil, uiImage: UIImage? = nil, isProcessing: Bool = false) {
         self.ciImage = ciImage
@@ -38,7 +39,7 @@ struct ImagePreviewView: View {
                         .scaleEffect(scale)
                         .offset(offset)
                         .gesture(zoomGesture)
-                        .simultaneousGesture(panGesture)
+                        .simultaneousGesture(panGesture(in: geometry.size))
                         .onTapGesture(count: 2, perform: doubleTap)
                 } else if let uiImage = uiImage {
                     // Fallback UIImage path
@@ -48,7 +49,7 @@ struct ImagePreviewView: View {
                         .scaleEffect(scale)
                         .offset(offset)
                         .gesture(zoomGesture)
-                        .simultaneousGesture(panGesture)
+                        .simultaneousGesture(panGesture(in: geometry.size))
                         .onTapGesture(count: 2, perform: doubleTap)
                 }
 
@@ -86,19 +87,33 @@ struct ImagePreviewView: View {
             }
     }
 
-    private var panGesture: some Gesture {
+    /// Pan gesture with boundary clamping — prevents the image from being
+    /// dragged completely off screen. Limits offset to half the scaled content size.
+    private func panGesture(in size: CGSize) -> some Gesture {
         DragGesture()
             .onChanged { value in
                 if scale > 1.0 {
-                    offset = CGSize(
+                    let proposed = CGSize(
                         width: lastOffset.width + value.translation.width,
                         height: lastOffset.height + value.translation.height
                     )
+                    offset = clampedOffset(proposed, in: size)
                 }
             }
             .onEnded { _ in
                 lastOffset = offset
             }
+    }
+
+    /// Clamp offset so the image can't be dragged more than half its visible area off-screen.
+    /// At scale 2x in a 400pt view, the content is 800pt — max offset = (800-400)/2 = 200pt.
+    private func clampedOffset(_ proposed: CGSize, in size: CGSize) -> CGSize {
+        let maxOffsetX = max((size.width * (scale - 1)) / 2, 0)
+        let maxOffsetY = max((size.height * (scale - 1)) / 2, 0)
+        return CGSize(
+            width: min(max(proposed.width, -maxOffsetX), maxOffsetX),
+            height: min(max(proposed.height, -maxOffsetY), maxOffsetY)
+        )
     }
 
     private func doubleTap() {

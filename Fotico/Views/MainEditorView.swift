@@ -6,6 +6,7 @@ struct MainEditorView: View {
     @StateObject private var editorVM = PhotoEditorViewModel()
     @State private var pickerItem: PhotosPickerItem?
     @State private var showCamera = false
+    @State private var showDiscardAlert = false
 
     var body: some View {
         ZStack {
@@ -46,6 +47,14 @@ struct MainEditorView: View {
                 editorVM.loadImage(capturedImage)
             }
         }
+        .alert("Descartar cambios?", isPresented: $showDiscardAlert) {
+            Button("Descartar", role: .destructive) {
+                editorVM.clearImage()
+            }
+            Button("Cancelar", role: .cancel) {}
+        } message: {
+            Text("Tienes ediciones sin guardar. Si sales se perderan.")
+        }
     }
 
     // MARK: - Editor Content
@@ -74,7 +83,11 @@ struct MainEditorView: View {
     private var topToolbar: some View {
         HStack {
             Button {
-                editorVM.clearImage()
+                if editorVM.editState.isDefault {
+                    editorVM.clearImage()
+                } else {
+                    showDiscardAlert = true
+                }
             } label: {
                 Image(systemName: "xmark")
                     .font(.title3)

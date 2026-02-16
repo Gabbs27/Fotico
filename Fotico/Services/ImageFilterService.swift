@@ -96,10 +96,10 @@ class ImageFilterService: @unchecked Sendable {
             filtered = applyCustomPreset(preset, to: image)
         }
 
-        // Apply additional preset parameters
-        for param in preset.parameters {
-            filtered = applyParameter(param, to: filtered)
-        }
+        // Apply additional preset parameters.
+        // Collect all ColorControls params (brightness, contrast, saturation) and apply
+        // them in a single call — applying individually resets the other values to defaults.
+        filtered = applyPresetParameters(preset.parameters, to: filtered)
 
         // Blend with original based on intensity
         if intensity < 1.0 {
@@ -152,39 +152,69 @@ class ImageFilterService: @unchecked Sendable {
         temperatureFilter.setValue(CIVector(x: 7500, y: 0), forKey: "inputTargetNeutral")
         result = temperatureFilter.outputImage ?? result
 
-        vignetteFilter.setValue(result, forKey: kCIInputImageKey)
-        vignetteFilter.setValue(1.0, forKey: kCIInputIntensityKey)
-        vignetteFilter.setValue(1.5, forKey: kCIInputRadiusKey)
-        result = vignetteFilter.outputImage ?? result
+        // Use a fresh vignette filter — the shared vignetteFilter is reserved for effects
+        let retroVignette = CIFilter(name: "CIVignette")!
+        retroVignette.setValue(result, forKey: kCIInputImageKey)
+        retroVignette.setValue(1.0, forKey: kCIInputIntensityKey)
+        retroVignette.setValue(1.5, forKey: kCIInputRadiusKey)
+        result = retroVignette.outputImage ?? result
 
         return result
     }
 
-    private func applyParameter(_ param: FilterParameter, to image: CIImage) -> CIImage {
-        switch param.key {
-        case "temperature":
-            temperatureFilter.setValue(image, forKey: kCIInputImageKey)
-            temperatureFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
-            temperatureFilter.setValue(CIVector(x: param.value, y: 0), forKey: "inputTargetNeutral")
-            return temperatureFilter.outputImage ?? image
-        case "contrast":
-            return applyColorControls(to: image, brightness: 0, contrast: param.value, saturation: 1.0)
-        case "brightness":
-            return applyColorControls(to: image, brightness: param.value, contrast: 1.0, saturation: 1.0)
-        case "saturation":
-            return applyColorControls(to: image, brightness: 0, contrast: 1.0, saturation: param.value)
-        case "vibrance":
-            vibranceFilter.setValue(image, forKey: kCIInputImageKey)
-            vibranceFilter.setValue(param.value, forKey: "inputAmount")
-            return vibranceFilter.outputImage ?? image
-        case "vignette":
-            vignetteFilter.setValue(image, forKey: kCIInputImageKey)
-            vignetteFilter.setValue(param.value, forKey: kCIInputIntensityKey)
-            vignetteFilter.setValue(1.5, forKey: kCIInputRadiusKey)
-            return vignetteFilter.outputImage ?? image
-        default:
-            return image
+    /// Applies preset parameters, batching ColorControls params (brightness, contrast,
+    /// saturation) into a single CIColorControls call to avoid resetting each other.
+    /// Also handles grain, vignette, temperature, and vibrance as separate filters.
+    private func applyPresetParameters(_ parameters: [FilterParameter], to image: CIImage) -> CIImage {
+        var result = image
+
+        // Collect ColorControls values — default to identity values
+        var brightness: Double = 0.0
+        var contrast: Double = 1.0
+        var saturation: Double = 1.0
+        var hasColorControls = false
+
+        for param in parameters {
+            switch param.key {
+            case "brightness":
+                brightness = param.value
+                hasColorControls = true
+            case "contrast":
+                contrast = param.value
+                hasColorControls = true
+            case "saturation":
+                saturation = param.value
+                hasColorControls = true
+            case "temperature":
+                temperatureFilter.setValue(result, forKey: kCIInputImageKey)
+                temperatureFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
+                temperatureFilter.setValue(CIVector(x: param.value, y: 0), forKey: "inputTargetNeutral")
+                result = temperatureFilter.outputImage ?? result
+            case "vibrance":
+                vibranceFilter.setValue(result, forKey: kCIInputImageKey)
+                vibranceFilter.setValue(param.value, forKey: "inputAmount")
+                result = vibranceFilter.outputImage ?? result
+            case "vignette":
+                // Use a separate vignette filter for presets to avoid conflict with effects vignette
+                let presetVignette = CIFilter(name: "CIVignette")!
+                presetVignette.setValue(result, forKey: kCIInputImageKey)
+                presetVignette.setValue(param.value, forKey: kCIInputIntensityKey)
+                presetVignette.setValue(1.5, forKey: kCIInputRadiusKey)
+                result = presetVignette.outputImage ?? result
+            case "grain":
+                // Apply grain as part of the preset (e.g., Retro)
+                result = applySimpleGrain(to: result, intensity: param.value, size: 0.5)
+            default:
+                break
+            }
         }
+
+        // Apply batched ColorControls in one pass
+        if hasColorControls {
+            result = applyColorControls(to: result, brightness: brightness, contrast: contrast, saturation: saturation)
+        }
+
+        return result
     }
 
     // MARK: - Adjustments

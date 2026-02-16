@@ -177,9 +177,7 @@ class CameraService: NSObject, ObservableObject {
 
         if let connection = videoOutput.connection(with: .video) {
             connection.videoRotationAngle = 90
-            if newPosition == .front {
-                connection.isVideoMirrored = true
-            }
+            connection.isVideoMirrored = (newPosition == .front)
         }
 
         session.commitConfiguration()
@@ -329,7 +327,14 @@ class CameraService: NSObject, ObservableObject {
 extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     nonisolated func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+
+        // CIImage(cvPixelBuffer:) retains the pixel buffer via CF ref counting,
+        // but AVFoundation's buffer pool can still recycle the backing memory
+        // if the capture pipeline pressure is high. withExtendedLifetime ensures
+        // the CMSampleBuffer stays alive until the CIImage is fully created.
+        let ciImage = withExtendedLifetime(sampleBuffer) {
+            CIImage(cvPixelBuffer: pixelBuffer)
+        }
 
         Task { @MainActor in
             self.previewCIImage = ciImage

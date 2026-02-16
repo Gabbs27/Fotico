@@ -305,8 +305,14 @@ class PhotoEditorViewModel: ObservableObject {
 
     // MARK: - Undo/Redo
 
+    private static let maxUndoStackSize = 50
+
     private func pushUndo() {
         undoStack.append(editState)
+        // Cap undo stack to prevent unbounded memory growth
+        if undoStack.count > Self.maxUndoStackSize {
+            undoStack.removeFirst(undoStack.count - Self.maxUndoStackSize)
+        }
         redoStack.removeAll()
         canUndo = true
         canRedo = false

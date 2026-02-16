@@ -6,6 +6,9 @@ struct AdjustmentPanelView: View {
     let onUpdate: () -> Void
     let onCommit: () -> Void
 
+    // Track whether any slider is being dragged — commit undo on release
+    @State private var isDragging = false
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 14) {
@@ -110,11 +113,19 @@ struct AdjustmentPanelView: View {
             Slider(value: value, in: range)
                 .tint(Color.foticoPrimary)
                 .onChange(of: value.wrappedValue) { _, _ in
+                    if !isDragging {
+                        // First change from a new drag — push undo before modifications
+                        isDragging = true
+                        onCommit()
+                    }
                     onUpdate()
                 }
-                .onSubmit {
-                    onCommit()
-                }
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 0)
+                        .onEnded { _ in
+                            isDragging = false
+                        }
+                )
         }
     }
 
