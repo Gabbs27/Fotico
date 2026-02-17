@@ -1,6 +1,6 @@
 import Foundation
 
-struct EditState: Sendable, Equatable {
+struct EditState: Sendable, Equatable, Codable {
     var selectedPresetId: String?
     var presetIntensity: Double = 1.0
 
@@ -29,6 +29,10 @@ struct EditState: Sendable, Equatable {
     var fisheyeIntensity: Double = 0.0   // 0.0...1.0
     var thresholdLevel: Double = 0.0     // 0.0...1.0 (0 = off)
 
+    // Overlay
+    var overlayId: String?
+    var overlayIntensity: Double = 0.7   // 0.0...1.0
+
     // Crop
     var cropRect: CropRect?
     var rotation: Double = 0.0           // degrees
@@ -42,7 +46,7 @@ struct EditState: Sendable, Equatable {
     }
 }
 
-struct CropRect: Sendable, Equatable {
+struct CropRect: Sendable, Equatable, Codable {
     var x: Double
     var y: Double
     var width: Double
