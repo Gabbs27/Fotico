@@ -7,6 +7,7 @@ struct MainEditorView: View {
     @StateObject private var editorVM = PhotoEditorViewModel()
     @ObservedObject private var subscriptionService = SubscriptionService.shared
     @ObservedObject private var clipboard = EditClipboard.shared
+    @Binding var injectedImage: UIImage?
     @State private var pickerItem: PhotosPickerItem?
     @State private var showCamera = false
     @State private var showDiscardAlert = false
@@ -42,6 +43,12 @@ struct MainEditorView: View {
                     editorVM.errorMessage = "Error al cargar: \(error.localizedDescription)"
                 }
                 pickerItem = nil
+            }
+        }
+        .onChange(of: injectedImage) { _, newImage in
+            if let image = newImage {
+                editorVM.loadImage(image)
+                injectedImage = nil
             }
         }
         .alert("Error", isPresented: .init(
@@ -290,5 +297,5 @@ struct MainEditorView: View {
 }
 
 #Preview {
-    MainEditorView()
+    MainEditorView(injectedImage: .constant(nil))
 }

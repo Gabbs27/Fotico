@@ -208,75 +208,75 @@ struct FilterPreset: Identifiable, Sendable {
     static let proPresets: [FilterPreset] = [
         // Cálidos (Warm)
         FilterPreset(id: "pro_dorado", name: "Dorado", displayName: "Dorado",
-                     category: .warm, tier: .pro, lutFileName: "dorado.cube", sortOrder: 100),
+                     category: .warm, tier: .free, lutFileName: "dorado.cube", sortOrder: 100),
         FilterPreset(id: "pro_miel", name: "Miel", displayName: "Miel",
-                     category: .warm, tier: .pro, lutFileName: "miel.cube", sortOrder: 101),
+                     category: .warm, tier: .free, lutFileName: "miel.cube", sortOrder: 101),
         FilterPreset(id: "pro_canela", name: "Canela", displayName: "Canela",
-                     category: .warm, tier: .pro, lutFileName: "canela.cube", sortOrder: 102),
+                     category: .warm, tier: .free, lutFileName: "canela.cube", sortOrder: 102),
         FilterPreset(id: "pro_atardecer", name: "Atardecer", displayName: "Atardecer",
-                     category: .warm, tier: .pro, lutFileName: "atardecer.cube", sortOrder: 103),
+                     category: .warm, tier: .free, lutFileName: "atardecer.cube", sortOrder: 103),
 
         // Fríos (Cool)
         FilterPreset(id: "pro_oceano", name: "Océano", displayName: "Océano",
-                     category: .cool, tier: .pro, lutFileName: "oceano.cube", sortOrder: 200),
+                     category: .cool, tier: .free, lutFileName: "oceano.cube", sortOrder: 200),
         FilterPreset(id: "pro_niebla", name: "Niebla", displayName: "Niebla",
-                     category: .cool, tier: .pro, lutFileName: "niebla.cube", sortOrder: 201),
+                     category: .cool, tier: .free, lutFileName: "niebla.cube", sortOrder: 201),
         FilterPreset(id: "pro_invierno", name: "Invierno", displayName: "Invierno",
-                     category: .cool, tier: .pro, lutFileName: "invierno.cube", sortOrder: 202),
+                     category: .cool, tier: .free, lutFileName: "invierno.cube", sortOrder: 202),
 
         // Cine
         FilterPreset(id: "pro_noche", name: "Noche", displayName: "Noche",
-                     category: .cinematic, tier: .pro, lutFileName: "noche.cube", sortOrder: 300),
+                     category: .cinematic, tier: .free, lutFileName: "noche.cube", sortOrder: 300),
         FilterPreset(id: "pro_drama", name: "Drama", displayName: "Drama",
-                     category: .cinematic, tier: .pro, lutFileName: "drama.cube", sortOrder: 301),
+                     category: .cinematic, tier: .free, lutFileName: "drama.cube", sortOrder: 301),
         FilterPreset(id: "pro_teal_orange", name: "Teal&Orange", displayName: "Teal&Orange",
-                     category: .cinematic, tier: .pro, lutFileName: "teal_orange.cube", sortOrder: 302),
+                     category: .cinematic, tier: .free, lutFileName: "teal_orange.cube", sortOrder: 302),
 
         // Suaves (Soft/Pastel)
         FilterPreset(id: "pro_petalo", name: "Pétalo", displayName: "Pétalo",
-                     category: .soft, tier: .pro, lutFileName: "petalo.cube", sortOrder: 400),
+                     category: .soft, tier: .free, lutFileName: "petalo.cube", sortOrder: 400),
         FilterPreset(id: "pro_nube", name: "Nube", displayName: "Nube",
-                     category: .soft, tier: .pro, lutFileName: "nube.cube", sortOrder: 401),
+                     category: .soft, tier: .free, lutFileName: "nube.cube", sortOrder: 401),
         FilterPreset(id: "pro_algodon", name: "Algodón", displayName: "Algodón",
-                     category: .soft, tier: .pro, lutFileName: "algodon.cube", sortOrder: 402),
+                     category: .soft, tier: .free, lutFileName: "algodon.cube", sortOrder: 402),
         FilterPreset(id: "pro_brisa", name: "Brisa", displayName: "Brisa",
-                     category: .soft, tier: .pro, lutFileName: "brisa.cube", sortOrder: 403),
+                     category: .soft, tier: .free, lutFileName: "brisa.cube", sortOrder: 403),
 
         // Película (Film emulation)
         FilterPreset(id: "pro_kodak", name: "Kodak", displayName: "Kodak",
-                     category: .film, tier: .pro, lutFileName: "kodak_gold.cube", sortOrder: 500),
+                     category: .film, tier: .free, lutFileName: "kodak_gold.cube", sortOrder: 500),
         FilterPreset(id: "pro_fuji", name: "Fuji", displayName: "Fuji",
-                     category: .film, tier: .pro, lutFileName: "fuji_400h.cube", sortOrder: 501),
+                     category: .film, tier: .free, lutFileName: "fuji_400h.cube", sortOrder: 501),
         FilterPreset(id: "pro_polaroid", name: "Polaroid", displayName: "Polaroid",
-                     category: .film, tier: .pro, lutFileName: "polaroid.cube", sortOrder: 502),
+                     category: .film, tier: .free, lutFileName: "polaroid.cube", sortOrder: 502),
         FilterPreset(id: "pro_super8", name: "Super8", displayName: "Super8",
-                     category: .film, tier: .pro, lutFileName: "super8.cube", sortOrder: 503),
+                     category: .film, tier: .free, lutFileName: "super8.cube", sortOrder: 503),
 
         // Editorial
         FilterPreset(id: "pro_revista", name: "Revista", displayName: "Revista",
-                     category: .editorial, tier: .pro, lutFileName: "revista.cube", sortOrder: 600),
+                     category: .editorial, tier: .free, lutFileName: "revista.cube", sortOrder: 600),
         FilterPreset(id: "pro_portada", name: "Portada", displayName: "Portada",
-                     category: .editorial, tier: .pro, lutFileName: "portada.cube", sortOrder: 601),
+                     category: .editorial, tier: .free, lutFileName: "portada.cube", sortOrder: 601),
         FilterPreset(id: "pro_glam", name: "Glam", displayName: "Glam",
-                     category: .editorial, tier: .pro, lutFileName: "glam.cube", sortOrder: 602),
+                     category: .editorial, tier: .free, lutFileName: "glam.cube", sortOrder: 602),
         FilterPreset(id: "pro_mate", name: "Mate", displayName: "Mate",
-                     category: .editorial, tier: .pro, lutFileName: "mate.cube", sortOrder: 603),
+                     category: .editorial, tier: .free, lutFileName: "mate.cube", sortOrder: 603),
 
         // Vintage
         FilterPreset(id: "pro_nostalgia", name: "Nostalgia", displayName: "Nostalgia",
-                     category: .vintage, tier: .pro, lutFileName: "nostalgia.cube", sortOrder: 700),
+                     category: .vintage, tier: .free, lutFileName: "nostalgia.cube", sortOrder: 700),
         FilterPreset(id: "pro_sepia", name: "Sepia", displayName: "Sepia",
-                     category: .vintage, tier: .pro, lutFileName: "sepia.cube", sortOrder: 701),
+                     category: .vintage, tier: .free, lutFileName: "sepia.cube", sortOrder: 701),
         FilterPreset(id: "pro_disco", name: "Disco", displayName: "Disco",
-                     category: .vintage, tier: .pro, lutFileName: "disco.cube", sortOrder: 702),
+                     category: .vintage, tier: .free, lutFileName: "disco.cube", sortOrder: 702),
         FilterPreset(id: "pro_vhs", name: "VHS", displayName: "VHS",
-                     category: .vintage, tier: .pro, lutFileName: "vhs.cube", sortOrder: 703),
+                     category: .vintage, tier: .free, lutFileName: "vhs.cube", sortOrder: 703),
 
         // B&W
         FilterPreset(id: "pro_carbon", name: "Carbón", displayName: "Carbón",
-                     category: .bw, tier: .pro, lutFileName: "carbon.cube", sortOrder: 800),
+                     category: .bw, tier: .free, lutFileName: "carbon.cube", sortOrder: 800),
         FilterPreset(id: "pro_seda", name: "Seda", displayName: "Seda",
-                     category: .bw, tier: .pro, lutFileName: "seda.cube", sortOrder: 801),
+                     category: .bw, tier: .free, lutFileName: "seda.cube", sortOrder: 801),
     ]
 }
 

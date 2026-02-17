@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CameraLaunchView: View {
     @State private var showCamera = false
+    var onPhotoCaptured: ((UIImage) -> Void)?
 
     var body: some View {
         ZStack {
@@ -24,7 +25,10 @@ struct CameraLaunchView: View {
             }
         }
         .fullScreenCover(isPresented: $showCamera) {
-            CameraView { _ in showCamera = false }
+            CameraView { image in
+                showCamera = false
+                onPhotoCaptured?(image)
+            }
         }
     }
 }

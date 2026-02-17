@@ -7,6 +7,8 @@ struct ProjectsGridView: View {
     @State private var showDeleteAlert = false
     @State private var projectToDelete: PhotoProject?
 
+    var onOpenProject: ((UIImage) -> Void)?
+
     private let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12),
@@ -35,6 +37,9 @@ struct ProjectsGridView: View {
                         LazyVGrid(columns: columns, spacing: 12) {
                             ForEach(viewModel.projects) { project in
                                 projectCard(project)
+                                    .onTapGesture {
+                                        openProject(project)
+                                    }
                             }
                         }
                         .padding()
@@ -58,6 +63,14 @@ struct ProjectsGridView: View {
                 Text("Esta acción no se puede deshacer")
             }
         }
+    }
+
+    private func openProject(_ project: PhotoProject) {
+        guard let image = ProjectStorageService.shared.loadOriginalImage(fileName: project.originalImagePath) else {
+            return
+        }
+        HapticManager.selection()
+        onOpenProject?(image)
     }
 
     private func projectCard(_ project: PhotoProject) -> some View {
