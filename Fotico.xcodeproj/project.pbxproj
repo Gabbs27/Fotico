@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0E5718C0807E06F67CA5CCB0 /* PresetStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBBDEEDB060842ABA5B6735 /* PresetStripView.swift */; };
+		0E5718C0807E06F67CA5CCB0 /* PresetGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBBDEEDB060842ABA5B6735 /* PresetGridView.swift */; };
 		13BCE6A1B057362A71D9047E /* PhotoLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9F515D40A563F788348AD1 /* PhotoLibraryService.swift */; };
 		29BC25AF7446B8810F7B31C1 /* FilterPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDF80977A4F5AED1D02D616 /* FilterPreset.swift */; };
 		2B7E9B06F6EE87AFF17A2197 /* ImagePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D85D0F652FEF3B63F2D724 /* ImagePreviewView.swift */; };
@@ -25,7 +25,7 @@
 		987C3D52488B5A6C68C936C5 /* CaptureButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CF9C27BBE59D67E458ED87 /* CaptureButtonView.swift */; };
 		9AB3423F90809A0ED20BD646 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0C0C18FD1C342A3DAEF5033 /* MetalKit.framework */; };
 		9C1B5E31AA8CDF35E65C730D /* EffectsPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4809EB16ABE2A6CA7B5FC772 /* EffectsPanelView.swift */; };
-		A1B2C3D4E5F60718192A3B4C /* CameraPresetStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718192A3B4C5D /* CameraPresetStripView.swift */; };
+/* CameraPresetStripView removed — replaced by PresetGridView in half-sheet */
 		A3612E3E1D70C965DF59CDF2 /* PhotoEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D91AC38F5665E6214C1ACA /* PhotoEditorViewModel.swift */; };
 		C4B0898695F49241A3ED00B8 /* MainEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4721D0094164679B583AA88F /* MainEditorView.swift */; };
 		CEE5B94F7E147A1A0A5E2001 /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D91AECEF9AA91E4CB36F597 /* CropView.swift */; };
@@ -121,9 +121,9 @@
 		9AC8C9A5E6B67576FC17B434 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		A2305F7EBB877817426CACC9 /* EditState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditState.swift; sourceTree = "<group>"; };
 		B287D1FD97A4514851E0168C /* Fotico.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fotico.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B2C3D4E5F60718192A3B4C5D /* CameraPresetStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPresetStripView.swift; sourceTree = "<group>"; };
+/* CameraPresetStripView.swift removed */
 		BC9F515D40A563F788348AD1 /* PhotoLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryService.swift; sourceTree = "<group>"; };
-		CEBBDEEDB060842ABA5B6735 /* PresetStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetStripView.swift; sourceTree = "<group>"; };
+		CEBBDEEDB060842ABA5B6735 /* PresetGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetGridView.swift; sourceTree = "<group>"; };
 		D0C0C18FD1C342A3DAEF5033 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		D3C2496338EBADD2A8CCBF4A /* FoticoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoticoApp.swift; sourceTree = "<group>"; };
 		E500C087AA366E851D8242A4 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -207,7 +207,7 @@
 				FB96FD9B88185888576BA7DC /* ExportSheet.swift */,
 				65D85D0F652FEF3B63F2D724 /* ImagePreviewView.swift */,
 				B0C1D2E3F4050617283940AB /* OverlayPanelView.swift */,
-				CEBBDEEDB060842ABA5B6735 /* PresetStripView.swift */,
+				CEBBDEEDB060842ABA5B6735 /* PresetGridView.swift */,
 				212CFF362D57F821DA1547D8 /* ToolBarView.swift */,
 			);
 			path = Editor;
@@ -271,7 +271,6 @@
 				22BB33CC44DD55EE66FF0011 /* CameraLaunchView.swift */,
 				39A8F513701A08A996998038 /* CameraView.swift */,
 				97CF9C27BBE59D67E458ED87 /* CaptureButtonView.swift */,
-				B2C3D4E5F60718192A3B4C5D /* CameraPresetStripView.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -549,7 +548,7 @@
 				9C1B5E31AA8CDF35E65C730D /* EffectsPanelView.swift in Sources */,
 				3F62CA28C541DCAEC8698A52 /* ExportSheet.swift in Sources */,
 				2B7E9B06F6EE87AFF17A2197 /* ImagePreviewView.swift in Sources */,
-				0E5718C0807E06F67CA5CCB0 /* PresetStripView.swift in Sources */,
+				0E5718C0807E06F67CA5CCB0 /* PresetGridView.swift in Sources */,
 				D09E69FA2103D4E1E57CCC13 /* ToolBarView.swift in Sources */,
 				C4B0898695F49241A3ED00B8 /* MainEditorView.swift in Sources */,
 				4DB1DF7A6F41D38DCF26EC89 /* BloomShader.metal in Sources */,
@@ -559,7 +558,7 @@
 				E358AC8A1AE458B80230507D /* CameraViewModel.swift in Sources */,
 				F537B69E8A7220763FB3EBFF /* CameraView.swift in Sources */,
 				987C3D52488B5A6C68C936C5 /* CaptureButtonView.swift in Sources */,
-				A1B2C3D4E5F60718192A3B4C /* CameraPresetStripView.swift in Sources */,
+/* CameraPresetStripView removed from build */
 				CC3344556677889900112233 /* RenderEngine.swift in Sources */,
 				DD4455667788990011223344 /* MetalImageView.swift in Sources */,
 				946C800D895BCDBB08A2F1B9 /* UserProfile.swift in Sources */,

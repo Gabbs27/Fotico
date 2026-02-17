@@ -3,7 +3,11 @@ import Combine
 
 struct CameraView: View {
     @StateObject private var viewModel = CameraViewModel()
+    @ObservedObject private var subscriptionService = SubscriptionService.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var showFilterSheet = false
+    @State private var dummyIntensity: Double = 1.0
+    @State private var showPaywall = false
 
     var onPhotoCaptured: ((UIImage) -> Void)?
 
@@ -37,7 +41,7 @@ struct CameraView: View {
                 zoomControls
                 modeToggle
                 if viewModel.cameraMode == .film {
-                    presetStrip
+                    filterButton
                 }
                 bottomControls
             }
@@ -60,6 +64,16 @@ struct CameraView: View {
                 onPhotoCaptured?(image)
                 dismiss()
             }
+        }
+        .sheet(isPresented: $showFilterSheet) {
+            filterSheet
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationBackgroundInteraction(.enabled)
+                .presentationCornerRadius(20)
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
         }
     }
 
@@ -156,14 +170,65 @@ struct CameraView: View {
         .padding(.bottom, 8)
     }
 
-    // MARK: - Preset Strip
+    // MARK: - Filter Button & Sheet
 
-    private var presetStrip: some View {
-        CameraPresetStripView(
-            selectedPreset: viewModel.selectedPreset,
-            onSelectPreset: { viewModel.selectPreset($0) },
-            onDeselectPreset: { viewModel.selectPreset(nil) }
-        )
+    private var filterButton: some View {
+        Button {
+            showFilterSheet = true
+            HapticManager.selection()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "camera.filters")
+                    .font(.caption)
+                Text(viewModel.selectedPreset?.displayName ?? "Filtros")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+            }
+            .foregroundColor(viewModel.selectedPreset != nil ? .black : .white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(viewModel.selectedPreset != nil ? Color.foticoPrimary : Color.white.opacity(0.2))
+            .cornerRadius(20)
+        }
+        .padding(.bottom, 8)
+    }
+
+    private var filterSheet: some View {
+        NavigationStack {
+            PresetGridView(
+                presets: FilterPreset.allPresets,
+                selectedPresetId: viewModel.selectedPreset?.id,
+                presetIntensity: $dummyIntensity,
+                thumbnails: nil,
+                isPro: subscriptionService.isPro,
+                showIntensitySlider: false,
+                onSelectPreset: { preset in
+                    viewModel.selectPreset(preset)
+                },
+                onDeselectPreset: {
+                    viewModel.selectPreset(nil)
+                },
+                onIntensityChange: nil,
+                onLockedPresetTapped: {
+                    showFilterSheet = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showPaywall = true
+                    }
+                }
+            )
+            .background(Color.foticoCardBg)
+            .navigationTitle("Filtros")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Listo") {
+                        showFilterSheet = false
+                    }
+                    .foregroundColor(Color.foticoPrimary)
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
     }
 
     // MARK: - Zoom Controls

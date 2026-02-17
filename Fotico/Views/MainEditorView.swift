@@ -206,12 +206,13 @@ struct MainEditorView: View {
     private var toolPanel: some View {
         switch editorVM.currentTool {
         case .presets:
-            PresetStripView(
+            PresetGridView(
                 presets: FilterPreset.allPresets,
                 selectedPresetId: editorVM.editState.selectedPresetId,
                 presetIntensity: $editorVM.editState.presetIntensity,
                 thumbnails: editorVM.presetThumbnails,
                 isPro: subscriptionService.isPro,
+                showIntensitySlider: true,
                 onSelectPreset: { editorVM.selectPreset($0) },
                 onDeselectPreset: { editorVM.deselectPreset() },
                 onIntensityChange: { editorVM.updatePresetIntensity($0) },
