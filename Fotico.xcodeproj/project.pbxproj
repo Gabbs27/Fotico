@@ -63,6 +63,34 @@
 		BB11CC22DD33EE44FF550066 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11CC22DD33EE44FF550067 /* PaywallView.swift */; };
 		CC22DD33EE44FF5500661177 /* EditClipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC22DD33EE44FF5500661178 /* EditClipboard.swift */; };
 		DD33EE44FF550066117722AA /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD33EE44FF550066117722AB /* OnboardingView.swift */; };
+		LB0012BBBBBBBBBBBBBBBB /* algodon.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0012AAAAAAAAAAAAAAAA /* algodon.cube */; };
+		LB0003BBBBBBBBBBBBBBBB /* atardecer.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0003AAAAAAAAAAAAAAAA /* atardecer.cube */; };
+		LB0013BBBBBBBBBBBBBBBB /* brisa.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0013AAAAAAAAAAAAAAAA /* brisa.cube */; };
+		LB0002BBBBBBBBBBBBBBBB /* canela.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0002AAAAAAAAAAAAAAAA /* canela.cube */; };
+		LB0026BBBBBBBBBBBBBBBB /* carbon.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0026AAAAAAAAAAAAAAAA /* carbon.cube */; };
+		LB0024BBBBBBBBBBBBBBBB /* disco.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0024AAAAAAAAAAAAAAAA /* disco.cube */; };
+		LB0000BBBBBBBBBBBBBBBB /* dorado.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0000AAAAAAAAAAAAAAAA /* dorado.cube */; };
+		LB0008BBBBBBBBBBBBBBBB /* drama.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0008AAAAAAAAAAAAAAAA /* drama.cube */; };
+		LB0015BBBBBBBBBBBBBBBB /* fuji_400h.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0015AAAAAAAAAAAAAAAA /* fuji_400h.cube */; };
+		LB0020BBBBBBBBBBBBBBBB /* glam.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0020AAAAAAAAAAAAAAAA /* glam.cube */; };
+		LB0006BBBBBBBBBBBBBBBB /* invierno.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0006AAAAAAAAAAAAAAAA /* invierno.cube */; };
+		LB0014BBBBBBBBBBBBBBBB /* kodak_gold.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0014AAAAAAAAAAAAAAAA /* kodak_gold.cube */; };
+		LB0021BBBBBBBBBBBBBBBB /* mate.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0021AAAAAAAAAAAAAAAA /* mate.cube */; };
+		LB0001BBBBBBBBBBBBBBBB /* miel.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0001AAAAAAAAAAAAAAAA /* miel.cube */; };
+		LB0005BBBBBBBBBBBBBBBB /* niebla.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0005AAAAAAAAAAAAAAAA /* niebla.cube */; };
+		LB0007BBBBBBBBBBBBBBBB /* noche.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0007AAAAAAAAAAAAAAAA /* noche.cube */; };
+		LB0022BBBBBBBBBBBBBBBB /* nostalgia.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0022AAAAAAAAAAAAAAAA /* nostalgia.cube */; };
+		LB0011BBBBBBBBBBBBBBBB /* nube.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0011AAAAAAAAAAAAAAAA /* nube.cube */; };
+		LB0004BBBBBBBBBBBBBBBB /* oceano.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0004AAAAAAAAAAAAAAAA /* oceano.cube */; };
+		LB0010BBBBBBBBBBBBBBBB /* petalo.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0010AAAAAAAAAAAAAAAA /* petalo.cube */; };
+		LB0016BBBBBBBBBBBBBBBB /* polaroid.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0016AAAAAAAAAAAAAAAA /* polaroid.cube */; };
+		LB0019BBBBBBBBBBBBBBBB /* portada.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0019AAAAAAAAAAAAAAAA /* portada.cube */; };
+		LB0018BBBBBBBBBBBBBBBB /* revista.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0018AAAAAAAAAAAAAAAA /* revista.cube */; };
+		LB0027BBBBBBBBBBBBBBBB /* seda.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0027AAAAAAAAAAAAAAAA /* seda.cube */; };
+		LB0023BBBBBBBBBBBBBBBB /* sepia.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0023AAAAAAAAAAAAAAAA /* sepia.cube */; };
+		LB0017BBBBBBBBBBBBBBBB /* super8.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0017AAAAAAAAAAAAAAAA /* super8.cube */; };
+		LB0009BBBBBBBBBBBBBBBB /* teal_orange.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0009AAAAAAAAAAAAAAAA /* teal_orange.cube */; };
+		LB0025BBBBBBBBBBBBBBBB /* vhs.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0025AAAAAAAAAAAAAAAA /* vhs.cube */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -123,6 +151,34 @@
 		BB11CC22DD33EE44FF550067 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		CC22DD33EE44FF5500661178 /* EditClipboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditClipboard.swift; sourceTree = "<group>"; };
 		DD33EE44FF550066117722AB /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		LR0012AAAAAAAAAAAAAAAA /* algodon.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = algodon.cube; sourceTree = "<group>"; };
+		LR0003AAAAAAAAAAAAAAAA /* atardecer.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = atardecer.cube; sourceTree = "<group>"; };
+		LR0013AAAAAAAAAAAAAAAA /* brisa.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = brisa.cube; sourceTree = "<group>"; };
+		LR0002AAAAAAAAAAAAAAAA /* canela.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = canela.cube; sourceTree = "<group>"; };
+		LR0026AAAAAAAAAAAAAAAA /* carbon.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = carbon.cube; sourceTree = "<group>"; };
+		LR0024AAAAAAAAAAAAAAAA /* disco.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = disco.cube; sourceTree = "<group>"; };
+		LR0000AAAAAAAAAAAAAAAA /* dorado.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = dorado.cube; sourceTree = "<group>"; };
+		LR0008AAAAAAAAAAAAAAAA /* drama.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = drama.cube; sourceTree = "<group>"; };
+		LR0015AAAAAAAAAAAAAAAA /* fuji_400h.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = fuji_400h.cube; sourceTree = "<group>"; };
+		LR0020AAAAAAAAAAAAAAAA /* glam.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = glam.cube; sourceTree = "<group>"; };
+		LR0006AAAAAAAAAAAAAAAA /* invierno.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = invierno.cube; sourceTree = "<group>"; };
+		LR0014AAAAAAAAAAAAAAAA /* kodak_gold.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = kodak_gold.cube; sourceTree = "<group>"; };
+		LR0021AAAAAAAAAAAAAAAA /* mate.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = mate.cube; sourceTree = "<group>"; };
+		LR0001AAAAAAAAAAAAAAAA /* miel.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = miel.cube; sourceTree = "<group>"; };
+		LR0005AAAAAAAAAAAAAAAA /* niebla.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = niebla.cube; sourceTree = "<group>"; };
+		LR0007AAAAAAAAAAAAAAAA /* noche.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = noche.cube; sourceTree = "<group>"; };
+		LR0022AAAAAAAAAAAAAAAA /* nostalgia.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = nostalgia.cube; sourceTree = "<group>"; };
+		LR0011AAAAAAAAAAAAAAAA /* nube.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = nube.cube; sourceTree = "<group>"; };
+		LR0004AAAAAAAAAAAAAAAA /* oceano.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = oceano.cube; sourceTree = "<group>"; };
+		LR0010AAAAAAAAAAAAAAAA /* petalo.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = petalo.cube; sourceTree = "<group>"; };
+		LR0016AAAAAAAAAAAAAAAA /* polaroid.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = polaroid.cube; sourceTree = "<group>"; };
+		LR0019AAAAAAAAAAAAAAAA /* portada.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = portada.cube; sourceTree = "<group>"; };
+		LR0018AAAAAAAAAAAAAAAA /* revista.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = revista.cube; sourceTree = "<group>"; };
+		LR0027AAAAAAAAAAAAAAAA /* seda.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = seda.cube; sourceTree = "<group>"; };
+		LR0023AAAAAAAAAAAAAAAA /* sepia.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = sepia.cube; sourceTree = "<group>"; };
+		LR0017AAAAAAAAAAAAAAAA /* super8.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = super8.cube; sourceTree = "<group>"; };
+		LR0009AAAAAAAAAAAAAAAA /* teal_orange.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = teal_orange.cube; sourceTree = "<group>"; };
+		LR0025AAAAAAAAAAAAAAAA /* vhs.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = vhs.cube; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +224,7 @@
 				AE4B24465580C2F2F93A7966 /* Views */,
 				A7AAC2AEDE1E9E9D82824989 /* Metal */,
 				1558C1C11DE01745C37E65F4 /* Assets.xcassets */,
+				CAFE00LUT0GRP000000000A /* LUTs */,
 			);
 			path = Fotico;
 			sourceTree = "<group>";
@@ -349,6 +406,41 @@
 			path = Auth;
 			sourceTree = "<group>";
 		};
+		CAFE00LUT0GRP000000000A /* LUTs */ = {
+			isa = PBXGroup;
+			children = (
+				LR0012AAAAAAAAAAAAAAAA /* algodon.cube */,
+				LR0003AAAAAAAAAAAAAAAA /* atardecer.cube */,
+				LR0013AAAAAAAAAAAAAAAA /* brisa.cube */,
+				LR0002AAAAAAAAAAAAAAAA /* canela.cube */,
+				LR0026AAAAAAAAAAAAAAAA /* carbon.cube */,
+				LR0024AAAAAAAAAAAAAAAA /* disco.cube */,
+				LR0000AAAAAAAAAAAAAAAA /* dorado.cube */,
+				LR0008AAAAAAAAAAAAAAAA /* drama.cube */,
+				LR0015AAAAAAAAAAAAAAAA /* fuji_400h.cube */,
+				LR0020AAAAAAAAAAAAAAAA /* glam.cube */,
+				LR0006AAAAAAAAAAAAAAAA /* invierno.cube */,
+				LR0014AAAAAAAAAAAAAAAA /* kodak_gold.cube */,
+				LR0021AAAAAAAAAAAAAAAA /* mate.cube */,
+				LR0001AAAAAAAAAAAAAAAA /* miel.cube */,
+				LR0005AAAAAAAAAAAAAAAA /* niebla.cube */,
+				LR0007AAAAAAAAAAAAAAAA /* noche.cube */,
+				LR0022AAAAAAAAAAAAAAAA /* nostalgia.cube */,
+				LR0011AAAAAAAAAAAAAAAA /* nube.cube */,
+				LR0004AAAAAAAAAAAAAAAA /* oceano.cube */,
+				LR0010AAAAAAAAAAAAAAAA /* petalo.cube */,
+				LR0016AAAAAAAAAAAAAAAA /* polaroid.cube */,
+				LR0019AAAAAAAAAAAAAAAA /* portada.cube */,
+				LR0018AAAAAAAAAAAAAAAA /* revista.cube */,
+				LR0027AAAAAAAAAAAAAAAA /* seda.cube */,
+				LR0023AAAAAAAAAAAAAAAA /* sepia.cube */,
+				LR0017AAAAAAAAAAAAAAAA /* super8.cube */,
+				LR0009AAAAAAAAAAAAAAAA /* teal_orange.cube */,
+				LR0025AAAAAAAAAAAAAAAA /* vhs.cube */,
+			);
+			path = "Resources/LUTs";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -402,6 +494,34 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9F4877CD35FF4299EDBAA4A /* Assets.xcassets in Resources */,
+				LB0012BBBBBBBBBBBBBBBB /* algodon.cube in Resources */,
+				LB0003BBBBBBBBBBBBBBBB /* atardecer.cube in Resources */,
+				LB0013BBBBBBBBBBBBBBBB /* brisa.cube in Resources */,
+				LB0002BBBBBBBBBBBBBBBB /* canela.cube in Resources */,
+				LB0026BBBBBBBBBBBBBBBB /* carbon.cube in Resources */,
+				LB0024BBBBBBBBBBBBBBBB /* disco.cube in Resources */,
+				LB0000BBBBBBBBBBBBBBBB /* dorado.cube in Resources */,
+				LB0008BBBBBBBBBBBBBBBB /* drama.cube in Resources */,
+				LB0015BBBBBBBBBBBBBBBB /* fuji_400h.cube in Resources */,
+				LB0020BBBBBBBBBBBBBBBB /* glam.cube in Resources */,
+				LB0006BBBBBBBBBBBBBBBB /* invierno.cube in Resources */,
+				LB0014BBBBBBBBBBBBBBBB /* kodak_gold.cube in Resources */,
+				LB0021BBBBBBBBBBBBBBBB /* mate.cube in Resources */,
+				LB0001BBBBBBBBBBBBBBBB /* miel.cube in Resources */,
+				LB0005BBBBBBBBBBBBBBBB /* niebla.cube in Resources */,
+				LB0007BBBBBBBBBBBBBBBB /* noche.cube in Resources */,
+				LB0022BBBBBBBBBBBBBBBB /* nostalgia.cube in Resources */,
+				LB0011BBBBBBBBBBBBBBBB /* nube.cube in Resources */,
+				LB0004BBBBBBBBBBBBBBBB /* oceano.cube in Resources */,
+				LB0010BBBBBBBBBBBBBBBB /* petalo.cube in Resources */,
+				LB0016BBBBBBBBBBBBBBBB /* polaroid.cube in Resources */,
+				LB0019BBBBBBBBBBBBBBBB /* portada.cube in Resources */,
+				LB0018BBBBBBBBBBBBBBBB /* revista.cube in Resources */,
+				LB0027BBBBBBBBBBBBBBBB /* seda.cube in Resources */,
+				LB0023BBBBBBBBBBBBBBBB /* sepia.cube in Resources */,
+				LB0017BBBBBBBBBBBBBBBB /* super8.cube in Resources */,
+				LB0009BBBBBBBBBBBBBBBB /* teal_orange.cube in Resources */,
+				LB0025BBBBBBBBBBBBBBBB /* vhs.cube in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

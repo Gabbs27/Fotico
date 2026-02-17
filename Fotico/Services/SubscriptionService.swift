@@ -6,7 +6,11 @@ class SubscriptionService: ObservableObject {
     static let shared = SubscriptionService()
 
     @Published var products: [Product] = []
+    #if DEBUG
+    @Published var isPro = true  // All tiers unlocked for testing
+    #else
     @Published var isPro = false
+    #endif
 
     private let productIDs = ["com.fotico.pro.monthly", "com.fotico.pro.annual"]
 
