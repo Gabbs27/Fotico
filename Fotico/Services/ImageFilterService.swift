@@ -86,6 +86,11 @@ class ImageFilterService: @unchecked Sendable {
         // 5. Apply effects (spatial filters after color for optimal fusion)
         image = applyEffects(state, to: image)
 
+        // 5.5. Apply overlay (texture compositing)
+        if let overlayId = state.overlayId {
+            image = applyOverlay(overlayId, to: image, intensity: state.overlayIntensity)
+        }
+
         // 6. Safety: ensure the result has a finite extent (CIRandomGenerator etc. produce infinite)
         let sourceExtent = sourceImage.extent
         if image.extent.isInfinite {
@@ -100,7 +105,10 @@ class ImageFilterService: @unchecked Sendable {
     func applyPreset(_ preset: FilterPreset, to image: CIImage, intensity: Double) -> CIImage {
         var filtered: CIImage
 
-        if let ciFilterName = preset.ciFilterName {
+        if let lutFileName = preset.lutFileName {
+            // LUT-based preset (Pro) — apply via CIColorCubeWithColorSpace
+            filtered = LUTService.shared.applyLUT(named: lutFileName, to: image, intensity: 1.0)
+        } else if let ciFilterName = preset.ciFilterName {
             filtered = applyStandardPreset(ciFilterName, to: image)
         } else {
             filtered = applyCustomPreset(preset, to: image)
@@ -503,5 +511,39 @@ class ImageFilterService: @unchecked Sendable {
         let scaled = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
         let filtered = applyPreset(preset, to: scaled, intensity: 1.0)
         return renderToUIImage(filtered)
+    }
+
+    // MARK: - Overlays
+
+    /// Composites a texture overlay PNG over the image with adjustable opacity.
+    /// Uses CISourceOverCompositing for GPU-accelerated compositing.
+    func applyOverlay(_ overlayId: String, to image: CIImage, intensity: Double) -> CIImage {
+        guard let asset = OverlayAsset.allOverlays.first(where: { $0.id == overlayId }),
+              let overlayUIImage = UIImage(named: asset.fileName),
+              var overlayCIImage = CIImage(image: overlayUIImage) else { return image }
+
+        let extent = image.extent
+
+        // Scale overlay to match image size
+        let scaleX = extent.width / overlayCIImage.extent.width
+        let scaleY = extent.height / overlayCIImage.extent.height
+        overlayCIImage = overlayCIImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+
+        // Adjust opacity via alpha channel
+        if intensity < 1.0 {
+            let alphaFilter = CIFilter(name: "CIColorMatrix")!
+            alphaFilter.setValue(overlayCIImage, forKey: kCIInputImageKey)
+            alphaFilter.setValue(CIVector(x: 1, y: 0, z: 0, w: 0), forKey: "inputRVector")
+            alphaFilter.setValue(CIVector(x: 0, y: 1, z: 0, w: 0), forKey: "inputGVector")
+            alphaFilter.setValue(CIVector(x: 0, y: 0, z: 1, w: 0), forKey: "inputBVector")
+            alphaFilter.setValue(CIVector(x: 0, y: 0, z: 0, w: CGFloat(intensity)), forKey: "inputAVector")
+            overlayCIImage = alphaFilter.outputImage ?? overlayCIImage
+        }
+
+        // Composite overlay over source image
+        let compositeFilter = CIFilter(name: "CISourceOverCompositing")!
+        compositeFilter.setValue(overlayCIImage, forKey: kCIInputImageKey)
+        compositeFilter.setValue(image, forKey: kCIInputBackgroundImageKey)
+        return compositeFilter.outputImage?.cropped(to: extent) ?? image
     }
 }

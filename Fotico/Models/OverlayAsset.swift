@@ -1,11 +1,5 @@
 import Foundation
 
-// Temporary — will be in FilterPreset.swift
-enum PresetTier: String, Codable, Sendable {
-    case free
-    case pro
-}
-
 struct OverlayAsset: Identifiable, Sendable {
     let id: String
     let name: String

@@ -44,6 +44,15 @@
 		F56657F9BE138D29001162C4 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320E8FDD1018D987BF801EE1 /* HapticManager.swift */; };
 		DD4455667788990011223344 /* MetalImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2233445566778899001122 /* MetalImageView.swift */; };
 		CC3344556677889900112233 /* RenderEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1122334455667788990011 /* RenderEngine.swift */; };
+		946C800D895BCDBB08A2F1B9 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58B54E4FB56F2F3879D8618 /* UserProfile.swift */; };
+		629CEB9CA2A6D419B03B1E27 /* PhotoProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79F8A05334E010FA8ACC149 /* PhotoProject.swift */; };
+		0BFF22DCBB6322A98E9724D5 /* SavedEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED50138006F3BCB7AB68693 /* SavedEdit.swift */; };
+		630CE8F20C1EB13F5445AEAF /* OverlayAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02781196ED8C1299B1360FF8 /* OverlayAsset.swift */; };
+		AA11BB22CC33DD44EE55FF66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AA22BB33CC44DD55EE66FF /* HomeTabView.swift */; };
+		BB22CC33DD44EE55FF660011 /* CameraLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22BB33CC44DD55EE66FF0011 /* CameraLaunchView.swift */; };
+		CC33DD44EE55FF66001122AA /* ProjectsGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC44DD55EE66FF001122AA /* ProjectsGridView.swift */; };
+		DD44EE55FF6600112233AABB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DD55EE66FF001122AA33BB /* ProfileView.swift */; };
+		3B8E62D1A9C0F74589ABCDEF /* LUTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A3F91B2C8D4E5F601234567 /* LUTService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -85,6 +94,15 @@
 		FDE77CC2D7DA2B378FDE452C /* ImageFilterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterService.swift; sourceTree = "<group>"; };
 		BB2233445566778899001122 /* MetalImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalImageView.swift; sourceTree = "<group>"; };
 		AA1122334455667788990011 /* RenderEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderEngine.swift; sourceTree = "<group>"; };
+		B58B54E4FB56F2F3879D8618 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		C79F8A05334E010FA8ACC149 /* PhotoProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoProject.swift; sourceTree = "<group>"; };
+		EED50138006F3BCB7AB68693 /* SavedEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedEdit.swift; sourceTree = "<group>"; };
+		02781196ED8C1299B1360FF8 /* OverlayAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayAsset.swift; sourceTree = "<group>"; };
+		11AA22BB33CC44DD55EE66FF /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
+		22BB33CC44DD55EE66FF0011 /* CameraLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraLaunchView.swift; sourceTree = "<group>"; };
+		33CC44DD55EE66FF001122AA /* ProjectsGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsGridView.swift; sourceTree = "<group>"; };
+		44DD55EE66FF001122AA33BB /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		7A3F91B2C8D4E5F601234567 /* LUTService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LUTService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +174,7 @@
 			isa = PBXGroup;
 			children = (
 				FDE77CC2D7DA2B378FDE452C /* ImageFilterService.swift */,
+				7A3F91B2C8D4E5F601234567 /* LUTService.swift */,
 				4AF6182A7989512164360ECE /* MetalKernelService.swift */,
 				BC9F515D40A563F788348AD1 /* PhotoLibraryService.swift */,
 				8390987642994CDC66477B0D /* CameraService.swift */,
@@ -167,6 +186,7 @@
 		7FE2FA266A9F6B1574CB6A00 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				22BB33CC44DD55EE66FF0011 /* CameraLaunchView.swift */,
 				39A8F513701A08A996998038 /* CameraView.swift */,
 				97CF9C27BBE59D67E458ED87 /* CaptureButtonView.swift */,
 				B2C3D4E5F60718192A3B4C5D /* CameraPresetStripView.swift */,
@@ -230,9 +250,28 @@
 				E5ACFCEC3ACB96323CD936AB /* Components */,
 				06DCA66DD2C08C5DA0C0AD38 /* Editor */,
 				D6FA556A53ADBB8DB12A467D /* Gallery */,
+				AABB001122334455EEFF6677 /* Profile */,
+				BBCC112233445566FFAA7788 /* Projects */,
+				11AA22BB33CC44DD55EE66FF /* HomeTabView.swift */,
 				4721D0094164679B583AA88F /* MainEditorView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		AABB001122334455EEFF6677 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				44DD55EE66FF001122AA33BB /* ProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		BBCC112233445566FFAA7788 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				33CC44DD55EE66FF001122AA /* ProjectsGridView.swift */,
+			);
+			path = Projects;
 			sourceTree = "<group>";
 		};
 		D6FA556A53ADBB8DB12A467D /* Gallery */ = {
@@ -256,6 +295,10 @@
 				A2305F7EBB877817426CACC9 /* EditState.swift */,
 				4472A85E4776C5B3081E6F27 /* EffectType.swift */,
 				7DDF80977A4F5AED1D02D616 /* FilterPreset.swift */,
+				B58B54E4FB56F2F3879D8618 /* UserProfile.swift */,
+				C79F8A05334E010FA8ACC149 /* PhotoProject.swift */,
+				EED50138006F3BCB7AB68693 /* SavedEdit.swift */,
+				02781196ED8C1299B1360FF8 /* OverlayAsset.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -353,6 +396,15 @@
 				A1B2C3D4E5F60718192A3B4C /* CameraPresetStripView.swift in Sources */,
 				CC3344556677889900112233 /* RenderEngine.swift in Sources */,
 				DD4455667788990011223344 /* MetalImageView.swift in Sources */,
+				946C800D895BCDBB08A2F1B9 /* UserProfile.swift in Sources */,
+				629CEB9CA2A6D419B03B1E27 /* PhotoProject.swift in Sources */,
+				0BFF22DCBB6322A98E9724D5 /* SavedEdit.swift in Sources */,
+				630CE8F20C1EB13F5445AEAF /* OverlayAsset.swift in Sources */,
+				3B8E62D1A9C0F74589ABCDEF /* LUTService.swift in Sources */,
+				AA11BB22CC33DD44EE55FF66 /* HomeTabView.swift in Sources */,
+				BB22CC33DD44EE55FF660011 /* CameraLaunchView.swift in Sources */,
+				CC33DD44EE55FF66001122AA /* ProjectsGridView.swift in Sources */,
+				DD44EE55FF6600112233AABB /* ProfileView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -198,11 +198,17 @@ class CameraViewModel: ObservableObject {
 enum CameraFilters {
 
     static func applyLivePreset(_ preset: FilterPreset, to image: CIImage) -> CIImage {
+        // LUT-based presets (Pro)
+        if let lutFileName = preset.lutFileName {
+            return LUTService.shared.applyLUT(named: lutFileName, to: image, intensity: 1.0)
+        }
+        // CIFilter-based presets
         if let filterName = preset.ciFilterName {
             guard let filter = CIFilter(name: filterName) else { return image }
             filter.setValue(image, forKey: kCIInputImageKey)
             return filter.outputImage ?? image
         }
+        // Custom presets
         switch preset.id {
         case "fotico_cine":
             let tempTint = CIFilter(name: "CITemperatureAndTint")!
@@ -260,10 +266,14 @@ enum CameraFilters {
         }
 
         // 6. Preset
-        if let preset, let filterName = preset.ciFilterName {
-            let f = CIFilter(name: filterName)!
-            f.setValue(result, forKey: kCIInputImageKey)
-            result = f.outputImage ?? result
+        if let preset {
+            if let lutFileName = preset.lutFileName {
+                result = LUTService.shared.applyLUT(named: lutFileName, to: result, intensity: 1.0)
+            } else if let filterName = preset.ciFilterName {
+                let f = CIFilter(name: filterName)!
+                f.setValue(result, forKey: kCIInputImageKey)
+                result = f.outputImage ?? result
+            }
         }
 
         return result.toUIImage(context: context) ?? image
@@ -273,10 +283,14 @@ enum CameraFilters {
         guard let ciImage = image.toCIImage() else { return image }
         var result = ciImage
 
-        if let preset, let filterName = preset.ciFilterName {
-            let f = CIFilter(name: filterName)!
-            f.setValue(result, forKey: kCIInputImageKey)
-            result = f.outputImage ?? result
+        if let preset {
+            if let lutFileName = preset.lutFileName {
+                result = LUTService.shared.applyLUT(named: lutFileName, to: result, intensity: 1.0)
+            } else if let filterName = preset.ciFilterName {
+                let f = CIFilter(name: filterName)!
+                f.setValue(result, forKey: kCIInputImageKey)
+                result = f.outputImage ?? result
+            }
         }
 
         if shouldApplyGrain {
