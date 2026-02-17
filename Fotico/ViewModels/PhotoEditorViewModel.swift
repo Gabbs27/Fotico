@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import CoreImage
 import Combine
 
@@ -13,6 +14,7 @@ class PhotoEditorViewModel: ObservableObject {
     @Published var currentTool: EditorTool = .presets
     @Published var errorMessage: String?
     @Published var exportSuccess = false
+    @Published var showSaveProjectSheet = false
 
     // Separate filter service per queue — CIFilter is NOT thread-safe
     private let filterService = ImageFilterService()       // For renderQueue only
@@ -175,6 +177,41 @@ class PhotoEditorViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Overlays
+
+    func selectOverlay(_ overlayId: String?) {
+        pushUndo()
+        if editState.overlayId == overlayId {
+            editState.overlayId = nil
+        } else {
+            editState.overlayId = overlayId
+        }
+        requestRender()
+    }
+
+    func updateOverlayIntensity(_ intensity: Double) {
+        editState.overlayIntensity = intensity
+        requestRender()
+    }
+
+    func commitOverlayChange() {
+        pushUndo()
+    }
+
+    // MARK: - Copy/Paste Edits (Batch Editing)
+
+    func copyEdits() {
+        EditClipboard.shared.copy(editState)
+    }
+
+    func pasteEdits() {
+        guard let copied = EditClipboard.shared.copiedState else { return }
+        pushUndo()
+        editState = copied
+        requestRender()
+        HapticManager.notification(.success)
+    }
+
     // MARK: - Rendering (Coalescing Throttle)
     //
     // Instead of debounce (which adds latency), we use a coalescing pattern:
@@ -311,6 +348,16 @@ class PhotoEditorViewModel: ObservableObject {
         isProcessing = false
     }
 
+    // MARK: - Save Project
+
+    func saveAsProject(name: String, modelContext: ModelContext) {
+        guard let image = originalImage else { return }
+        let vm = ProjectsViewModel()
+        vm.setModelContext(modelContext)
+        vm.saveProject(name: name, image: image, editState: editState)
+        HapticManager.notification(.success)
+    }
+
     // MARK: - Undo/Redo
 
     private static let maxUndoStackSize = 50
@@ -391,6 +438,7 @@ enum EditorTool: String, CaseIterable, Sendable {
     case presets
     case adjust
     case effects
+    case overlays
     case crop
 
     nonisolated var displayName: String {
@@ -398,6 +446,7 @@ enum EditorTool: String, CaseIterable, Sendable {
         case .presets: return "Presets"
         case .adjust: return "Ajustes"
         case .effects: return "Efectos"
+        case .overlays: return "Overlays"
         case .crop: return "Rotar"
         }
     }
@@ -407,6 +456,7 @@ enum EditorTool: String, CaseIterable, Sendable {
         case .presets: return "camera.filters"
         case .adjust: return "slider.horizontal.3"
         case .effects: return "sparkles"
+        case .overlays: return "square.on.square"
         case .crop: return "crop"
         }
     }

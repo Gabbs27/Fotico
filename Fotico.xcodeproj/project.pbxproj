@@ -53,6 +53,16 @@
 		CC33DD44EE55FF66001122AA /* ProjectsGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC44DD55EE66FF001122AA /* ProjectsGridView.swift */; };
 		DD44EE55FF6600112233AABB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DD55EE66FF001122AA33BB /* ProfileView.swift */; };
 		3B8E62D1A9C0F74589ABCDEF /* LUTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A3F91B2C8D4E5F601234567 /* LUTService.swift */; };
+		EE66FF00112233AABB44CC55 /* PremiumBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77001122334455AABB6688 /* PremiumBadge.swift */; };
+		B2C3D4E5F6071819AABBCCDD /* ProjectStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071819AABBCC /* ProjectStorageService.swift */; };
+		D4E5F6071819AABBCCDDEEFF /* ProjectsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6071819AABBCCDDEE /* ProjectsViewModel.swift */; };
+		F1A2B3C4D5E6071800000001 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6071800000002 /* AuthService.swift */; };
+		F1A2B3C4D5E6071800000003 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6071800000004 /* LoginView.swift */; };
+		A0B1C2D3E4F5061728394A5B /* OverlayPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C1D2E3F4050617283940AB /* OverlayPanelView.swift */; };
+		AA00BB11CC22DD33EE44FF55 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00BB11CC22DD33EE44FF56 /* SubscriptionService.swift */; };
+		BB11CC22DD33EE44FF550066 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11CC22DD33EE44FF550067 /* PaywallView.swift */; };
+		CC22DD33EE44FF5500661177 /* EditClipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC22DD33EE44FF5500661178 /* EditClipboard.swift */; };
+		DD33EE44FF550066117722AA /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD33EE44FF550066117722AB /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -103,6 +113,16 @@
 		33CC44DD55EE66FF001122AA /* ProjectsGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsGridView.swift; sourceTree = "<group>"; };
 		44DD55EE66FF001122AA33BB /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		7A3F91B2C8D4E5F601234567 /* LUTService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LUTService.swift; sourceTree = "<group>"; };
+		FF77001122334455AABB6688 /* PremiumBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumBadge.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6071819AABBCC /* ProjectStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectStorageService.swift; sourceTree = "<group>"; };
+		C3D4E5F6071819AABBCCDDEE /* ProjectsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsViewModel.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6071800000002 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6071800000004 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		B0C1D2E3F4050617283940AB /* OverlayPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPanelView.swift; sourceTree = "<group>"; };
+		AA00BB11CC22DD33EE44FF56 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
+		BB11CC22DD33EE44FF550067 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		CC22DD33EE44FF5500661178 /* EditClipboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditClipboard.swift; sourceTree = "<group>"; };
+		DD33EE44FF550066117722AB /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +150,7 @@
 				4809EB16ABE2A6CA7B5FC772 /* EffectsPanelView.swift */,
 				FB96FD9B88185888576BA7DC /* ExportSheet.swift */,
 				65D85D0F652FEF3B63F2D724 /* ImagePreviewView.swift */,
+				B0C1D2E3F4050617283940AB /* OverlayPanelView.swift */,
 				CEBBDEEDB060842ABA5B6735 /* PresetStripView.swift */,
 				212CFF362D57F821DA1547D8 /* ToolBarView.swift */,
 			);
@@ -177,8 +198,12 @@
 				7A3F91B2C8D4E5F601234567 /* LUTService.swift */,
 				4AF6182A7989512164360ECE /* MetalKernelService.swift */,
 				BC9F515D40A563F788348AD1 /* PhotoLibraryService.swift */,
+				A1B2C3D4E5F6071819AABBCC /* ProjectStorageService.swift */,
 				8390987642994CDC66477B0D /* CameraService.swift */,
 				AA1122334455667788990011 /* RenderEngine.swift */,
+				F1A2B3C4D5E6071800000002 /* AuthService.swift */,
+				AA00BB11CC22DD33EE44FF56 /* SubscriptionService.swift */,
+				CC22DD33EE44FF5500661178 /* EditClipboard.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -226,6 +251,7 @@
 			children = (
 				25D91AC38F5665E6214C1ACA /* PhotoEditorViewModel.swift */,
 				696854199B0343E679E72511 /* CameraViewModel.swift */,
+				C3D4E5F6071819AABBCCDDEE /* ProjectsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -246,10 +272,12 @@
 		AE4B24465580C2F2F93A7966 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F1A2B3C4D5E6071800000005 /* Auth */,
 				7FE2FA266A9F6B1574CB6A00 /* Camera */,
 				E5ACFCEC3ACB96323CD936AB /* Components */,
 				06DCA66DD2C08C5DA0C0AD38 /* Editor */,
 				D6FA556A53ADBB8DB12A467D /* Gallery */,
+				EE44FF550066117722AABB33 /* Onboarding */,
 				AABB001122334455EEFF6677 /* Profile */,
 				BBCC112233445566FFAA7788 /* Projects */,
 				11AA22BB33CC44DD55EE66FF /* HomeTabView.swift */,
@@ -285,6 +313,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2233445566778899001122 /* MetalImageView.swift */,
+				FF77001122334455AABB6688 /* PremiumBadge.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -301,6 +330,23 @@
 				02781196ED8C1299B1360FF8 /* OverlayAsset.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		EE44FF550066117722AABB33 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				DD33EE44FF550066117722AB /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		F1A2B3C4D5E6071800000005 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				F1A2B3C4D5E6071800000004 /* LoginView.swift */,
+				BB11CC22DD33EE44FF550067 /* PaywallView.swift */,
+			);
+			path = Auth;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -405,6 +451,16 @@
 				BB22CC33DD44EE55FF660011 /* CameraLaunchView.swift in Sources */,
 				CC33DD44EE55FF66001122AA /* ProjectsGridView.swift in Sources */,
 				DD44EE55FF6600112233AABB /* ProfileView.swift in Sources */,
+				EE66FF00112233AABB44CC55 /* PremiumBadge.swift in Sources */,
+				B2C3D4E5F6071819AABBCCDD /* ProjectStorageService.swift in Sources */,
+				D4E5F6071819AABBCCDDEEFF /* ProjectsViewModel.swift in Sources */,
+				F1A2B3C4D5E6071800000001 /* AuthService.swift in Sources */,
+				F1A2B3C4D5E6071800000003 /* LoginView.swift in Sources */,
+				A0B1C2D3E4F5061728394A5B /* OverlayPanelView.swift in Sources */,
+				AA00BB11CC22DD33EE44FF55 /* SubscriptionService.swift in Sources */,
+				BB11CC22DD33EE44FF550066 /* PaywallView.swift in Sources */,
+				CC22DD33EE44FF5500661177 /* EditClipboard.swift in Sources */,
+				DD33EE44FF550066117722AA /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

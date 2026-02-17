@@ -1,11 +1,16 @@
 import SwiftUI
+import SwiftData
 import PhotosUI
 
 struct MainEditorView: View {
+    @Environment(\.modelContext) private var modelContext
     @StateObject private var editorVM = PhotoEditorViewModel()
+    @ObservedObject private var subscriptionService = SubscriptionService.shared
+    @ObservedObject private var clipboard = EditClipboard.shared
     @State private var pickerItem: PhotosPickerItem?
     @State private var showCamera = false
     @State private var showDiscardAlert = false
+    @State private var showPaywall = false
 
     var body: some View {
         ZStack {
@@ -56,6 +61,16 @@ struct MainEditorView: View {
             CameraView { capturedImage in
                 editorVM.loadImage(capturedImage)
             }
+        }
+        .onChange(of: editorVM.showSaveProjectSheet) { _, show in
+            if show {
+                let name = "Foto \(Date().formatted(.dateTime.month(.abbreviated).day().hour().minute()))"
+                editorVM.saveAsProject(name: name, modelContext: modelContext)
+                editorVM.showSaveProjectSheet = false
+            }
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
         }
         .alert("Descartar cambios?", isPresented: $showDiscardAlert) {
             Button("Descartar", role: .destructive) {
@@ -131,6 +146,25 @@ struct MainEditorView: View {
             Spacer()
 
             HStack(spacing: 16) {
+                // Copy/Paste edits
+                Button {
+                    editorVM.copyEdits()
+                } label: {
+                    Image(systemName: "doc.on.doc")
+                        .foregroundColor(!editorVM.editState.isDefault ? .white : .gray)
+                }
+                .disabled(editorVM.editState.isDefault)
+                .accessibilityLabel("Copiar ediciones")
+
+                Button {
+                    editorVM.pasteEdits()
+                } label: {
+                    Image(systemName: "doc.on.clipboard")
+                        .foregroundColor(clipboard.hasContent ? Color.foticoPrimary : .gray)
+                }
+                .disabled(!clipboard.hasContent)
+                .accessibilityLabel("Pegar ediciones")
+
                 if !editorVM.editState.isDefault {
                     Button {
                         editorVM.resetEdits()
@@ -150,6 +184,15 @@ struct MainEditorView: View {
                         .foregroundColor(Color.foticoPrimary)
                 }
                 .accessibilityLabel("Guardar imagen")
+
+                Button {
+                    editorVM.showSaveProjectSheet = true
+                } label: {
+                    Image(systemName: "folder.badge.plus")
+                        .font(.title3)
+                        .foregroundColor(.white)
+                }
+                .accessibilityLabel("Guardar proyecto")
             }
         }
         .padding(.horizontal)
@@ -168,9 +211,11 @@ struct MainEditorView: View {
                 selectedPresetId: editorVM.editState.selectedPresetId,
                 presetIntensity: $editorVM.editState.presetIntensity,
                 thumbnails: editorVM.presetThumbnails,
+                isPro: subscriptionService.isPro,
                 onSelectPreset: { editorVM.selectPreset($0) },
                 onDeselectPreset: { editorVM.deselectPreset() },
-                onIntensityChange: { editorVM.updatePresetIntensity($0) }
+                onIntensityChange: { editorVM.updatePresetIntensity($0) },
+                onLockedPresetTapped: { showPaywall = true }
             )
         case .adjust:
             AdjustmentPanelView(editState: $editorVM.editState) {
@@ -180,6 +225,8 @@ struct MainEditorView: View {
             }
         case .effects:
             EffectsPanelView(editorVM: editorVM)
+        case .overlays:
+            OverlayPanelView(editorVM: editorVM)
         case .crop:
             CropView(
                 rotation: $editorVM.editState.rotation,
