@@ -81,7 +81,7 @@ struct FilterPreset: Identifiable, Sendable {
         // Color Grades (custom CIFilter chains)
         FilterPreset(
             id: "fotico_sunset", name: "Sunset", displayName: "Sunset",
-            category: .warm, tier: .free,
+            category: .cleanGirl, tier: .free,
             parameters: [
                 FilterParameter(key: "temperature", value: 8500, minValue: 2000, maxValue: 10000),
                 FilterParameter(key: "saturation", value: 1.3, minValue: 0, maxValue: 2),
@@ -91,7 +91,7 @@ struct FilterPreset: Identifiable, Sendable {
         ),
         FilterPreset(
             id: "fotico_cool", name: "Cool", displayName: "Cool",
-            category: .cool, tier: .free,
+            category: .soft, tier: .free,
             parameters: [
                 FilterParameter(key: "temperature", value: 4500, minValue: 2000, maxValue: 10000),
                 FilterParameter(key: "saturation", value: 0.85, minValue: 0, maxValue: 2),
@@ -101,7 +101,7 @@ struct FilterPreset: Identifiable, Sendable {
         ),
         FilterPreset(
             id: "fotico_vivid", name: "Vivid", displayName: "Vivid",
-            category: .warm, tier: .free,
+            category: .cleanGirl, tier: .free,
             parameters: [
                 FilterParameter(key: "saturation", value: 1.5, minValue: 0, maxValue: 2),
                 FilterParameter(key: "contrast", value: 1.2, minValue: 0.25, maxValue: 4),
@@ -121,7 +121,7 @@ struct FilterPreset: Identifiable, Sendable {
         ),
         FilterPreset(
             id: "fotico_golden", name: "Golden", displayName: "Golden",
-            category: .warm, tier: .free,
+            category: .cleanGirl, tier: .free,
             parameters: [
                 FilterParameter(key: "temperature", value: 8000, minValue: 2000, maxValue: 10000),
                 FilterParameter(key: "saturation", value: 0.7, minValue: 0, maxValue: 2),
@@ -143,25 +143,25 @@ struct FilterPreset: Identifiable, Sendable {
         // Black & White
         FilterPreset(
             id: "fotico_bn1", name: "BW", displayName: "BW",
-            category: .bw, tier: .free,
+            category: .film, tier: .free,
             ciFilterName: "CIPhotoEffectMono",
             sortOrder: 20
         ),
         FilterPreset(
             id: "fotico_bn2", name: "BW Noir", displayName: "Noir",
-            category: .bw, tier: .free,
+            category: .film, tier: .free,
             ciFilterName: "CIPhotoEffectNoir",
             sortOrder: 21
         ),
         FilterPreset(
             id: "fotico_bn3", name: "BW Tonal", displayName: "Tonal",
-            category: .bw, tier: .free,
+            category: .film, tier: .free,
             ciFilterName: "CIPhotoEffectTonal",
             sortOrder: 22
         ),
         FilterPreset(
             id: "fotico_silverplate", name: "Silver", displayName: "Silver",
-            category: .bw, tier: .free,
+            category: .film, tier: .free,
             parameters: [
                 FilterParameter(key: "saturation", value: 0.0, minValue: 0, maxValue: 2),
                 FilterParameter(key: "contrast", value: 1.4, minValue: 0.25, maxValue: 4),
@@ -173,7 +173,7 @@ struct FilterPreset: Identifiable, Sendable {
         // Cinematic & Special
         FilterPreset(
             id: "fotico_cine", name: "Cine", displayName: "Cine",
-            category: .cinematic, tier: .free,
+            category: .film, tier: .free,
             parameters: [
                 FilterParameter(key: "tealShadows", value: 0.6, minValue: 0, maxValue: 1),
                 FilterParameter(key: "orangeHighlights", value: 0.5, minValue: 0, maxValue: 1),
@@ -183,7 +183,7 @@ struct FilterPreset: Identifiable, Sendable {
         ),
         FilterPreset(
             id: "fotico_neon", name: "Neon", displayName: "Neon",
-            category: .cinematic, tier: .free,
+            category: .film, tier: .free,
             parameters: [
                 FilterParameter(key: "saturation", value: 1.8, minValue: 0, maxValue: 2),
                 FilterParameter(key: "contrast", value: 1.4, minValue: 0.25, maxValue: 4),
@@ -206,33 +206,33 @@ struct FilterPreset: Identifiable, Sendable {
     // MARK: - Pro Presets (LUT-based)
 
     static let proPresets: [FilterPreset] = [
-        // Cálidos (Warm)
+        // Clean Girl (formerly Warm)
         FilterPreset(id: "pro_dorado", name: "Dorado", displayName: "Dorado",
-                     category: .warm, tier: .free, lutFileName: "dorado.cube", sortOrder: 100),
+                     category: .cleanGirl, tier: .free, lutFileName: "dorado.cube", sortOrder: 100),
         FilterPreset(id: "pro_miel", name: "Miel", displayName: "Miel",
-                     category: .warm, tier: .free, lutFileName: "miel.cube", sortOrder: 101),
+                     category: .cleanGirl, tier: .free, lutFileName: "miel.cube", sortOrder: 101),
         FilterPreset(id: "pro_canela", name: "Canela", displayName: "Canela",
-                     category: .warm, tier: .free, lutFileName: "canela.cube", sortOrder: 102),
+                     category: .cleanGirl, tier: .free, lutFileName: "canela.cube", sortOrder: 102),
         FilterPreset(id: "pro_atardecer", name: "Atardecer", displayName: "Atardecer",
-                     category: .warm, tier: .free, lutFileName: "atardecer.cube", sortOrder: 103),
+                     category: .cleanGirl, tier: .free, lutFileName: "atardecer.cube", sortOrder: 103),
 
-        // Fríos (Cool)
+        // Soft (formerly Cool)
         FilterPreset(id: "pro_oceano", name: "Océano", displayName: "Océano",
-                     category: .cool, tier: .free, lutFileName: "oceano.cube", sortOrder: 200),
+                     category: .soft, tier: .free, lutFileName: "oceano.cube", sortOrder: 200),
         FilterPreset(id: "pro_niebla", name: "Niebla", displayName: "Niebla",
-                     category: .cool, tier: .free, lutFileName: "niebla.cube", sortOrder: 201),
+                     category: .soft, tier: .free, lutFileName: "niebla.cube", sortOrder: 201),
         FilterPreset(id: "pro_invierno", name: "Invierno", displayName: "Invierno",
-                     category: .cool, tier: .free, lutFileName: "invierno.cube", sortOrder: 202),
+                     category: .soft, tier: .free, lutFileName: "invierno.cube", sortOrder: 202),
 
-        // Cine
+        // Film (formerly Cinematic)
         FilterPreset(id: "pro_noche", name: "Noche", displayName: "Noche",
-                     category: .cinematic, tier: .free, lutFileName: "noche.cube", sortOrder: 300),
+                     category: .film, tier: .free, lutFileName: "noche.cube", sortOrder: 300),
         FilterPreset(id: "pro_drama", name: "Drama", displayName: "Drama",
-                     category: .cinematic, tier: .free, lutFileName: "drama.cube", sortOrder: 301),
+                     category: .film, tier: .free, lutFileName: "drama.cube", sortOrder: 301),
         FilterPreset(id: "pro_teal_orange", name: "Teal&Orange", displayName: "Teal&Orange",
-                     category: .cinematic, tier: .free, lutFileName: "teal_orange.cube", sortOrder: 302),
+                     category: .film, tier: .free, lutFileName: "teal_orange.cube", sortOrder: 302),
 
-        // Suaves (Soft/Pastel)
+        // Soft (Pastel)
         FilterPreset(id: "pro_petalo", name: "Pétalo", displayName: "Pétalo",
                      category: .soft, tier: .free, lutFileName: "petalo.cube", sortOrder: 400),
         FilterPreset(id: "pro_nube", name: "Nube", displayName: "Nube",
@@ -242,7 +242,7 @@ struct FilterPreset: Identifiable, Sendable {
         FilterPreset(id: "pro_brisa", name: "Brisa", displayName: "Brisa",
                      category: .soft, tier: .free, lutFileName: "brisa.cube", sortOrder: 403),
 
-        // Película (Film emulation)
+        // Film (Film emulation)
         FilterPreset(id: "pro_kodak", name: "Kodak", displayName: "Kodak",
                      category: .film, tier: .free, lutFileName: "kodak_gold.cube", sortOrder: 500),
         FilterPreset(id: "pro_fuji", name: "Fuji", displayName: "Fuji",
@@ -252,15 +252,15 @@ struct FilterPreset: Identifiable, Sendable {
         FilterPreset(id: "pro_super8", name: "Super8", displayName: "Super8",
                      category: .film, tier: .free, lutFileName: "super8.cube", sortOrder: 503),
 
-        // Editorial
+        // Clean Girl (formerly Editorial)
         FilterPreset(id: "pro_revista", name: "Revista", displayName: "Revista",
-                     category: .editorial, tier: .free, lutFileName: "revista.cube", sortOrder: 600),
+                     category: .cleanGirl, tier: .free, lutFileName: "revista.cube", sortOrder: 600),
         FilterPreset(id: "pro_portada", name: "Portada", displayName: "Portada",
-                     category: .editorial, tier: .free, lutFileName: "portada.cube", sortOrder: 601),
+                     category: .cleanGirl, tier: .free, lutFileName: "portada.cube", sortOrder: 601),
         FilterPreset(id: "pro_glam", name: "Glam", displayName: "Glam",
-                     category: .editorial, tier: .free, lutFileName: "glam.cube", sortOrder: 602),
+                     category: .cleanGirl, tier: .free, lutFileName: "glam.cube", sortOrder: 602),
         FilterPreset(id: "pro_mate", name: "Mate", displayName: "Mate",
-                     category: .editorial, tier: .free, lutFileName: "mate.cube", sortOrder: 603),
+                     category: .cleanGirl, tier: .free, lutFileName: "mate.cube", sortOrder: 603),
 
         // Vintage
         FilterPreset(id: "pro_nostalgia", name: "Nostalgia", displayName: "Nostalgia",
@@ -272,48 +272,36 @@ struct FilterPreset: Identifiable, Sendable {
         FilterPreset(id: "pro_vhs", name: "VHS", displayName: "VHS",
                      category: .vintage, tier: .free, lutFileName: "vhs.cube", sortOrder: 703),
 
-        // B&W
+        // Film (formerly B&W)
         FilterPreset(id: "pro_carbon", name: "Carbón", displayName: "Carbón",
-                     category: .bw, tier: .free, lutFileName: "carbon.cube", sortOrder: 800),
+                     category: .film, tier: .free, lutFileName: "carbon.cube", sortOrder: 800),
         FilterPreset(id: "pro_seda", name: "Seda", displayName: "Seda",
-                     category: .bw, tier: .free, lutFileName: "seda.cube", sortOrder: 801),
+                     category: .film, tier: .free, lutFileName: "seda.cube", sortOrder: 801),
     ]
 }
 
 // MARK: - Preset Category
 
 enum PresetCategory: String, CaseIterable, Sendable {
-    case film
-    case warm
-    case cool
-    case bw
-    case cinematic
+    case cleanGirl
     case soft
-    case editorial
+    case film
     case vintage
 
     nonisolated var displayName: String {
         switch self {
-        case .film: return "Película"
-        case .warm: return "Cálidos"
-        case .cool: return "Fríos"
-        case .bw: return "B&W"
-        case .cinematic: return "Cine"
-        case .soft: return "Suaves"
-        case .editorial: return "Editorial"
+        case .cleanGirl: return "Clean Girl"
+        case .soft: return "Soft"
+        case .film: return "Film"
         case .vintage: return "Vintage"
         }
     }
 
     nonisolated var icon: String {
         switch self {
-        case .film: return "film"
-        case .warm: return "sun.max.fill"
-        case .cool: return "snowflake"
-        case .bw: return "circle.lefthalf.filled"
-        case .cinematic: return "theatermasks"
+        case .cleanGirl: return "sparkles"
         case .soft: return "cloud.fill"
-        case .editorial: return "newspaper.fill"
+        case .film: return "film"
         case .vintage: return "clock.arrow.circlepath"
         }
     }
