@@ -41,242 +41,167 @@ struct FilterPreset: Identifiable, Sendable {
     // MARK: - Free Presets (CIFilter-based)
 
     static let freePresets: [FilterPreset] = [
-        // Film Color Presets (E1-E5)
+        // MARK: Clean Girl
         FilterPreset(
-            id: "fotico_1000", name: "E1", displayName: "E1",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectChrome",
-            parameters: [FilterParameter(key: "temperature", value: 7000, minValue: 2000, maxValue: 10000)],
+            id: "cocoa", name: "Cocoa", displayName: "Cocoa",
+            category: .cleanGirl, tier: .free,
+            parameters: [
+                FilterParameter(key: "temperature", value: 7800, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 0.95, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 1.05, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "brightness", value: 0.03, minValue: -1, maxValue: 1),
+            ],
             sortOrder: 0
         ),
         FilterPreset(
-            id: "fotico_2000", name: "E2", displayName: "E2",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectProcess",
-            parameters: [FilterParameter(key: "brightness", value: 0.05, minValue: -1, maxValue: 1)],
+            id: "butter", name: "Butter", displayName: "Butter",
+            category: .cleanGirl, tier: .free,
+            parameters: [
+                FilterParameter(key: "temperature", value: 7500, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 1.1, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 0.9, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "brightness", value: 0.05, minValue: -1, maxValue: 1),
+            ],
             sortOrder: 1
         ),
         FilterPreset(
-            id: "fotico_3000", name: "E3", displayName: "E3",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectInstant",
-            parameters: [FilterParameter(key: "vignette", value: 1.5, minValue: 0, maxValue: 3)],
+            id: "goldie", name: "Goldie", displayName: "Goldie",
+            category: .cleanGirl, tier: .free,
+            parameters: [
+                FilterParameter(key: "temperature", value: 8200, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 1.05, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 1.1, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "vignette", value: 0.5, minValue: 0, maxValue: 3),
+            ],
             sortOrder: 2
         ),
         FilterPreset(
-            id: "fotico_4000", name: "E4", displayName: "E4",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectTransfer",
-            parameters: [FilterParameter(key: "contrast", value: 1.3, minValue: 0.25, maxValue: 4)],
+            id: "latte", name: "Latte", displayName: "Latte",
+            category: .cleanGirl, tier: .free,
+            parameters: [
+                FilterParameter(key: "temperature", value: 7200, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 0.8, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 0.95, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "brightness", value: 0.04, minValue: -1, maxValue: 1),
+            ],
             sortOrder: 3
         ),
-        FilterPreset(
-            id: "fotico_5000", name: "E5", displayName: "E5",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectFade",
-            parameters: [FilterParameter(key: "temperature", value: 7500, minValue: 2000, maxValue: 10000)],
-            sortOrder: 4
-        ),
 
-        // Color Grades (custom CIFilter chains)
+        // MARK: Soft
         FilterPreset(
-            id: "fotico_sunset", name: "Sunset", displayName: "Sunset",
-            category: .cleanGirl, tier: .free,
-            parameters: [
-                FilterParameter(key: "temperature", value: 8500, minValue: 2000, maxValue: 10000),
-                FilterParameter(key: "saturation", value: 1.3, minValue: 0, maxValue: 2),
-                FilterParameter(key: "contrast", value: 1.15, minValue: 0.25, maxValue: 4)
-            ],
-            sortOrder: 10
-        ),
-        FilterPreset(
-            id: "fotico_cool", name: "Cool", displayName: "Cool",
+            id: "honey", name: "Honey", displayName: "Honey",
             category: .soft, tier: .free,
             parameters: [
-                FilterParameter(key: "temperature", value: 4500, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "temperature", value: 7600, minValue: 2000, maxValue: 10000),
                 FilterParameter(key: "saturation", value: 0.85, minValue: 0, maxValue: 2),
-                FilterParameter(key: "contrast", value: 1.1, minValue: 0.25, maxValue: 4)
-            ],
-            sortOrder: 11
-        ),
-        FilterPreset(
-            id: "fotico_vivid", name: "Vivid", displayName: "Vivid",
-            category: .cleanGirl, tier: .free,
-            parameters: [
-                FilterParameter(key: "saturation", value: 1.5, minValue: 0, maxValue: 2),
-                FilterParameter(key: "contrast", value: 1.2, minValue: 0.25, maxValue: 4),
-                FilterParameter(key: "vibrance", value: 0.5, minValue: -1, maxValue: 1)
-            ],
-            sortOrder: 12
-        ),
-        FilterPreset(
-            id: "fotico_faded", name: "Faded", displayName: "Faded",
-            category: .vintage, tier: .free,
-            parameters: [
-                FilterParameter(key: "saturation", value: 0.5, minValue: 0, maxValue: 2),
                 FilterParameter(key: "contrast", value: 0.85, minValue: 0.25, maxValue: 4),
-                FilterParameter(key: "brightness", value: 0.06, minValue: -1, maxValue: 1)
+                FilterParameter(key: "brightness", value: 0.06, minValue: -1, maxValue: 1),
             ],
-            sortOrder: 13
+            sortOrder: 100
         ),
         FilterPreset(
-            id: "fotico_golden", name: "Golden", displayName: "Golden",
-            category: .cleanGirl, tier: .free,
+            id: "peach", name: "Peach", displayName: "Peach",
+            category: .soft, tier: .free,
+            parameters: [
+                FilterParameter(key: "temperature", value: 7000, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 0.9, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 0.88, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "brightness", value: 0.05, minValue: -1, maxValue: 1),
+            ],
+            sortOrder: 101
+        ),
+        FilterPreset(
+            id: "cloud", name: "Cloud", displayName: "Cloud",
+            category: .soft, tier: .free,
+            parameters: [
+                FilterParameter(key: "temperature", value: 6800, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 0.85, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 0.78, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "brightness", value: 0.07, minValue: -1, maxValue: 1),
+            ],
+            sortOrder: 102
+        ),
+        FilterPreset(
+            id: "blush", name: "Blush", displayName: "Blush",
+            category: .soft, tier: .free,
+            parameters: [
+                FilterParameter(key: "temperature", value: 6500, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 1.05, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 0.85, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "brightness", value: 0.04, minValue: -1, maxValue: 1),
+            ],
+            sortOrder: 103
+        ),
+
+        // MARK: Vintage
+        FilterPreset(
+            id: "disposable", name: "Disposable", displayName: "Disposable",
+            category: .vintage, tier: .free,
             parameters: [
                 FilterParameter(key: "temperature", value: 8000, minValue: 2000, maxValue: 10000),
                 FilterParameter(key: "saturation", value: 0.7, minValue: 0, maxValue: 2),
-                FilterParameter(key: "vignette", value: 1.2, minValue: 0, maxValue: 3)
+                FilterParameter(key: "contrast", value: 1.15, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "grain", value: 0.35, minValue: 0, maxValue: 1),
+                FilterParameter(key: "vignette", value: 1.5, minValue: 0, maxValue: 3),
             ],
-            sortOrder: 14
+            sortOrder: 300
         ),
         FilterPreset(
-            id: "fotico_soft", name: "Soft", displayName: "Soft",
-            category: .soft, tier: .free,
-            parameters: [
-                FilterParameter(key: "contrast", value: 0.8, minValue: 0.25, maxValue: 4),
-                FilterParameter(key: "saturation", value: 0.9, minValue: 0, maxValue: 2),
-                FilterParameter(key: "brightness", value: 0.04, minValue: -1, maxValue: 1)
-            ],
-            sortOrder: 15
-        ),
-
-        // Black & White
-        FilterPreset(
-            id: "fotico_bn1", name: "BW", displayName: "BW",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectMono",
-            sortOrder: 20
-        ),
-        FilterPreset(
-            id: "fotico_bn2", name: "BW Noir", displayName: "Noir",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectNoir",
-            sortOrder: 21
-        ),
-        FilterPreset(
-            id: "fotico_bn3", name: "BW Tonal", displayName: "Tonal",
-            category: .film, tier: .free,
-            ciFilterName: "CIPhotoEffectTonal",
-            sortOrder: 22
-        ),
-        FilterPreset(
-            id: "fotico_silverplate", name: "Silver", displayName: "Silver",
-            category: .film, tier: .free,
-            parameters: [
-                FilterParameter(key: "saturation", value: 0.0, minValue: 0, maxValue: 2),
-                FilterParameter(key: "contrast", value: 1.4, minValue: 0.25, maxValue: 4),
-                FilterParameter(key: "brightness", value: -0.02, minValue: -1, maxValue: 1)
-            ],
-            sortOrder: 23
-        ),
-
-        // Cinematic & Special
-        FilterPreset(
-            id: "fotico_cine", name: "Cine", displayName: "Cine",
-            category: .film, tier: .free,
-            parameters: [
-                FilterParameter(key: "tealShadows", value: 0.6, minValue: 0, maxValue: 1),
-                FilterParameter(key: "orangeHighlights", value: 0.5, minValue: 0, maxValue: 1),
-                FilterParameter(key: "contrast", value: 1.2, minValue: 0.25, maxValue: 4)
-            ],
-            sortOrder: 30
-        ),
-        FilterPreset(
-            id: "fotico_neon", name: "Neon", displayName: "Neon",
-            category: .film, tier: .free,
-            parameters: [
-                FilterParameter(key: "saturation", value: 1.8, minValue: 0, maxValue: 2),
-                FilterParameter(key: "contrast", value: 1.4, minValue: 0.25, maxValue: 4),
-                FilterParameter(key: "vibrance", value: 0.8, minValue: -1, maxValue: 1)
-            ],
-            sortOrder: 31
-        ),
-        FilterPreset(
-            id: "fotico_retro", name: "Retro", displayName: "Retro",
+            id: "throwback", name: "Throwback", displayName: "Throwback",
             category: .vintage, tier: .free,
             parameters: [
-                FilterParameter(key: "saturation", value: 0.6, minValue: 0, maxValue: 2),
-                FilterParameter(key: "temperature", value: 7500, minValue: 2000, maxValue: 10000),
-                FilterParameter(key: "grain", value: 0.4, minValue: 0, maxValue: 1)
+                FilterParameter(key: "temperature", value: 7800, minValue: 2000, maxValue: 10000),
+                FilterParameter(key: "saturation", value: 0.55, minValue: 0, maxValue: 2),
+                FilterParameter(key: "contrast", value: 0.9, minValue: 0.25, maxValue: 4),
+                FilterParameter(key: "brightness", value: 0.05, minValue: -1, maxValue: 1),
+                FilterParameter(key: "grain", value: 0.2, minValue: 0, maxValue: 1),
             ],
-            sortOrder: 32
+            sortOrder: 301
         ),
     ]
 
     // MARK: - Pro Presets (LUT-based)
 
     static let proPresets: [FilterPreset] = [
-        // Clean Girl (formerly Warm)
+        // MARK: Clean Girl (LUT)
         FilterPreset(id: "pro_dorado", name: "Dorado", displayName: "Dorado",
-                     category: .cleanGirl, tier: .free, lutFileName: "dorado.cube", sortOrder: 100),
-        FilterPreset(id: "pro_miel", name: "Miel", displayName: "Miel",
-                     category: .cleanGirl, tier: .free, lutFileName: "miel.cube", sortOrder: 101),
+                     category: .cleanGirl, tier: .free, lutFileName: "dorado.cube", sortOrder: 4),
         FilterPreset(id: "pro_canela", name: "Canela", displayName: "Canela",
-                     category: .cleanGirl, tier: .free, lutFileName: "canela.cube", sortOrder: 102),
-        FilterPreset(id: "pro_atardecer", name: "Atardecer", displayName: "Atardecer",
-                     category: .cleanGirl, tier: .free, lutFileName: "atardecer.cube", sortOrder: 103),
-
-        // Soft (formerly Cool)
-        FilterPreset(id: "pro_oceano", name: "Océano", displayName: "Océano",
-                     category: .soft, tier: .free, lutFileName: "oceano.cube", sortOrder: 200),
-        FilterPreset(id: "pro_niebla", name: "Niebla", displayName: "Niebla",
-                     category: .soft, tier: .free, lutFileName: "niebla.cube", sortOrder: 201),
-        FilterPreset(id: "pro_invierno", name: "Invierno", displayName: "Invierno",
-                     category: .soft, tier: .free, lutFileName: "invierno.cube", sortOrder: 202),
-
-        // Film (formerly Cinematic)
-        FilterPreset(id: "pro_noche", name: "Noche", displayName: "Noche",
-                     category: .film, tier: .free, lutFileName: "noche.cube", sortOrder: 300),
-        FilterPreset(id: "pro_drama", name: "Drama", displayName: "Drama",
-                     category: .film, tier: .free, lutFileName: "drama.cube", sortOrder: 301),
-        FilterPreset(id: "pro_teal_orange", name: "Teal&Orange", displayName: "Teal&Orange",
-                     category: .film, tier: .free, lutFileName: "teal_orange.cube", sortOrder: 302),
-
-        // Soft (Pastel)
-        FilterPreset(id: "pro_petalo", name: "Pétalo", displayName: "Pétalo",
-                     category: .soft, tier: .free, lutFileName: "petalo.cube", sortOrder: 400),
-        FilterPreset(id: "pro_nube", name: "Nube", displayName: "Nube",
-                     category: .soft, tier: .free, lutFileName: "nube.cube", sortOrder: 401),
-        FilterPreset(id: "pro_algodon", name: "Algodón", displayName: "Algodón",
-                     category: .soft, tier: .free, lutFileName: "algodon.cube", sortOrder: 402),
-        FilterPreset(id: "pro_brisa", name: "Brisa", displayName: "Brisa",
-                     category: .soft, tier: .free, lutFileName: "brisa.cube", sortOrder: 403),
-
-        // Film (Film emulation)
-        FilterPreset(id: "pro_kodak", name: "Kodak", displayName: "Kodak",
-                     category: .film, tier: .free, lutFileName: "kodak_gold.cube", sortOrder: 500),
-        FilterPreset(id: "pro_fuji", name: "Fuji", displayName: "Fuji",
-                     category: .film, tier: .free, lutFileName: "fuji_400h.cube", sortOrder: 501),
-        FilterPreset(id: "pro_polaroid", name: "Polaroid", displayName: "Polaroid",
-                     category: .film, tier: .free, lutFileName: "polaroid.cube", sortOrder: 502),
-        FilterPreset(id: "pro_super8", name: "Super8", displayName: "Super8",
-                     category: .film, tier: .free, lutFileName: "super8.cube", sortOrder: 503),
-
-        // Clean Girl (formerly Editorial)
-        FilterPreset(id: "pro_revista", name: "Revista", displayName: "Revista",
-                     category: .cleanGirl, tier: .free, lutFileName: "revista.cube", sortOrder: 600),
-        FilterPreset(id: "pro_portada", name: "Portada", displayName: "Portada",
-                     category: .cleanGirl, tier: .free, lutFileName: "portada.cube", sortOrder: 601),
+                     category: .cleanGirl, tier: .free, lutFileName: "canela.cube", sortOrder: 5),
         FilterPreset(id: "pro_glam", name: "Glam", displayName: "Glam",
-                     category: .cleanGirl, tier: .free, lutFileName: "glam.cube", sortOrder: 602),
-        FilterPreset(id: "pro_mate", name: "Mate", displayName: "Mate",
-                     category: .cleanGirl, tier: .free, lutFileName: "mate.cube", sortOrder: 603),
+                     category: .cleanGirl, tier: .free, lutFileName: "glam.cube", sortOrder: 6),
 
-        // Vintage
-        FilterPreset(id: "pro_nostalgia", name: "Nostalgia", displayName: "Nostalgia",
-                     category: .vintage, tier: .free, lutFileName: "nostalgia.cube", sortOrder: 700),
-        FilterPreset(id: "pro_sepia", name: "Sepia", displayName: "Sepia",
-                     category: .vintage, tier: .free, lutFileName: "sepia.cube", sortOrder: 701),
-        FilterPreset(id: "pro_disco", name: "Disco", displayName: "Disco",
-                     category: .vintage, tier: .free, lutFileName: "disco.cube", sortOrder: 702),
-        FilterPreset(id: "pro_vhs", name: "VHS", displayName: "VHS",
-                     category: .vintage, tier: .free, lutFileName: "vhs.cube", sortOrder: 703),
+        // MARK: Soft (LUT)
+        FilterPreset(id: "pro_petalo", name: "Pétalo", displayName: "Pétalo",
+                     category: .soft, tier: .free, lutFileName: "petalo.cube", sortOrder: 104),
+        FilterPreset(id: "pro_nube", name: "Nube", displayName: "Nube",
+                     category: .soft, tier: .free, lutFileName: "nube.cube", sortOrder: 105),
+        FilterPreset(id: "pro_algodon", name: "Algodón", displayName: "Algodón",
+                     category: .soft, tier: .free, lutFileName: "algodon.cube", sortOrder: 106),
+        FilterPreset(id: "pro_brisa", name: "Brisa", displayName: "Brisa",
+                     category: .soft, tier: .free, lutFileName: "brisa.cube", sortOrder: 107),
 
-        // Film (formerly B&W)
+        // MARK: Film (LUT)
+        FilterPreset(id: "pro_portra", name: "Portra", displayName: "Portra",
+                     category: .film, tier: .free, lutFileName: "portra.cube", sortOrder: 200),
+        FilterPreset(id: "pro_fuji", name: "Fuji 400", displayName: "Fuji 400",
+                     category: .film, tier: .free, lutFileName: "fuji_400h.cube", sortOrder: 201),
+        FilterPreset(id: "pro_kodak", name: "Kodak", displayName: "Kodak",
+                     category: .film, tier: .free, lutFileName: "kodak_gold.cube", sortOrder: 202),
+        FilterPreset(id: "pro_polaroid", name: "Polaroid", displayName: "Polaroid",
+                     category: .film, tier: .free, lutFileName: "polaroid.cube", sortOrder: 203),
+        FilterPreset(id: "pro_super8", name: "Super8", displayName: "Super8",
+                     category: .film, tier: .free, lutFileName: "super8.cube", sortOrder: 204),
         FilterPreset(id: "pro_carbon", name: "Carbón", displayName: "Carbón",
-                     category: .film, tier: .free, lutFileName: "carbon.cube", sortOrder: 800),
+                     category: .film, tier: .free, lutFileName: "carbon.cube", sortOrder: 205),
         FilterPreset(id: "pro_seda", name: "Seda", displayName: "Seda",
-                     category: .film, tier: .free, lutFileName: "seda.cube", sortOrder: 801),
+                     category: .film, tier: .free, lutFileName: "seda.cube", sortOrder: 206),
+
+        // MARK: Vintage (LUT)
+        FilterPreset(id: "pro_nostalgia", name: "Nostalgia", displayName: "Nostalgia",
+                     category: .vintage, tier: .free, lutFileName: "nostalgia.cube", sortOrder: 302),
+        FilterPreset(id: "pro_vhs", name: "VHS", displayName: "VHS",
+                     category: .vintage, tier: .free, lutFileName: "vhs.cube", sortOrder: 303),
     ]
 }
 
