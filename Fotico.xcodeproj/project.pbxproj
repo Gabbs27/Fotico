@@ -79,6 +79,16 @@
 		LB0027BBBBBBBBBBBBBBBB /* seda.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0027AAAAAAAAAAAAAAAA /* seda.cube */; };
 		LB0017BBBBBBBBBBBBBBBB /* super8.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0017AAAAAAAAAAAAAAAA /* super8.cube */; };
 		LB0025BBBBBBBBBBBBBBBB /* vhs.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0025AAAAAAAAAAAAAAAA /* vhs.cube */; };
+		LB0030BBBBBBBBBBBBBBBB /* blush.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0030AAAAAAAAAAAAAAAA /* blush.cube */; };
+		LB0031BBBBBBBBBBBBBBBB /* butter.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0031AAAAAAAAAAAAAAAA /* butter.cube */; };
+		LB0032BBBBBBBBBBBBBBBB /* cloud.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0032AAAAAAAAAAAAAAAA /* cloud.cube */; };
+		LB0033BBBBBBBBBBBBBBBB /* cocoa.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0033AAAAAAAAAAAAAAAA /* cocoa.cube */; };
+		LB0034BBBBBBBBBBBBBBBB /* disposable.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0034AAAAAAAAAAAAAAAA /* disposable.cube */; };
+		LB0035BBBBBBBBBBBBBBBB /* goldie.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0035AAAAAAAAAAAAAAAA /* goldie.cube */; };
+		LB0036BBBBBBBBBBBBBBBB /* honey.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0036AAAAAAAAAAAAAAAA /* honey.cube */; };
+		LB0037BBBBBBBBBBBBBBBB /* latte.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0037AAAAAAAAAAAAAAAA /* latte.cube */; };
+		LB0038BBBBBBBBBBBBBBBB /* peach.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0038AAAAAAAAAAAAAAAA /* peach.cube */; };
+		LB0039BBBBBBBBBBBBBBBB /* throwback.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0039AAAAAAAAAAAAAAAA /* throwback.cube */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -155,6 +165,16 @@
 		LR0027AAAAAAAAAAAAAAAA /* seda.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = seda.cube; sourceTree = "<group>"; };
 		LR0017AAAAAAAAAAAAAAAA /* super8.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = super8.cube; sourceTree = "<group>"; };
 		LR0025AAAAAAAAAAAAAAAA /* vhs.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = vhs.cube; sourceTree = "<group>"; };
+		LR0030AAAAAAAAAAAAAAAA /* blush.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = blush.cube; sourceTree = "<group>"; };
+		LR0031AAAAAAAAAAAAAAAA /* butter.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = butter.cube; sourceTree = "<group>"; };
+		LR0032AAAAAAAAAAAAAAAA /* cloud.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = cloud.cube; sourceTree = "<group>"; };
+		LR0033AAAAAAAAAAAAAAAA /* cocoa.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = cocoa.cube; sourceTree = "<group>"; };
+		LR0034AAAAAAAAAAAAAAAA /* disposable.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = disposable.cube; sourceTree = "<group>"; };
+		LR0035AAAAAAAAAAAAAAAA /* goldie.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = goldie.cube; sourceTree = "<group>"; };
+		LR0036AAAAAAAAAAAAAAAA /* honey.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = honey.cube; sourceTree = "<group>"; };
+		LR0037AAAAAAAAAAAAAAAA /* latte.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = latte.cube; sourceTree = "<group>"; };
+		LR0038AAAAAAAAAAAAAAAA /* peach.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = peach.cube; sourceTree = "<group>"; };
+		LR0039AAAAAAAAAAAAAAAA /* throwback.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = throwback.cube; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -385,20 +405,30 @@
 			isa = PBXGroup;
 			children = (
 				LR0012AAAAAAAAAAAAAAAA /* algodon.cube */,
+				LR0030AAAAAAAAAAAAAAAA /* blush.cube */,
 				LR0013AAAAAAAAAAAAAAAA /* brisa.cube */,
+				LR0031AAAAAAAAAAAAAAAA /* butter.cube */,
 				LR0002AAAAAAAAAAAAAAAA /* canela.cube */,
 				LR0026AAAAAAAAAAAAAAAA /* carbon.cube */,
+				LR0032AAAAAAAAAAAAAAAA /* cloud.cube */,
+				LR0033AAAAAAAAAAAAAAAA /* cocoa.cube */,
+				LR0034AAAAAAAAAAAAAAAA /* disposable.cube */,
 				LR0000AAAAAAAAAAAAAAAA /* dorado.cube */,
 				LR0015AAAAAAAAAAAAAAAA /* fuji_400h.cube */,
+				LR0035AAAAAAAAAAAAAAAA /* goldie.cube */,
 				LR0020AAAAAAAAAAAAAAAA /* glam.cube */,
+				LR0036AAAAAAAAAAAAAAAA /* honey.cube */,
 				LR0014AAAAAAAAAAAAAAAA /* kodak_gold.cube */,
+				LR0037AAAAAAAAAAAAAAAA /* latte.cube */,
 				LR0022AAAAAAAAAAAAAAAA /* nostalgia.cube */,
 				LR0011AAAAAAAAAAAAAAAA /* nube.cube */,
+				LR0038AAAAAAAAAAAAAAAA /* peach.cube */,
 				LR0010AAAAAAAAAAAAAAAA /* petalo.cube */,
 				LR0016AAAAAAAAAAAAAAAA /* polaroid.cube */,
 				LR0028AAAAAAAAAAAAAAAA /* portra.cube */,
 				LR0027AAAAAAAAAAAAAAAA /* seda.cube */,
 				LR0017AAAAAAAAAAAAAAAA /* super8.cube */,
+				LR0039AAAAAAAAAAAAAAAA /* throwback.cube */,
 				LR0025AAAAAAAAAAAAAAAA /* vhs.cube */,
 			);
 			path = "Resources/LUTs";
@@ -458,20 +488,30 @@
 			files = (
 				D9F4877CD35FF4299EDBAA4A /* Assets.xcassets in Resources */,
 				LB0012BBBBBBBBBBBBBBBB /* algodon.cube in Resources */,
+				LB0030BBBBBBBBBBBBBBBB /* blush.cube in Resources */,
 				LB0013BBBBBBBBBBBBBBBB /* brisa.cube in Resources */,
+				LB0031BBBBBBBBBBBBBBBB /* butter.cube in Resources */,
 				LB0002BBBBBBBBBBBBBBBB /* canela.cube in Resources */,
 				LB0026BBBBBBBBBBBBBBBB /* carbon.cube in Resources */,
+				LB0032BBBBBBBBBBBBBBBB /* cloud.cube in Resources */,
+				LB0033BBBBBBBBBBBBBBBB /* cocoa.cube in Resources */,
+				LB0034BBBBBBBBBBBBBBBB /* disposable.cube in Resources */,
 				LB0000BBBBBBBBBBBBBBBB /* dorado.cube in Resources */,
 				LB0015BBBBBBBBBBBBBBBB /* fuji_400h.cube in Resources */,
+				LB0035BBBBBBBBBBBBBBBB /* goldie.cube in Resources */,
 				LB0020BBBBBBBBBBBBBBBB /* glam.cube in Resources */,
+				LB0036BBBBBBBBBBBBBBBB /* honey.cube in Resources */,
 				LB0014BBBBBBBBBBBBBBBB /* kodak_gold.cube in Resources */,
+				LB0037BBBBBBBBBBBBBBBB /* latte.cube in Resources */,
 				LB0022BBBBBBBBBBBBBBBB /* nostalgia.cube in Resources */,
 				LB0011BBBBBBBBBBBBBBBB /* nube.cube in Resources */,
+				LB0038BBBBBBBBBBBBBBBB /* peach.cube in Resources */,
 				LB0010BBBBBBBBBBBBBBBB /* petalo.cube in Resources */,
 				LB0016BBBBBBBBBBBBBBBB /* polaroid.cube in Resources */,
 				LB0028BBBBBBBBBBBBBBBB /* portra.cube in Resources */,
 				LB0027BBBBBBBBBBBBBBBB /* seda.cube in Resources */,
 				LB0017BBBBBBBBBBBBBBBB /* super8.cube in Resources */,
+				LB0039BBBBBBBBBBBBBBBB /* throwback.cube in Resources */,
 				LB0025BBBBBBBBBBBBBBBB /* vhs.cube in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
