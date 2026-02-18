@@ -89,6 +89,11 @@
 		LB0037BBBBBBBBBBBBBBBB /* latte.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0037AAAAAAAAAAAAAAAA /* latte.cube */; };
 		LB0038BBBBBBBBBBBBBBBB /* peach.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0038AAAAAAAAAAAAAAAA /* peach.cube */; };
 		LB0039BBBBBBBBBBBBBBBB /* throwback.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0039AAAAAAAAAAAAAAAA /* throwback.cube */; };
+		LB0040BBBBBBBBBBBBBBBB /* tezza_dream.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0040AAAAAAAAAAAAAAAA /* tezza_dream.cube */; };
+		LB0041BBBBBBBBBBBBBBBB /* tezza_golden.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0041AAAAAAAAAAAAAAAA /* tezza_golden.cube */; };
+		LB0042BBBBBBBBBBBBBBBB /* tezza_lush.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0042AAAAAAAAAAAAAAAA /* tezza_lush.cube */; };
+		LB0043BBBBBBBBBBBBBBBB /* tezza_mood.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0043AAAAAAAAAAAAAAAA /* tezza_mood.cube */; };
+		LB0044BBBBBBBBBBBBBBBB /* tezza_vintage.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0044AAAAAAAAAAAAAAAA /* tezza_vintage.cube */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -175,6 +180,11 @@
 		LR0037AAAAAAAAAAAAAAAA /* latte.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = latte.cube; sourceTree = "<group>"; };
 		LR0038AAAAAAAAAAAAAAAA /* peach.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = peach.cube; sourceTree = "<group>"; };
 		LR0039AAAAAAAAAAAAAAAA /* throwback.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = throwback.cube; sourceTree = "<group>"; };
+		LR0040AAAAAAAAAAAAAAAA /* tezza_dream.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = tezza_dream.cube; sourceTree = "<group>"; };
+		LR0041AAAAAAAAAAAAAAAA /* tezza_golden.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = tezza_golden.cube; sourceTree = "<group>"; };
+		LR0042AAAAAAAAAAAAAAAA /* tezza_lush.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = tezza_lush.cube; sourceTree = "<group>"; };
+		LR0043AAAAAAAAAAAAAAAA /* tezza_mood.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = tezza_mood.cube; sourceTree = "<group>"; };
+		LR0044AAAAAAAAAAAAAAAA /* tezza_vintage.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = tezza_vintage.cube; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -429,6 +439,11 @@
 				LR0027AAAAAAAAAAAAAAAA /* seda.cube */,
 				LR0017AAAAAAAAAAAAAAAA /* super8.cube */,
 				LR0039AAAAAAAAAAAAAAAA /* throwback.cube */,
+				LR0040AAAAAAAAAAAAAAAA /* tezza_dream.cube */,
+				LR0041AAAAAAAAAAAAAAAA /* tezza_golden.cube */,
+				LR0042AAAAAAAAAAAAAAAA /* tezza_lush.cube */,
+				LR0043AAAAAAAAAAAAAAAA /* tezza_mood.cube */,
+				LR0044AAAAAAAAAAAAAAAA /* tezza_vintage.cube */,
 				LR0025AAAAAAAAAAAAAAAA /* vhs.cube */,
 			);
 			path = "Resources/LUTs";
@@ -512,6 +527,11 @@
 				LB0027BBBBBBBBBBBBBBBB /* seda.cube in Resources */,
 				LB0017BBBBBBBBBBBBBBBB /* super8.cube in Resources */,
 				LB0039BBBBBBBBBBBBBBBB /* throwback.cube in Resources */,
+				LB0040BBBBBBBBBBBBBBBB /* tezza_dream.cube in Resources */,
+				LB0041BBBBBBBBBBBBBBBB /* tezza_golden.cube in Resources */,
+				LB0042BBBBBBBBBBBBBBBB /* tezza_lush.cube in Resources */,
+				LB0043BBBBBBBBBBBBBBBB /* tezza_mood.cube in Resources */,
+				LB0044BBBBBBBBBBBBBBBB /* tezza_vintage.cube in Resources */,
 				LB0025BBBBBBBBBBBBBBBB /* vhs.cube in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

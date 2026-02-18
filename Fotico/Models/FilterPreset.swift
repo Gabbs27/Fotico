@@ -38,6 +38,20 @@ struct FilterPreset: Identifiable, Sendable {
 
     static let allPresets: [FilterPreset] = [
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // MARK: Featured
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        FilterPreset(id: "tezza_vintage", name: "Vintage", displayName: "Vintage",
+                     category: .featured, tier: .free, lutFileName: "tezza_vintage.cube", sortOrder: -500),
+        FilterPreset(id: "tezza_mood", name: "Mood", displayName: "Mood",
+                     category: .featured, tier: .free, lutFileName: "tezza_mood.cube", sortOrder: -400),
+        FilterPreset(id: "tezza_lush", name: "Lush", displayName: "Lush",
+                     category: .featured, tier: .free, lutFileName: "tezza_lush.cube", sortOrder: -300),
+        FilterPreset(id: "tezza_dream", name: "Dream", displayName: "Dream",
+                     category: .featured, tier: .free, lutFileName: "tezza_dream.cube", sortOrder: -200),
+        FilterPreset(id: "tezza_golden", name: "Golden", displayName: "Golden",
+                     category: .featured, tier: .free, lutFileName: "tezza_golden.cube", sortOrder: -100),
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // MARK: Clean Girl
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         FilterPreset(id: "cocoa", name: "Cocoa", displayName: "Cocoa",
@@ -110,6 +124,7 @@ struct FilterPreset: Identifiable, Sendable {
 // MARK: - Preset Category
 
 enum PresetCategory: String, CaseIterable, Sendable {
+    case featured
     case cleanGirl
     case soft
     case film
@@ -117,6 +132,7 @@ enum PresetCategory: String, CaseIterable, Sendable {
 
     nonisolated var displayName: String {
         switch self {
+        case .featured: return "Featured"
         case .cleanGirl: return "Clean Girl"
         case .soft: return "Soft"
         case .film: return "Film"
@@ -126,6 +142,7 @@ enum PresetCategory: String, CaseIterable, Sendable {
 
     nonisolated var icon: String {
         switch self {
+        case .featured: return "star.fill"
         case .cleanGirl: return "sparkles"
         case .soft: return "cloud.fill"
         case .film: return "film"
