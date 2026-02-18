@@ -63,6 +63,10 @@
 		BB11CC22DD33EE44FF550066 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11CC22DD33EE44FF550067 /* PaywallView.swift */; };
 		CC22DD33EE44FF5500661177 /* EditClipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC22DD33EE44FF5500661178 /* EditClipboard.swift */; };
 		DD33EE44FF550066117722AA /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD33EE44FF550066117722AB /* OnboardingView.swift */; };
+		CA01AA00BB11CC22DD33EE01 /* CameraType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA01AA00BB11CC22DD33EE02 /* CameraType.swift */; };
+		CA02AA00BB11CC22DD33EE01 /* CameraTypeStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA02AA00BB11CC22DD33EE02 /* CameraTypeStripView.swift */; };
+		CA03AA00BB11CC22DD33EE01 /* CameraToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA03AA00BB11CC22DD33EE02 /* CameraToolbarView.swift */; };
+		CA04AA00BB11CC22DD33EE01 /* GridOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA04AA00BB11CC22DD33EE02 /* GridOverlayView.swift */; };
 		LB0012BBBBBBBBBBBBBBBB /* algodon.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0012AAAAAAAAAAAAAAAA /* algodon.cube */; };
 		LB0013BBBBBBBBBBBBBBBB /* brisa.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0013AAAAAAAAAAAAAAAA /* brisa.cube */; };
 		LB0002BBBBBBBBBBBBBBBB /* canela.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0002AAAAAAAAAAAAAAAA /* canela.cube */; };
@@ -154,6 +158,10 @@
 		BB11CC22DD33EE44FF550067 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		CC22DD33EE44FF5500661178 /* EditClipboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditClipboard.swift; sourceTree = "<group>"; };
 		DD33EE44FF550066117722AB /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		CA01AA00BB11CC22DD33EE02 /* CameraType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraType.swift; sourceTree = "<group>"; };
+		CA02AA00BB11CC22DD33EE02 /* CameraTypeStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraTypeStripView.swift; sourceTree = "<group>"; };
+		CA03AA00BB11CC22DD33EE02 /* CameraToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraToolbarView.swift; sourceTree = "<group>"; };
+		CA04AA00BB11CC22DD33EE02 /* GridOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridOverlayView.swift; sourceTree = "<group>"; };
 		LR0012AAAAAAAAAAAAAAAA /* algodon.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = algodon.cube; sourceTree = "<group>"; };
 		LR0013AAAAAAAAAAAAAAAA /* brisa.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = brisa.cube; sourceTree = "<group>"; };
 		LR0002AAAAAAAAAAAAAAAA /* canela.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = canela.cube; sourceTree = "<group>"; };
@@ -275,8 +283,11 @@
 			isa = PBXGroup;
 			children = (
 				22BB33CC44DD55EE66FF0011 /* CameraLaunchView.swift */,
+				CA03AA00BB11CC22DD33EE02 /* CameraToolbarView.swift */,
+				CA02AA00BB11CC22DD33EE02 /* CameraTypeStripView.swift */,
 				39A8F513701A08A996998038 /* CameraView.swift */,
 				97CF9C27BBE59D67E458ED87 /* CaptureButtonView.swift */,
+				CA04AA00BB11CC22DD33EE02 /* GridOverlayView.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -383,6 +394,7 @@
 		F5B570DBC0E2013470AE34AD /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				CA01AA00BB11CC22DD33EE02 /* CameraType.swift */,
 				A2305F7EBB877817426CACC9 /* EditState.swift */,
 				4472A85E4776C5B3081E6F27 /* EffectType.swift */,
 				7DDF80977A4F5AED1D02D616 /* FilterPreset.swift */,
@@ -592,6 +604,10 @@
 				BB11CC22DD33EE44FF550066 /* PaywallView.swift in Sources */,
 				CC22DD33EE44FF5500661177 /* EditClipboard.swift in Sources */,
 				DD33EE44FF550066117722AA /* OnboardingView.swift in Sources */,
+				CA01AA00BB11CC22DD33EE01 /* CameraType.swift in Sources */,
+				CA02AA00BB11CC22DD33EE01 /* CameraTypeStripView.swift in Sources */,
+				CA03AA00BB11CC22DD33EE01 /* CameraToolbarView.swift in Sources */,
+				CA04AA00BB11CC22DD33EE01 /* GridOverlayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

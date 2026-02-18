@@ -3,35 +3,23 @@ import SwiftUI
 import CoreImage.CIFilterBuiltins
 import Combine
 
-enum CameraMode: String, CaseIterable, Sendable {
-    case normal
-    case film
-
-    var displayName: String {
-        switch self {
-        case .normal: return "Normal"
-        case .film: return "Film"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .normal: return "camera"
-        case .film: return "film"
-        }
-    }
-}
-
 @MainActor
 class CameraViewModel: ObservableObject {
     @Published var processedPreviewCIImage: CIImage?   // CIImage for MetalImageView (no CGImage!)
     @Published var capturedImage: UIImage?
-    @Published var selectedPreset: FilterPreset? = FilterPreset.allPresets.first
+    @Published var selectedCameraType: CameraType = CameraType.allTypes[0]
     @Published var showEditor = false
     @Published var isCapturing = false
     @Published var showFlashOverlay = false
-    @Published var grainOnPreview = false
-    @Published var cameraMode: CameraMode = .film
+
+    // Toolbar state
+    @Published var selectedFrame: String? = nil
+    @Published var gridMode: GridMode = .off
+    @Published var grainLevel: GrainLevel = .off
+    @Published var toolbarLightLeakOn: Bool = false
+    @Published var toolbarVignetteOn: Bool = false
+    @Published var toolbarBloomOn: Bool = false
+    @Published var selectedToolbarTab: CameraToolbarTab? = nil
 
     let cameraService = CameraService()
 
@@ -71,17 +59,19 @@ class CameraViewModel: ObservableObject {
     // MARK: - Live Preview Processing (semaphore-gated)
     //
     // Uses semaphore instead of frame skip counter:
-    // - If processing slot is free → process this frame
-    // - If still processing previous frame → drop this frame
+    // - If processing slot is free -> process this frame
+    // - If still processing previous frame -> drop this frame
     // This adapts to GPU speed: fast GPU = no drops, slow GPU = drops excess frames.
 
     private func processPreviewFrame(_ ciImage: CIImage) {
         // Non-blocking check: if already processing, drop this frame
         guard frameSemaphore.wait(timeout: .now()) == .success else { return }
 
-        let mode = cameraMode
-        let preset = selectedPreset
-        let grain = grainOnPreview
+        let cameraType = selectedCameraType
+        let extraGrain = grainLevel
+        let fxLightLeak = toolbarLightLeakOn
+        let fxVignette = toolbarVignetteOn
+        let fxBloom = toolbarBloomOn
 
         let semaphore = frameSemaphore  // Capture before weak self
         processingQueue.async { [weak self] in
@@ -100,16 +90,35 @@ class CameraViewModel: ObservableObject {
                 result = result.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
             }
 
-            if mode == .film {
-                if let preset {
-                    result = CameraFilters.applyLivePreset(preset, to: result)
-                }
-                if grain {
-                    result = CameraFilters.addFilmGrain(to: result, intensity: 0.04)
-                }
+            // Apply LUT
+            if let lutFileName = cameraType.lutFileName {
+                result = CameraFilters.applyLivePreset(lutFileName: lutFileName, to: result)
             }
 
-            // Pass CIImage directly — MetalImageView will render it on GPU
+            // Apply grain: camera type default + toolbar override
+            let grainAmount = max(cameraType.grainIntensity * 0.15, extraGrain.intensity)
+            if grainAmount > 0 {
+                result = CameraFilters.addFilmGrain(to: result, intensity: CGFloat(grainAmount))
+            }
+
+            // Apply vignette: toolbar toggle or camera type default
+            let vignetteAmount = fxVignette ? 1.2 : cameraType.vignetteIntensity
+            if vignetteAmount > 0 {
+                result = CameraFilters.addVignette(to: result, intensity: CGFloat(vignetteAmount))
+            }
+
+            // Apply bloom
+            let bloomAmount = fxBloom ? 0.3 : cameraType.bloomIntensity
+            if bloomAmount > 0 {
+                result = CameraFilters.addBloom(to: result, intensity: CGFloat(bloomAmount))
+            }
+
+            // Apply light leak
+            if cameraType.lightLeakEnabled || fxLightLeak {
+                result = CameraFilters.addLightLeak(to: result, intensity: 0.4)
+            }
+
+            // Pass CIImage directly -- MetalImageView will render it on GPU
             // No createCGImage needed!
             let finalImage = result
 
@@ -137,21 +146,31 @@ class CameraViewModel: ObservableObject {
         }
 
         // Move heavy processing off main thread
-        let mode = cameraMode
         let flashMode = cameraService.flashMode
-        let preset = selectedPreset
+        let cameraType = selectedCameraType
+        let extraGrain = grainLevel
+        let fxLightLeak = toolbarLightLeakOn
+        let fxVignette = toolbarVignetteOn
+        let fxBloom = toolbarBloomOn
         let context = ciContext
-        let grain = grainOnPreview
 
         let processed: UIImage = await withCheckedContinuation { continuation in
             processingQueue.async {
                 let result: UIImage
-                if mode == .normal {
-                    result = photo
-                } else if flashMode == .vintage {
-                    result = CameraFilters.vintageFlashProcess(photo, preset: preset, shouldApplyGrain: grain, context: context)
+                if flashMode == .vintage {
+                    result = CameraFilters.vintageFlashProcess(
+                        photo, cameraType: cameraType,
+                        grainLevel: extraGrain, fxLightLeak: fxLightLeak,
+                        fxVignette: fxVignette, fxBloom: fxBloom,
+                        context: context
+                    )
                 } else {
-                    result = CameraFilters.standardProcess(photo, preset: preset, context: context, shouldApplyGrain: grain)
+                    result = CameraFilters.standardProcess(
+                        photo, cameraType: cameraType,
+                        grainLevel: extraGrain, fxLightLeak: fxLightLeak,
+                        fxVignette: fxVignette, fxBloom: fxBloom,
+                        context: context
+                    )
                 }
                 continuation.resume(returning: result)
             }
@@ -165,28 +184,8 @@ class CameraViewModel: ObservableObject {
 
     // MARK: - Controls
 
-    func selectPreset(_ preset: FilterPreset?) {
-        guard let preset else {
-            selectedPreset = nil
-            return
-        }
-        if selectedPreset?.id == preset.id {
-            selectedPreset = nil
-        } else {
-            selectedPreset = preset
-        }
-    }
-
-    func toggleMode() {
-        cameraMode = cameraMode == .normal ? .film : .normal
-        if cameraMode == .normal {
-            selectedPreset = nil
-        } else {
-            // Restore default preset when switching back to Film mode
-            selectedPreset = FilterPreset.allPresets.first
-        }
-        grainOnPreview = false
-        HapticManager.selection()
+    func selectCameraType(_ type: CameraType) {
+        selectedCameraType = type
     }
 }
 
@@ -194,25 +193,58 @@ class CameraViewModel: ObservableObject {
 
 /// Extracted filter processing to a separate enum to avoid @MainActor inheritance.
 /// All methods are safe to call from any thread.
-/// Uses fresh filter instances per call — CIFilter is NOT thread-safe.
+/// Uses fresh filter instances per call -- CIFilter is NOT thread-safe.
 enum CameraFilters {
 
-    static func applyLivePreset(_ preset: FilterPreset, to image: CIImage) -> CIImage {
-        // LUT-based presets (Pro)
-        if let lutFileName = preset.lutFileName {
-            return LUTService.shared.applyLUT(named: lutFileName, to: image, intensity: 1.0)
-        }
-        // CIFilter-based presets
-        if let filterName = preset.ciFilterName {
-            guard let filter = CIFilter(name: filterName) else { return image }
-            filter.setValue(image, forKey: kCIInputImageKey)
-            return filter.outputImage ?? image
-        }
-        // Custom presets no longer exist — parameter-only presets handled by editor
-        return image
+    static func applyLivePreset(lutFileName: String, to image: CIImage) -> CIImage {
+        return LUTService.shared.applyLUT(named: lutFileName, to: image, intensity: 1.0)
     }
 
-    static func vintageFlashProcess(_ image: UIImage, preset: FilterPreset?, shouldApplyGrain: Bool, context: CIContext) -> UIImage {
+    static func addVignette(to image: CIImage, intensity: CGFloat) -> CIImage {
+        let vignette = CIFilter(name: "CIVignette")!
+        vignette.setValue(image, forKey: kCIInputImageKey)
+        vignette.setValue(intensity, forKey: kCIInputIntensityKey)
+        vignette.setValue(max(intensity * 0.8, 1.0), forKey: kCIInputRadiusKey)
+        return vignette.outputImage ?? image
+    }
+
+    static func addBloom(to image: CIImage, intensity: CGFloat) -> CIImage {
+        let bloom = CIFilter(name: "CIBloom")!
+        bloom.setValue(image, forKey: kCIInputImageKey)
+        bloom.setValue(intensity, forKey: kCIInputIntensityKey)
+        bloom.setValue(10.0, forKey: kCIInputRadiusKey)
+        return bloom.outputImage ?? image
+    }
+
+    static func addLightLeak(to image: CIImage, intensity: CGFloat) -> CIImage {
+        let extent = image.extent
+
+        // Create a warm radial gradient for light leak effect
+        let center = CIVector(x: extent.width * 0.8, y: extent.height * 0.7)
+        let gradient = CIFilter(name: "CIRadialGradient")!
+        gradient.setValue(center, forKey: "inputCenter")
+        gradient.setValue(0, forKey: "inputRadius0")
+        gradient.setValue(extent.width * 0.6, forKey: "inputRadius1")
+        gradient.setValue(CIColor(red: 1.0, green: 0.6, blue: 0.2, alpha: intensity), forKey: "inputColor0")
+        gradient.setValue(CIColor(red: 1.0, green: 0.3, blue: 0.1, alpha: 0), forKey: "inputColor1")
+
+        guard let leak = gradient.outputImage?.cropped(to: extent) else { return image }
+
+        let blend = CIFilter(name: "CIScreenBlendMode")!
+        blend.setValue(image, forKey: kCIInputBackgroundImageKey)
+        blend.setValue(leak, forKey: kCIInputImageKey)
+        return blend.outputImage ?? image
+    }
+
+    static func vintageFlashProcess(
+        _ image: UIImage,
+        cameraType: CameraType,
+        grainLevel: GrainLevel,
+        fxLightLeak: Bool,
+        fxVignette: Bool,
+        fxBloom: Bool,
+        context: CIContext
+    ) -> UIImage {
         guard let ciImage = image.toCIImage() else { return image }
         var result = ciImage
 
@@ -239,48 +271,79 @@ enum CameraFilters {
         result = color.outputImage ?? result
 
         // 4. Heavy vignette
-        let vignette = CIFilter(name: "CIVignette")!
-        vignette.setValue(result, forKey: kCIInputImageKey)
-        vignette.setValue(1.8, forKey: kCIInputIntensityKey)
-        vignette.setValue(1.2, forKey: kCIInputRadiusKey)
-        result = vignette.outputImage ?? result
+        result = addVignette(to: result, intensity: 1.8)
 
         // 5. Grain
-        if shouldApplyGrain {
+        let grainAmount = max(cameraType.grainIntensity * 0.15, grainLevel.intensity)
+        if grainAmount > 0 {
+            result = addFilmGrain(to: result, intensity: CGFloat(max(grainAmount, 0.06)))
+        } else {
             result = addFilmGrain(to: result, intensity: 0.06)
         }
 
-        // 6. Preset
-        if let preset {
-            if let lutFileName = preset.lutFileName {
-                result = LUTService.shared.applyLUT(named: lutFileName, to: result, intensity: 1.0)
-            } else if let filterName = preset.ciFilterName {
-                let f = CIFilter(name: filterName)!
-                f.setValue(result, forKey: kCIInputImageKey)
-                result = f.outputImage ?? result
-            }
+        // 6. Camera type LUT
+        if let lutFileName = cameraType.lutFileName {
+            result = LUTService.shared.applyLUT(named: lutFileName, to: result, intensity: 1.0)
+        }
+
+        // 7. Additional FX from toolbar
+        let vignetteAmount = fxVignette ? 1.2 : 0.0
+        if vignetteAmount > 0 {
+            result = addVignette(to: result, intensity: CGFloat(vignetteAmount))
+        }
+
+        let bloomAmount = fxBloom ? 0.3 : cameraType.bloomIntensity
+        if bloomAmount > 0 {
+            result = addBloom(to: result, intensity: CGFloat(bloomAmount))
+        }
+
+        if cameraType.lightLeakEnabled || fxLightLeak {
+            result = addLightLeak(to: result, intensity: 0.4)
         }
 
         return result.toUIImage(context: context) ?? image
     }
 
-    static func standardProcess(_ image: UIImage, preset: FilterPreset?, context: CIContext, shouldApplyGrain: Bool) -> UIImage {
+    static func standardProcess(
+        _ image: UIImage,
+        cameraType: CameraType,
+        grainLevel: GrainLevel,
+        fxLightLeak: Bool,
+        fxVignette: Bool,
+        fxBloom: Bool,
+        context: CIContext
+    ) -> UIImage {
         guard let ciImage = image.toCIImage() else { return image }
         var result = ciImage
 
-        if let preset {
-            if let lutFileName = preset.lutFileName {
-                result = LUTService.shared.applyLUT(named: lutFileName, to: result, intensity: 1.0)
-            } else if let filterName = preset.ciFilterName {
-                let f = CIFilter(name: filterName)!
-                f.setValue(result, forKey: kCIInputImageKey)
-                result = f.outputImage ?? result
-            }
+        // Apply LUT
+        if let lutFileName = cameraType.lutFileName {
+            result = LUTService.shared.applyLUT(named: lutFileName, to: result, intensity: 1.0)
         }
 
-        if shouldApplyGrain {
-            result = addFilmGrain(to: result, intensity: 0.04)
+        // Apply grain: camera type default + toolbar override
+        let grainAmount = max(cameraType.grainIntensity * 0.15, grainLevel.intensity)
+        if grainAmount > 0 {
+            result = addFilmGrain(to: result, intensity: CGFloat(grainAmount))
         }
+
+        // Apply vignette: toolbar toggle or camera type default
+        let vignetteAmount = fxVignette ? 1.2 : cameraType.vignetteIntensity
+        if vignetteAmount > 0 {
+            result = addVignette(to: result, intensity: CGFloat(vignetteAmount))
+        }
+
+        // Apply bloom
+        let bloomAmount = fxBloom ? 0.3 : cameraType.bloomIntensity
+        if bloomAmount > 0 {
+            result = addBloom(to: result, intensity: CGFloat(bloomAmount))
+        }
+
+        // Apply light leak
+        if cameraType.lightLeakEnabled || fxLightLeak {
+            result = addLightLeak(to: result, intensity: 0.4)
+        }
+
         return result.toUIImage(context: context) ?? image
     }
 
@@ -289,7 +352,7 @@ enum CameraFilters {
     static func addFilmGrain(to image: CIImage, intensity: CGFloat) -> CIImage {
         let extent = image.extent
 
-        // Fresh instances per call — CIFilter is NOT thread-safe
+        // Fresh instances per call -- CIFilter is NOT thread-safe
         let noise = CIFilter(name: "CIRandomGenerator")!
         guard let rawNoise = noise.outputImage else { return image }
 

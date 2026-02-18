@@ -5,8 +5,6 @@ struct CameraView: View {
     @StateObject private var viewModel = CameraViewModel()
     @ObservedObject private var subscriptionService = SubscriptionService.shared
     @Environment(\.dismiss) private var dismiss
-    @State private var showFilterSheet = false
-    @State private var dummyIntensity: Double = 1.0
     @State private var showPaywall = false
 
     var onPhotoCaptured: ((UIImage) -> Void)?
@@ -15,10 +13,14 @@ struct CameraView: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            // Live preview — GPU-rendered via MetalImageView (no CGImage creation)
+            // Live preview -- GPU-rendered via MetalImageView (no CGImage creation)
             if let ciImage = viewModel.processedPreviewCIImage {
-                MetalImageView(ciImage: ciImage, usesCameraContext: true)
-                    .ignoresSafeArea()
+                ZStack {
+                    MetalImageView(ciImage: ciImage, usesCameraContext: true)
+                        .ignoresSafeArea()
+
+                    GridOverlayView(mode: viewModel.gridMode)
+                }
             } else if !viewModel.cameraService.permissionGranted {
                 permissionDeniedView
             } else {
@@ -39,11 +41,23 @@ struct CameraView: View {
                 topControls
                 Spacer()
                 zoomControls
-                modeToggle
-                if viewModel.cameraMode == .film {
-                    filterButton
-                }
+                cameraTypeStrip
+                    .padding(.bottom, 8)
                 bottomControls
+                CameraToolbarView(
+                    selectedTab: $viewModel.selectedToolbarTab,
+                    selectedFrame: $viewModel.selectedFrame,
+                    gridMode: $viewModel.gridMode,
+                    grainLevel: $viewModel.grainLevel,
+                    lightLeakOn: $viewModel.toolbarLightLeakOn,
+                    vignetteOn: $viewModel.toolbarVignetteOn,
+                    bloomOn: $viewModel.toolbarBloomOn,
+                    flashMode: viewModel.cameraService.flashMode,
+                    onFlashSet: { mode in
+                        viewModel.cameraService.flashMode = mode
+                        HapticManager.selection()
+                    }
+                )
             }
         }
         .preferredColorScheme(.dark)
@@ -65,13 +79,6 @@ struct CameraView: View {
                 dismiss()
             }
         }
-        .sheet(isPresented: $showFilterSheet) {
-            filterSheet
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-                .presentationBackgroundInteraction(.enabled)
-                .presentationCornerRadius(20)
-        }
         .sheet(isPresented: $showPaywall) {
             PaywallView()
         }
@@ -92,143 +99,38 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.4))
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Cerrar cámara")
+            .accessibilityLabel("Cerrar camara")
 
             Spacer()
 
-            // Flash mode
+            // Switch camera
             Button {
-                viewModel.cameraService.cycleFlash()
+                viewModel.cameraService.switchCamera()
+                HapticManager.selection()
             } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: viewModel.cameraService.flashMode.icon)
-                        .font(.title3)
-
-                    if viewModel.cameraService.flashMode == .vintage {
-                        Text("Vintage")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                    }
-                }
-                .foregroundColor(flashColor)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.black.opacity(0.4))
-                .cornerRadius(20)
+                Image(systemName: "camera.rotate.fill")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(Color.black.opacity(0.4))
+                    .clipShape(Circle())
             }
-            .accessibilityLabel("Flash: \(viewModel.cameraService.flashMode.displayName)")
-
-            Spacer()
-
-            // Spacer to balance layout (switch camera button is in bottom controls)
-            Rectangle()
-                .fill(Color.clear)
-                .frame(width: 44, height: 44)
+            .accessibilityLabel("Cambiar camara")
         }
         .padding(.horizontal)
         .padding(.top, 8)
     }
 
-    private var flashColor: Color {
-        switch viewModel.cameraService.flashMode {
-        case .off: return .white
-        case .on: return Color.foticoAccent
-        case .auto: return Color.foticoAccent
-        case .vintage: return Color.foticoWarning
-        }
-    }
+    // MARK: - Camera Type Strip
 
-    // MARK: - Mode Toggle
-
-    private var modeToggle: some View {
-        HStack(spacing: 0) {
-            ForEach(CameraMode.allCases, id: \.self) { mode in
-                Button {
-                    if viewModel.cameraMode != mode {
-                        viewModel.toggleMode()
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: mode.icon)
-                            .font(.caption)
-                        Text(mode.displayName)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                    }
-                    .foregroundColor(viewModel.cameraMode == mode ? Color.foticoDark : .white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(
-                        viewModel.cameraMode == mode
-                        ? Color.foticoPrimary
-                        : Color.white.opacity(0.15)
-                    )
-                }
+    private var cameraTypeStrip: some View {
+        CameraTypeStripView(
+            cameraTypes: CameraType.allTypes,
+            selectedId: viewModel.selectedCameraType.id,
+            onSelect: { cameraType in
+                viewModel.selectCameraType(cameraType)
             }
-        }
-        .cornerRadius(20)
-        .padding(.bottom, 8)
-    }
-
-    // MARK: - Filter Button & Sheet
-
-    private var filterButton: some View {
-        Button {
-            showFilterSheet = true
-            HapticManager.selection()
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "camera.filters")
-                    .font(.caption)
-                Text(viewModel.selectedPreset?.displayName ?? "Filtros")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-            }
-            .foregroundColor(viewModel.selectedPreset != nil ? .black : .white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(viewModel.selectedPreset != nil ? Color.foticoPrimary : Color.white.opacity(0.2))
-            .cornerRadius(20)
-        }
-        .padding(.bottom, 8)
-    }
-
-    private var filterSheet: some View {
-        NavigationStack {
-            PresetGridView(
-                presets: FilterPreset.allPresets,
-                selectedPresetId: viewModel.selectedPreset?.id,
-                presetIntensity: $dummyIntensity,
-                thumbnails: nil,
-                isPro: subscriptionService.isPro,
-                showIntensitySlider: false,
-                onSelectPreset: { preset in
-                    viewModel.selectPreset(preset)
-                },
-                onDeselectPreset: {
-                    viewModel.selectPreset(nil)
-                },
-                onIntensityChange: nil,
-                onLockedPresetTapped: {
-                    showFilterSheet = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showPaywall = true
-                    }
-                }
-            )
-            .background(Color.foticoCardBg)
-            .navigationTitle("Filtros")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Listo") {
-                        showFilterSheet = false
-                    }
-                    .foregroundColor(Color.foticoPrimary)
-                }
-            }
-        }
-        .preferredColorScheme(.dark)
+        )
     }
 
     // MARK: - Zoom Controls
@@ -269,23 +171,10 @@ struct CameraView: View {
 
     private var bottomControls: some View {
         HStack {
-            // Grain toggle (film mode only)
-            if viewModel.cameraMode == .film {
-                Button {
-                    viewModel.grainOnPreview.toggle()
-                    HapticManager.selection()
-                } label: {
-                    Image(systemName: viewModel.grainOnPreview ? "circle.dotted.circle" : "circle.dotted")
-                        .font(.title2)
-                        .foregroundColor(viewModel.grainOnPreview ? .white : .white.opacity(0.5))
-                        .frame(width: 50, height: 50)
-                }
-                .accessibilityLabel("Grano: \(viewModel.grainOnPreview ? "activado" : "desactivado")")
-            } else {
-                Rectangle()
-                    .fill(Color.clear)
-                    .frame(width: 50, height: 50)
-            }
+            // Spacer for balance
+            Rectangle()
+                .fill(Color.clear)
+                .frame(width: 50, height: 50)
 
             Spacer()
 
@@ -299,22 +188,13 @@ struct CameraView: View {
 
             Spacer()
 
-            // Switch camera (selfie)
-            Button {
-                viewModel.cameraService.switchCamera()
-                HapticManager.selection()
-            } label: {
-                Image(systemName: "camera.rotate.fill")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .frame(width: 50, height: 50)
-                    .background(Color.white.opacity(0.15))
-                    .clipShape(Circle())
-            }
-            .accessibilityLabel("Cambiar cámara")
+            // Spacer for balance
+            Rectangle()
+                .fill(Color.clear)
+                .frame(width: 50, height: 50)
         }
         .padding(.horizontal, 24)
-        .padding(.bottom, 24)
+        .padding(.bottom, 12)
     }
 
     // MARK: - Permission Denied
@@ -325,11 +205,11 @@ struct CameraView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.gray)
 
-            Text("Acceso a la Cámara")
+            Text("Acceso a la Camara")
                 .font(.title2)
                 .foregroundColor(.white)
 
-            Text("Fotico necesita acceso a tu cámara para tomar fotos con efectos vintage.")
+            Text("Fotico necesita acceso a tu camara para tomar fotos con efectos vintage.")
                 .font(.subheadline)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
