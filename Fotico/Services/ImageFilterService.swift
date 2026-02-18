@@ -134,50 +134,7 @@ class ImageFilterService: @unchecked Sendable {
     }
 
     private func applyCustomPreset(_ preset: FilterPreset, to image: CIImage) -> CIImage {
-        switch preset.id {
-        case "fotico_cine":
-            return applyCinematicGrade(to: image, preset: preset)
-        case "fotico_retro":
-            return applyRetroLook(to: image, preset: preset)
-        default:
-            return image
-        }
-    }
-
-    private func applyCinematicGrade(to image: CIImage, preset: FilterPreset) -> CIImage {
-        var result = image
-
-        let contrastValue = preset.parameters.first(where: { $0.key == "contrast" })?.value ?? 1.2
-        result = applyColorControls(to: result, brightness: 0, contrast: contrastValue, saturation: 1.0)
-
-        guard let tempFilter = cachedFilter(named: "CITemperatureAndTint") else { return result }
-        tempFilter.setValue(result, forKey: kCIInputImageKey)
-        tempFilter.setValue(CIVector(x: 5500, y: 0), forKey: "inputNeutral")
-        tempFilter.setValue(CIVector(x: 7000, y: -20), forKey: "inputTargetNeutral")
-        result = tempFilter.outputImage ?? result
-
-        return result
-    }
-
-    private func applyRetroLook(to image: CIImage, preset: FilterPreset) -> CIImage {
-        var result = image
-
-        let satValue = preset.parameters.first(where: { $0.key == "saturation" })?.value ?? 0.6
-        result = applyColorControls(to: result, brightness: 0.03, contrast: 1.0, saturation: satValue)
-
-        temperatureFilter.setValue(result, forKey: kCIInputImageKey)
-        temperatureFilter.setValue(CIVector(x: 6500, y: 0), forKey: "inputNeutral")
-        temperatureFilter.setValue(CIVector(x: 7500, y: 0), forKey: "inputTargetNeutral")
-        result = temperatureFilter.outputImage ?? result
-
-        // Use a fresh vignette filter — the shared vignetteFilter is reserved for effects
-        let retroVignette = CIFilter(name: "CIVignette")!
-        retroVignette.setValue(result, forKey: kCIInputImageKey)
-        retroVignette.setValue(1.0, forKey: kCIInputIntensityKey)
-        retroVignette.setValue(1.5, forKey: kCIInputRadiusKey)
-        result = retroVignette.outputImage ?? result
-
-        return result
+        return image
     }
 
     /// Applies preset parameters, batching ColorControls params (brightness, contrast,

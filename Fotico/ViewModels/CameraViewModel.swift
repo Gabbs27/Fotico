@@ -208,23 +208,8 @@ enum CameraFilters {
             filter.setValue(image, forKey: kCIInputImageKey)
             return filter.outputImage ?? image
         }
-        // Custom presets
-        switch preset.id {
-        case "fotico_cine":
-            let tempTint = CIFilter(name: "CITemperatureAndTint")!
-            tempTint.setValue(image, forKey: kCIInputImageKey)
-            tempTint.setValue(CIVector(x: 5500, y: 0), forKey: "inputNeutral")
-            tempTint.setValue(CIVector(x: 7000, y: -20), forKey: "inputTargetNeutral")
-            return tempTint.outputImage ?? image
-        case "fotico_retro":
-            let controls = CIFilter(name: "CIColorControls")!
-            controls.setValue(image, forKey: kCIInputImageKey)
-            controls.setValue(0.6, forKey: kCIInputSaturationKey)
-            controls.setValue(0.03, forKey: kCIInputBrightnessKey)
-            return controls.outputImage ?? image
-        default:
-            return image
-        }
+        // Custom presets no longer exist — parameter-only presets handled by editor
+        return image
     }
 
     static func vintageFlashProcess(_ image: UIImage, preset: FilterPreset?, shouldApplyGrain: Bool, context: CIContext) -> UIImage {
