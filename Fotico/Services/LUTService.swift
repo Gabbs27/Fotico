@@ -9,6 +9,7 @@ final class LUTService: @unchecked Sendable {
 
     // Cache of parsed LUT data: [fileName: LUTData]
     private let cache = NSCache<NSString, LUTData>()
+    private let colorSpace = CGColorSpaceCreateDeviceRGB()
 
     private init() {
         cache.countLimit = 20  // Keep at most 20 LUTs in memory
@@ -21,7 +22,7 @@ final class LUTService: @unchecked Sendable {
         let filter = CIFilter(name: "CIColorCubeWithColorSpace")!
         filter.setValue(lutData.size, forKey: "inputCubeDimension")
         filter.setValue(lutData.data, forKey: "inputCubeData")
-        filter.setValue(CGColorSpaceCreateDeviceRGB(), forKey: "inputColorSpace")
+        filter.setValue(colorSpace, forKey: "inputColorSpace")
         filter.setValue(image, forKey: kCIInputImageKey)
 
         guard let filtered = filter.outputImage else { return image }

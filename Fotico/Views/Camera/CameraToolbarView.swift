@@ -1,11 +1,10 @@
 import SwiftUI
 
 enum CameraToolbarTab: String, CaseIterable, Sendable {
-    case frame, grid, texture, fx, flash
+    case grid, texture, fx, flash
 
     var icon: String {
         switch self {
-        case .frame: return "square"
         case .grid: return "grid"
         case .texture: return "line.3.horizontal"
         case .fx: return "fx"
@@ -15,7 +14,6 @@ enum CameraToolbarTab: String, CaseIterable, Sendable {
 
     var label: String {
         switch self {
-        case .frame: return "Frame"
         case .grid: return "Grid"
         case .texture: return "Texture"
         case .fx: return "FX"
@@ -43,7 +41,6 @@ enum GrainLevel: String, Sendable {
 
 struct CameraToolbarView: View {
     @Binding var selectedTab: CameraToolbarTab?
-    @Binding var selectedFrame: String?
     @Binding var gridMode: GridMode
     @Binding var grainLevel: GrainLevel
     @Binding var lightLeakOn: Bool
@@ -87,22 +84,11 @@ struct CameraToolbarView: View {
     @ViewBuilder
     private func tabPanel(for tab: CameraToolbarTab) -> some View {
         switch tab {
-        case .frame: frameOptions
         case .grid: gridOptions
         case .texture: textureOptions
         case .fx: fxOptions
         case .flash: flashOptions
         }
-    }
-
-    private var frameOptions: some View {
-        HStack(spacing: 12) {
-            chipButton("None", selected: selectedFrame == nil) { selectedFrame = nil }
-            chipButton("Polaroid", selected: selectedFrame == "frame_polaroid") { selectedFrame = "frame_polaroid" }
-            chipButton("35mm", selected: selectedFrame == "frame_35mm") { selectedFrame = "frame_35mm" }
-            chipButton("Super8", selected: selectedFrame == "frame_super8") { selectedFrame = "frame_super8" }
-        }
-        .padding(.horizontal, 16)
     }
 
     private var gridOptions: some View {

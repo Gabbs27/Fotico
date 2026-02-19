@@ -57,7 +57,7 @@ struct PresetGridView: View {
                         let isLocked = preset.tier == .pro && !isPro
                         gridItem(
                             id: preset.id,
-                            name: preset.displayName,
+                            name: preset.name,
                             thumbnail: thumbnails?[preset.id],
                             isLocked: isLocked
                         ) {

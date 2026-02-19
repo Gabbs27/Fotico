@@ -46,7 +46,6 @@ struct CameraView: View {
                 bottomControls
                 CameraToolbarView(
                     selectedTab: $viewModel.selectedToolbarTab,
-                    selectedFrame: $viewModel.selectedFrame,
                     gridMode: $viewModel.gridMode,
                     grainLevel: $viewModel.grainLevel,
                     lightLeakOn: $viewModel.toolbarLightLeakOn,

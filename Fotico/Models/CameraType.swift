@@ -1,6 +1,6 @@
 import Foundation
 
-struct CameraType: Identifiable, Sendable {
+struct CameraType: Identifiable, Sendable, Equatable {
     let id: String
     let name: String
     let icon: String
@@ -9,6 +9,10 @@ struct CameraType: Identifiable, Sendable {
     let vignetteIntensity: Double
     let bloomIntensity: Double
     let lightLeakEnabled: Bool
+
+    static func == (lhs: CameraType, rhs: CameraType) -> Bool {
+        lhs.id == rhs.id
+    }
 
     static let allTypes: [CameraType] = [
         CameraType(id: "normal", name: "Normal", icon: "camera",

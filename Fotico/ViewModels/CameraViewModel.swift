@@ -13,7 +13,6 @@ class CameraViewModel: ObservableObject {
     @Published var showFlashOverlay = false
 
     // Toolbar state
-    @Published var selectedFrame: String? = nil
     @Published var gridMode: GridMode = .off
     @Published var grainLevel: GrainLevel = .off
     @Published var toolbarLightLeakOn: Bool = false
@@ -85,8 +84,8 @@ class CameraViewModel: ObservableObject {
             // Downscale preview for faster processing
             let extent = result.extent
             let maxDim = max(extent.width, extent.height)
-            if maxDim > 900 {
-                let scale = 900.0 / maxDim
+            if maxDim > CameraFilters.previewMaxDimension {
+                let scale = CameraFilters.previewMaxDimension / maxDim
                 result = result.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
             }
 
@@ -96,26 +95,26 @@ class CameraViewModel: ObservableObject {
             }
 
             // Apply grain: camera type default + toolbar override
-            let grainAmount = max(cameraType.grainIntensity * 0.15, extraGrain.intensity)
+            let grainAmount = max(cameraType.grainIntensity * CameraFilters.grainScaleFactor, extraGrain.intensity)
             if grainAmount > 0 {
                 result = CameraFilters.addFilmGrain(to: result, intensity: CGFloat(grainAmount))
             }
 
             // Apply vignette: toolbar toggle or camera type default
-            let vignetteAmount = fxVignette ? 1.2 : cameraType.vignetteIntensity
+            let vignetteAmount = fxVignette ? CameraFilters.toolbarVignetteIntensity : cameraType.vignetteIntensity
             if vignetteAmount > 0 {
                 result = CameraFilters.addVignette(to: result, intensity: CGFloat(vignetteAmount))
             }
 
             // Apply bloom
-            let bloomAmount = fxBloom ? 0.3 : cameraType.bloomIntensity
+            let bloomAmount = fxBloom ? CameraFilters.toolbarBloomIntensity : cameraType.bloomIntensity
             if bloomAmount > 0 {
                 result = CameraFilters.addBloom(to: result, intensity: CGFloat(bloomAmount))
             }
 
             // Apply light leak
             if cameraType.lightLeakEnabled || fxLightLeak {
-                result = CameraFilters.addLightLeak(to: result, intensity: 0.4)
+                result = CameraFilters.addLightLeak(to: result, intensity: CameraFilters.lightLeakIntensity)
             }
 
             // Pass CIImage directly -- MetalImageView will render it on GPU
@@ -196,6 +195,15 @@ class CameraViewModel: ObservableObject {
 /// Uses fresh filter instances per call -- CIFilter is NOT thread-safe.
 enum CameraFilters {
 
+    // MARK: - Constants
+
+    static let previewMaxDimension: CGFloat = 900
+    static let grainScaleFactor: Double = 0.15
+    static let toolbarVignetteIntensity: Double = 1.2
+    static let toolbarBloomIntensity: Double = 0.3
+    static let lightLeakIntensity: CGFloat = 0.4
+    static let bloomRadius: Double = 10.0
+
     static func applyLivePreset(lutFileName: String, to image: CIImage) -> CIImage {
         return LUTService.shared.applyLUT(named: lutFileName, to: image, intensity: 1.0)
     }
@@ -209,11 +217,12 @@ enum CameraFilters {
     }
 
     static func addBloom(to image: CIImage, intensity: CGFloat) -> CIImage {
+        let extent = image.extent
         let bloom = CIFilter(name: "CIBloom")!
         bloom.setValue(image, forKey: kCIInputImageKey)
         bloom.setValue(intensity, forKey: kCIInputIntensityKey)
-        bloom.setValue(10.0, forKey: kCIInputRadiusKey)
-        return bloom.outputImage ?? image
+        bloom.setValue(bloomRadius, forKey: kCIInputRadiusKey)
+        return bloom.outputImage?.cropped(to: extent) ?? image
     }
 
     static func addLightLeak(to image: CIImage, intensity: CGFloat) -> CIImage {
@@ -274,7 +283,7 @@ enum CameraFilters {
         result = addVignette(to: result, intensity: 1.8)
 
         // 5. Grain
-        let grainAmount = max(cameraType.grainIntensity * 0.15, grainLevel.intensity)
+        let grainAmount = max(cameraType.grainIntensity * grainScaleFactor, grainLevel.intensity)
         if grainAmount > 0 {
             result = addFilmGrain(to: result, intensity: CGFloat(max(grainAmount, 0.06)))
         } else {
@@ -287,18 +296,18 @@ enum CameraFilters {
         }
 
         // 7. Additional FX from toolbar
-        let vignetteAmount = fxVignette ? 1.2 : 0.0
+        let vignetteAmount = fxVignette ? toolbarVignetteIntensity : 0.0
         if vignetteAmount > 0 {
             result = addVignette(to: result, intensity: CGFloat(vignetteAmount))
         }
 
-        let bloomAmount = fxBloom ? 0.3 : cameraType.bloomIntensity
+        let bloomAmount = fxBloom ? toolbarBloomIntensity : cameraType.bloomIntensity
         if bloomAmount > 0 {
             result = addBloom(to: result, intensity: CGFloat(bloomAmount))
         }
 
         if cameraType.lightLeakEnabled || fxLightLeak {
-            result = addLightLeak(to: result, intensity: 0.4)
+            result = addLightLeak(to: result, intensity: lightLeakIntensity)
         }
 
         return result.toUIImage(context: context) ?? image
@@ -322,26 +331,26 @@ enum CameraFilters {
         }
 
         // Apply grain: camera type default + toolbar override
-        let grainAmount = max(cameraType.grainIntensity * 0.15, grainLevel.intensity)
+        let grainAmount = max(cameraType.grainIntensity * grainScaleFactor, grainLevel.intensity)
         if grainAmount > 0 {
             result = addFilmGrain(to: result, intensity: CGFloat(grainAmount))
         }
 
         // Apply vignette: toolbar toggle or camera type default
-        let vignetteAmount = fxVignette ? 1.2 : cameraType.vignetteIntensity
+        let vignetteAmount = fxVignette ? toolbarVignetteIntensity : cameraType.vignetteIntensity
         if vignetteAmount > 0 {
             result = addVignette(to: result, intensity: CGFloat(vignetteAmount))
         }
 
         // Apply bloom
-        let bloomAmount = fxBloom ? 0.3 : cameraType.bloomIntensity
+        let bloomAmount = fxBloom ? toolbarBloomIntensity : cameraType.bloomIntensity
         if bloomAmount > 0 {
             result = addBloom(to: result, intensity: CGFloat(bloomAmount))
         }
 
         // Apply light leak
         if cameraType.lightLeakEnabled || fxLightLeak {
-            result = addLightLeak(to: result, intensity: 0.4)
+            result = addLightLeak(to: result, intensity: lightLeakIntensity)
         }
 
         return result.toUIImage(context: context) ?? image
