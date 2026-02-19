@@ -15,7 +15,7 @@ struct MainEditorView: View {
 
     var body: some View {
         ZStack {
-            Color.foticoDark.ignoresSafeArea()
+            Color.lumeDark.ignoresSafeArea()
 
             if editorVM.hasImage {
                 editorContent
@@ -103,7 +103,7 @@ struct MainEditorView: View {
             // Tool panels
             toolPanel
                 .frame(height: 280)
-                .background(Color.foticoCardBg)
+                .background(Color.lumeCardBg)
                 .animation(.easeInOut(duration: 0.2), value: editorVM.currentTool)
 
             // Bottom toolbar
@@ -167,7 +167,7 @@ struct MainEditorView: View {
                     editorVM.pasteEdits()
                 } label: {
                     Image(systemName: "doc.on.clipboard")
-                        .foregroundColor(clipboard.hasContent ? Color.foticoPrimary : .gray)
+                        .foregroundColor(clipboard.hasContent ? Color.lumePrimary : .gray)
                 }
                 .disabled(!clipboard.hasContent)
                 .accessibilityLabel("Pegar ediciones")
@@ -178,7 +178,7 @@ struct MainEditorView: View {
                     } label: {
                         Text("Reset")
                             .font(.subheadline)
-                            .foregroundColor(Color.foticoWarning)
+                            .foregroundColor(Color.lumeWarning)
                     }
                     .accessibilityLabel("Restablecer ediciones")
                 }
@@ -188,7 +188,7 @@ struct MainEditorView: View {
                 } label: {
                     Image(systemName: "square.and.arrow.down")
                         .font(.title3)
-                        .foregroundColor(Color.foticoPrimary)
+                        .foregroundColor(Color.lumePrimary)
                 }
                 .accessibilityLabel("Guardar imagen")
 
@@ -204,7 +204,7 @@ struct MainEditorView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color.foticoCardBg)
+        .background(Color.lumeCardBg)
     }
 
     // MARK: - Tool Panel
@@ -250,7 +250,7 @@ struct MainEditorView: View {
         VStack(spacing: 24) {
             Spacer()
 
-            Text("FOTICO")
+            Text("LUMÉ")
                 .font(.system(size: 48, weight: .bold, design: .default))
                 .tracking(8)
                 .foregroundColor(.white)
@@ -287,7 +287,7 @@ struct MainEditorView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 32)
                 .padding(.vertical, 14)
-                .background(Color.foticoSurface)
+                .background(Color.lumeSurface)
                 .cornerRadius(12)
             }
 

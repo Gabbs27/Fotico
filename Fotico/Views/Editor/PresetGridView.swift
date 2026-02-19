@@ -85,7 +85,7 @@ struct PresetGridView: View {
                 .foregroundColor(.gray)
 
             Slider(value: $presetIntensity, in: 0...1, step: 0.01)
-                .tint(Color.foticoPrimary)
+                .tint(Color.lumePrimary)
                 .onChange(of: presetIntensity) { _, newValue in
                     onIntensityChange?(newValue)
                 }
@@ -129,7 +129,7 @@ struct PresetGridView: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .background(isSelected ? Color.foticoPrimary : Color.foticoSurface)
+            .background(isSelected ? Color.lumePrimary : Color.lumeSurface)
             .foregroundColor(isSelected ? .black : .gray)
             .cornerRadius(14)
         }
@@ -153,7 +153,7 @@ struct PresetGridView: View {
                             .cornerRadius(10)
                     } else {
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.foticoSurface)
+                            .fill(Color.lumeSurface)
                             .aspectRatio(1, contentMode: .fit)
                             .overlay(
                                 Image(systemName: id == nil ? "photo" : "camera.filters")
@@ -169,7 +169,7 @@ struct PresetGridView: View {
                 }
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(isSelected ? Color.foticoPrimary : Color.clear, lineWidth: 2.5)
+                        .stroke(isSelected ? Color.lumePrimary : Color.clear, lineWidth: 2.5)
                 )
                 .scaleEffect(isSelected ? 1.03 : 1.0)
                 .animation(.easeOut(duration: 0.15), value: isSelected)

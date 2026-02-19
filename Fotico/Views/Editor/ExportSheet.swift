@@ -29,7 +29,7 @@ struct ExportSheet: View {
                     .font(.subheadline)
                 }
                 .padding()
-                .background(Color.foticoCardBg)
+                .background(Color.lumeCardBg)
                 .cornerRadius(12)
                 .padding(.horizontal)
 
@@ -61,16 +61,16 @@ struct ExportSheet: View {
                     }
                     .disabled(isSaving)
 
-                    ShareLink(item: Image(uiImage: image), preview: SharePreview("Fotico", image: Image(uiImage: image))) {
+                    ShareLink(item: Image(uiImage: image), preview: SharePreview("Lumé", image: Image(uiImage: image))) {
                         HStack {
                             Image(systemName: "square.and.arrow.up")
                             Text("Compartir")
                         }
                         .font(.headline)
-                        .foregroundColor(Color.foticoPrimary)
+                        .foregroundColor(Color.lumePrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.foticoSurface)
+                        .background(Color.lumeSurface)
                         .cornerRadius(12)
                     }
                 }
@@ -78,13 +78,13 @@ struct ExportSheet: View {
 
                 Spacer()
             }
-            .background(Color.foticoDark.ignoresSafeArea())
+            .background(Color.lumeDark.ignoresSafeArea())
             .navigationTitle("Exportar")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cerrar") { dismiss() }
-                        .foregroundColor(Color.foticoPrimary)
+                        .foregroundColor(Color.lumePrimary)
                 }
             }
         }

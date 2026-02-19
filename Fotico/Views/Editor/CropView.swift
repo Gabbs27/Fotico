@@ -49,7 +49,7 @@ struct CropView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(Color.foticoSurface)
+                        .background(Color.lumeSurface)
                         .cornerRadius(8)
                 }
 
@@ -61,10 +61,10 @@ struct CropView: View {
                 } label: {
                     Label("Reset", systemImage: "arrow.counterclockwise")
                         .font(.caption)
-                        .foregroundColor(Color.foticoWarning)
+                        .foregroundColor(Color.lumeWarning)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(Color.foticoSurface)
+                        .background(Color.lumeSurface)
                         .cornerRadius(8)
                 }
             }

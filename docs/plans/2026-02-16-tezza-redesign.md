@@ -1,8 +1,8 @@
-# Fotico v2: Tezza-Inspired Redesign — Implementation Plan
+# Lumé v2: Tezza-Inspired Redesign — Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Transform Fotico into a Tezza-style aesthetic photo editor with accounts, StoreKit 2 subscriptions, 40+ LUT presets, batch editing, texture overlays, and local project storage.
+**Goal:** Transform Lumé into a Tezza-style aesthetic photo editor with accounts, StoreKit 2 subscriptions, 40+ LUT presets, batch editing, texture overlays, and local project storage.
 
 **Architecture:** Tab-based navigation (Editor, Camera, Projects, Profile). All data local via SwiftData. Auth via Sign in with Apple. Subscriptions via StoreKit 2. LUT presets via CIColorCubeWithColorSpace. Overlays via CISourceOverCompositing.
 
@@ -1100,7 +1100,7 @@ class SubscriptionService: ObservableObject {
     @Published var products: [Product] = []
     @Published var isPro = false
 
-    private let productIDs = ["com.fotico.pro.monthly", "com.fotico.pro.annual"]
+    private let productIDs = ["com.lume.pro.monthly", "com.lume.pro.annual"]
 
     func loadProducts() async {
         do {
@@ -1257,7 +1257,7 @@ git commit -m "feat: add copy/paste edit clipboard for batch editing"
 **Step 1: Create OnboardingView**
 
 3-page onboarding with:
-1. Welcome — "FOTICO" logo + tagline
+1. Welcome — "LUME" logo + tagline
 2. Features — presets, effects, camera
 3. Get started — optional Sign in with Apple
 

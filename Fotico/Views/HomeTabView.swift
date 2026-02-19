@@ -42,7 +42,7 @@ struct HomeTabView: View {
                     }
                     .tag(3)
             }
-            .tint(Color.foticoPrimary)
+            .tint(Color.lumePrimary)
 
             if !hasSeenOnboarding {
                 OnboardingView {

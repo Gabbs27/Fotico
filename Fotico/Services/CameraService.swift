@@ -34,7 +34,7 @@ class CameraService: NSObject, ObservableObject {
     nonisolated(unsafe) private let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
     private let videoOutput = AVCaptureVideoDataOutput()
-    private let processingQueue = DispatchQueue(label: "com.fotico.camera", qos: .userInitiated)
+    private let processingQueue = DispatchQueue(label: "com.lume.camera", qos: .userInitiated)
     private var currentDevice: AVCaptureDevice?
     private var photoContinuation: CheckedContinuation<UIImage?, Never>?
 

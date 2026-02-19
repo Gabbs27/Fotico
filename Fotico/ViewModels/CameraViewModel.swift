@@ -23,7 +23,7 @@ class CameraViewModel: ObservableObject {
     let cameraService = CameraService()
 
     private let ciContext: CIContext
-    private let processingQueue = DispatchQueue(label: "com.fotico.processing", qos: .userInitiated)
+    private let processingQueue = DispatchQueue(label: "com.lume.processing", qos: .userInitiated)
     private var previewCancellable: AnyCancellable?
 
     // Semaphore-based frame dropping: if GPU is busy, drop the frame.

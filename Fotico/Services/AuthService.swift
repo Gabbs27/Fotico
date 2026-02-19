@@ -9,7 +9,7 @@ class AuthService: ObservableObject {
     @Published var isAuthenticated = false
     @Published var currentUser: UserProfile?
 
-    private let keychainKey = "com.fotico.appleUserID"
+    private let keychainKey = "com.lume.appleUserID"
 
     func checkExistingAuth(modelContext: ModelContext) {
         guard let userID = KeychainHelper.load(key: keychainKey) else {

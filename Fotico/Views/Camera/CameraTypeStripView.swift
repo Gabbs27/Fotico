@@ -21,7 +21,7 @@ struct CameraTypeStripView: View {
                                 .font(.system(size: 10, weight: .medium))
                                 .lineLimit(1)
                         }
-                        .foregroundColor(selectedId == cameraType.id ? Color.foticoPrimary : .white.opacity(0.7))
+                        .foregroundColor(selectedId == cameraType.id ? Color.lumePrimary : .white.opacity(0.7))
                     }
                 }
             }

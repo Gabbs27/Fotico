@@ -5,7 +5,7 @@
 
 ## Goal
 
-Overhaul Fotico into a two-experience app: (1) Camera with "camera types" as live preview (Disposable, Polaroid, 35mm, etc.) with a Tezza-style bottom toolbar, and (2) Editor with 5 featured filters (Soft, Golden, Clean, Vintage, Moody) + 27 existing LUT presets.
+Overhaul Lumé into a two-experience app: (1) Camera with "camera types" as live preview (Disposable, Polaroid, 35mm, etc.) with a Tezza-style bottom toolbar, and (2) Editor with 5 featured filters (Soft, Golden, Clean, Vintage, Moody) + 27 existing LUT presets.
 
 ## Part 1: Camera — Camera Types with Live Preview
 
@@ -21,7 +21,7 @@ Each camera type applies a LUT color grade + optional effects (grain, vignette, 
 | 35mm | Classic 35mm film | portra.cube | grain(0.15) |
 | Fuji 400 | Fuji 400H film stock | fuji_400h.cube | grain(0.1) |
 | Super8 | Cine Super8mm look | super8.cube | grain(0.4) + vignette(1.2) |
-| Glow | Original Fotico: dreamy soft | honey.cube | bloom(0.3) |
+| Glow | Original Lumé: dreamy soft | honey.cube | bloom(0.3) |
 | Nocturna | Night/flash shots, editorial | carbon.cube | vignette(0.6) |
 
 ### Camera UI Layout

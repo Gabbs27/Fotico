@@ -23,7 +23,7 @@ struct OverlayPanelView: View {
                         Spacer()
                         Text("\(Int(editorVM.editState.overlayIntensity * 100))%")
                             .font(.caption)
-                            .foregroundColor(Color.foticoPrimary)
+                            .foregroundColor(Color.lumePrimary)
                     }
                     .padding(.horizontal)
 
@@ -31,7 +31,7 @@ struct OverlayPanelView: View {
                         get: { editorVM.editState.overlayIntensity },
                         set: { editorVM.updateOverlayIntensity($0) }
                     ), in: 0...1, step: 0.01)
-                        .tint(Color.foticoPrimary)
+                        .tint(Color.lumePrimary)
                         .padding(.horizontal)
                 }
                 .padding(.top, 8)
@@ -70,7 +70,7 @@ struct OverlayPanelView: View {
                             VStack(spacing: 6) {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color.foticoSurface)
+                                        .fill(Color.lumeSurface)
                                         .frame(width: 68, height: 68)
 
                                     Image(overlay.fileName)
@@ -82,12 +82,12 @@ struct OverlayPanelView: View {
                                 }
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(isSelected ? Color.foticoPrimary : Color.clear, lineWidth: 2)
+                                        .stroke(isSelected ? Color.lumePrimary : Color.clear, lineWidth: 2)
                                 )
 
                                 Text(overlay.displayName)
                                     .font(.caption2)
-                                    .foregroundColor(isSelected ? Color.foticoPrimary : .gray)
+                                    .foregroundColor(isSelected ? Color.lumePrimary : .gray)
                                     .lineLimit(1)
                             }
                         }
@@ -109,7 +109,7 @@ struct OverlayPanelView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(isSelected ? Color.foticoPrimary : Color.foticoSurface)
+            .background(isSelected ? Color.lumePrimary : Color.lumeSurface)
             .foregroundColor(isSelected ? .black : .gray)
             .cornerRadius(16)
         }
@@ -123,7 +123,7 @@ struct OverlayPanelView: View {
         } label: {
             VStack(spacing: 6) {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.foticoSurface)
+                    .fill(Color.lumeSurface)
                     .frame(width: 68, height: 68)
                     .overlay(
                         Image(systemName: icon)
@@ -131,12 +131,12 @@ struct OverlayPanelView: View {
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(isSelected ? Color.foticoPrimary : Color.clear, lineWidth: 2)
+                            .stroke(isSelected ? Color.lumePrimary : Color.clear, lineWidth: 2)
                     )
 
                 Text(name)
                     .font(.caption2)
-                    .foregroundColor(isSelected ? Color.foticoPrimary : .gray)
+                    .foregroundColor(isSelected ? Color.lumePrimary : .gray)
                     .lineLimit(1)
             }
         }

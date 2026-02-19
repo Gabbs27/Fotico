@@ -18,7 +18,7 @@ struct ProjectsGridView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.foticoDark.ignoresSafeArea()
+                Color.lumeDark.ignoresSafeArea()
 
                 if viewModel.projects.isEmpty {
                     VStack(spacing: 16) {
@@ -85,7 +85,7 @@ struct ProjectsGridView: View {
                     .cornerRadius(8)
             } else {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.foticoSurface)
+                    .fill(Color.lumeSurface)
                     .frame(height: 120)
                     .overlay(
                         Image(systemName: "photo")

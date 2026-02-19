@@ -9,7 +9,7 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.foticoDark.ignoresSafeArea()
+                Color.lumeDark.ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -24,20 +24,20 @@ struct ProfileView: View {
                                 if let email = authService.currentUser?.email {
                                     settingsRow(icon: "envelope.fill", title: email)
                                 }
-                                settingsRow(icon: "crown.fill", title: "Plan: \(authService.currentUser?.tier.rawValue.capitalized ?? "Free")", color: Color.foticoPrimary)
+                                settingsRow(icon: "crown.fill", title: "Plan: \(authService.currentUser?.tier.rawValue.capitalized ?? "Free")", color: Color.lumePrimary)
                             } else {
                                 Button {
                                     showLogin = true
                                 } label: {
-                                    settingsRow(icon: "person.badge.plus", title: "Iniciar sesion", color: Color.foticoPrimary)
+                                    settingsRow(icon: "person.badge.plus", title: "Iniciar sesion", color: Color.lumePrimary)
                                 }
                             }
                         }
 
                         // App section
                         settingsSection(title: "App") {
-                            settingsRow(icon: "star.fill", title: "Calificar Fotico", color: .yellow)
-                            settingsRow(icon: "square.and.arrow.up", title: "Compartir Fotico")
+                            settingsRow(icon: "star.fill", title: "Calificar Lumé", color: .yellow)
+                            settingsRow(icon: "square.and.arrow.up", title: "Compartir Lumé")
                             settingsRow(icon: "questionmark.circle.fill", title: "Ayuda")
                         }
 
@@ -53,7 +53,7 @@ struct ProfileView: View {
                         }
 
                         // Version
-                        Text("Fotico v2.0")
+                        Text("Lumé v2.0")
                             .font(.caption)
                             .foregroundColor(.gray)
                             .padding(.top, 16)
@@ -78,12 +78,12 @@ struct ProfileView: View {
     private var profileHeader: some View {
         VStack(spacing: 12) {
             Circle()
-                .fill(Color.foticoSurface)
+                .fill(Color.lumeSurface)
                 .frame(width: 80, height: 80)
                 .overlay(
                     Image(systemName: authService.isAuthenticated ? "person.fill" : "person.crop.circle")
                         .font(.system(size: 32))
-                        .foregroundColor(authService.isAuthenticated ? Color.foticoPrimary : .gray)
+                        .foregroundColor(authService.isAuthenticated ? Color.lumePrimary : .gray)
                 )
 
             Text(authService.isAuthenticated ? (authService.currentUser?.displayName ?? "Usuario") : "Invitado")
@@ -107,7 +107,7 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 content()
             }
-            .background(Color.foticoCardBg)
+            .background(Color.lumeCardBg)
             .cornerRadius(12)
         }
     }

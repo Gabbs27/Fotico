@@ -12,7 +12,7 @@ struct LoginView: View {
 
             // Logo
             VStack(spacing: 8) {
-                Text("FOTICO")
+                Text("LUMÉ")
                     .font(.system(size: 40, weight: .bold))
                     .tracking(6)
                     .foregroundColor(.white)
@@ -51,6 +51,6 @@ struct LoginView: View {
 
             Spacer().frame(height: 40)
         }
-        .background(Color.foticoDark.ignoresSafeArea())
+        .background(Color.lumeDark.ignoresSafeArea())
     }
 }

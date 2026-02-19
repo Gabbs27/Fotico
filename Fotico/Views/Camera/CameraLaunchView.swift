@@ -6,12 +6,12 @@ struct CameraLaunchView: View {
 
     var body: some View {
         ZStack {
-            Color.foticoDark.ignoresSafeArea()
+            Color.lumeDark.ignoresSafeArea()
             if !showCamera {
                 VStack(spacing: 16) {
                     Image(systemName: "camera.fill")
                         .font(.system(size: 48))
-                        .foregroundColor(Color.foticoPrimary)
+                        .foregroundColor(Color.lumePrimary)
                     Button("Abrir Cámara") {
                         showCamera = true
                     }

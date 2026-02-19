@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate Fotico Featured LUTs with professional color grading formulas.
+Generate Lumé Featured LUTs with professional color grading formulas.
 
 Vintage: Retro/70s - heavy grain + matte blacks + warm earth tones
 Mood: Editorial - desaturated + killed greens/blues + high contrast

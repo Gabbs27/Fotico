@@ -25,7 +25,7 @@ struct CameraView: View {
                 permissionDeniedView
             } else {
                 ProgressView()
-                    .tint(Color.foticoPrimary)
+                    .tint(Color.lumePrimary)
             }
 
             // Flash overlay animation
@@ -208,7 +208,7 @@ struct CameraView: View {
                 .font(.title2)
                 .foregroundColor(.white)
 
-            Text("Fotico necesita acceso a tu camara para tomar fotos con efectos vintage.")
+            Text("Lumé necesita acceso a tu camara para tomar fotos con efectos vintage.")
                 .font(.subheadline)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)

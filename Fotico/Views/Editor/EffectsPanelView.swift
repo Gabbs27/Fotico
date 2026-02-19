@@ -17,7 +17,7 @@ struct EffectsPanelView: View {
                         Spacer()
                         Text("\(Int(editorVM.effectIntensity(for: effect) * 100))%")
                             .font(.caption)
-                            .foregroundColor(Color.foticoPrimary)
+                            .foregroundColor(Color.lumePrimary)
 
                         if editorVM.effectIntensity(for: effect) > 0 {
                             Button {
@@ -26,7 +26,7 @@ struct EffectsPanelView: View {
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.caption)
-                                    .foregroundColor(Color.foticoWarning)
+                                    .foregroundColor(Color.lumeWarning)
                             }
                         }
                     }
@@ -40,7 +40,7 @@ struct EffectsPanelView: View {
                         in: 0...1,
                         step: 0.01
                     )
-                    .tint(Color.foticoPrimary)
+                    .tint(Color.lumePrimary)
                     .padding(.horizontal)
                 }
                 .padding(.top, 8)
@@ -78,20 +78,20 @@ struct EffectsPanelView: View {
             VStack(spacing: 8) {
                 Image(systemName: effect.icon)
                     .font(.title2)
-                    .foregroundColor(isActive ? Color.foticoPrimary : .gray)
+                    .foregroundColor(isActive ? Color.lumePrimary : .gray)
                     .frame(width: 56, height: 56)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(isSelected ? Color.foticoPrimary.opacity(0.15) : Color.foticoSurface)
+                            .fill(isSelected ? Color.lumePrimary.opacity(0.15) : Color.lumeSurface)
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(isSelected ? Color.foticoPrimary : Color.clear, lineWidth: 1.5)
+                            .stroke(isSelected ? Color.lumePrimary : Color.clear, lineWidth: 1.5)
                     )
 
                 Text(effect.displayName)
                     .font(.caption2)
-                    .foregroundColor(isActive ? Color.foticoPrimary : .gray)
+                    .foregroundColor(isActive ? Color.lumePrimary : .gray)
                     .lineLimit(1)
             }
         }

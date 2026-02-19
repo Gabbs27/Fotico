@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct FoticoApp: App {
+struct LumeApp: App {
     var body: some Scene {
         WindowGroup {
             HomeTabView()

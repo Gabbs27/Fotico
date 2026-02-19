@@ -12,7 +12,7 @@ class SubscriptionService: ObservableObject {
     @Published var isPro = false
     #endif
 
-    private let productIDs = ["com.fotico.pro.monthly", "com.fotico.pro.annual"]
+    private let productIDs = ["com.lume.pro.monthly", "com.lume.pro.annual"]
 
     func loadProducts() async {
         do {

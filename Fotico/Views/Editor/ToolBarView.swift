@@ -16,16 +16,16 @@ struct ToolBarView: View {
                         Text(tool.displayName)
                             .font(.caption2)
                     }
-                    .foregroundColor(selectedTool == tool ? Color.foticoPrimary : .gray)
+                    .foregroundColor(selectedTool == tool ? Color.lumePrimary : .gray)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
                 }
             }
         }
-        .background(Color.foticoCardBg)
+        .background(Color.lumeCardBg)
         .overlay(
             Rectangle()
-                .fill(Color.foticoSurface)
+                .fill(Color.lumeSurface)
                 .frame(height: 0.5),
             alignment: .top
         )

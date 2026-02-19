@@ -27,8 +27,8 @@ class PhotoEditorViewModel: ObservableObject {
     private var isRendering = false
     private var pendingRender = false
     private var renderGeneration = 0  // Incremented on clearImage to invalidate in-flight renders
-    private let renderQueue = DispatchQueue(label: "com.fotico.render", qos: .userInteractive)
-    private let exportQueue = DispatchQueue(label: "com.fotico.export", qos: .userInitiated)
+    private let renderQueue = DispatchQueue(label: "com.lume.render", qos: .userInteractive)
+    private let exportQueue = DispatchQueue(label: "com.lume.export", qos: .userInitiated)
 
     // Undo/Redo
     private var undoStack: [EditState] = []

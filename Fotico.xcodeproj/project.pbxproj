@@ -31,7 +31,7 @@
 		CEE5B94F7E147A1A0A5E2001 /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D91AECEF9AA91E4CB36F597 /* CropView.swift */; };
 		D039B9434B85F691608582BC /* GrainShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5C549E27111B7DF1B1E2D672 /* GrainShader.metal */; };
 		D09E69FA2103D4E1E57CCC13 /* ToolBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212CFF362D57F821DA1547D8 /* ToolBarView.swift */; };
-		D210E3E55BB8571E9A17BB4D /* FoticoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C2496338EBADD2A8CCBF4A /* FoticoApp.swift */; };
+		D210E3E55BB8571E9A17BB4D /* LumeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C2496338EBADD2A8CCBF4A /* LumeApp.swift */; };
 		D38AC5EB13F1A7637DBEA3BA /* LightLeakShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 35EB6A0D4837D48F86251373 /* LightLeakShader.metal */; };
 		D9F4877CD35FF4299EDBAA4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1558C1C11DE01745C37E65F4 /* Assets.xcassets */; };
 		E358AC8A1AE458B80230507D /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696854199B0343E679E72511 /* CameraViewModel.swift */; };
@@ -132,7 +132,7 @@
 		BC9F515D40A563F788348AD1 /* PhotoLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryService.swift; sourceTree = "<group>"; };
 		CEBBDEEDB060842ABA5B6735 /* PresetGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetGridView.swift; sourceTree = "<group>"; };
 		D0C0C18FD1C342A3DAEF5033 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
-		D3C2496338EBADD2A8CCBF4A /* FoticoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoticoApp.swift; sourceTree = "<group>"; };
+		D3C2496338EBADD2A8CCBF4A /* LumeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumeApp.swift; sourceTree = "<group>"; };
 		E500C087AA366E851D8242A4 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		EC00CE2941ED29EFAE28D3F8 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
 		FB96FD9B88185888576BA7DC /* ExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportSheet.swift; sourceTree = "<group>"; };
@@ -295,7 +295,7 @@
 		8F6FF1698069BFE516AA9AEE /* App */ = {
 			isa = PBXGroup;
 			children = (
-				D3C2496338EBADD2A8CCBF4A /* FoticoApp.swift */,
+				D3C2496338EBADD2A8CCBF4A /* LumeApp.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -555,7 +555,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D210E3E55BB8571E9A17BB4D /* FoticoApp.swift in Sources */,
+				D210E3E55BB8571E9A17BB4D /* LumeApp.swift in Sources */,
 				F3D6E43451011130F2B024ED /* EditState.swift in Sources */,
 				67598F686BBA39C3675C7309 /* EffectType.swift in Sources */,
 				29BC25AF7446B8810F7B31C1 /* FilterPreset.swift in Sources */,
@@ -622,8 +622,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Fotico necesita acceso a tu camara para tomar fotos con efectos vintage";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Fotico necesita permiso para guardar fotos editadas en tu galeria";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Lumé necesita acceso a tu camara para tomar fotos con efectos vintage";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Lumé necesita permiso para guardar fotos editadas en tu galeria";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -634,7 +634,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Personal.Fotico;
+				PRODUCT_BUNDLE_IDENTIFIER = Personal.Lume;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lumé";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -650,8 +651,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Fotico necesita acceso a tu camara para tomar fotos con efectos vintage";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Fotico necesita permiso para guardar fotos editadas en tu galeria";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Lumé necesita acceso a tu camara para tomar fotos con efectos vintage";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Lumé necesita permiso para guardar fotos editadas en tu galeria";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -662,7 +663,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Personal.Fotico;
+				PRODUCT_BUNDLE_IDENTIFIER = Personal.Lume;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lumé";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

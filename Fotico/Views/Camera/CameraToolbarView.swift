@@ -71,7 +71,7 @@ struct CameraToolbarView: View {
                             Text(tab.label)
                                 .font(.system(size: 9, weight: .medium))
                         }
-                        .foregroundColor(selectedTab == tab ? Color.foticoPrimary : .white.opacity(0.6))
+                        .foregroundColor(selectedTab == tab ? Color.lumePrimary : .white.opacity(0.6))
                         .frame(maxWidth: .infinity)
                     }
                 }
@@ -140,7 +140,7 @@ struct CameraToolbarView: View {
                 .fontWeight(.medium)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(selected ? Color.foticoPrimary : Color.white.opacity(0.15))
+                .background(selected ? Color.lumePrimary : Color.white.opacity(0.15))
                 .foregroundColor(selected ? .black : .white)
                 .cornerRadius(14)
         }

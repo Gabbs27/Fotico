@@ -25,14 +25,15 @@ extension Color {
         )
     }
 
-    // Fotico Brand Colors - Minimal Dark Theme
-    static let foticoPrimary = Color.white                     // Clean white - active states, selections
-    static let foticoSecondary = Color(hex: "#8E8E93")         // System gray - secondary elements
-    static let foticoAccent = Color(hex: "#E8A849")            // Warm amber - subtle brand accent
-    static let foticoSuccess = Color(hex: "#34C759")           // System green
-    static let foticoWarning = Color(hex: "#FF453A")           // System red
-    static let foticoDark = Color(hex: "#000000")              // Pure black background
-    static let foticoCardBg = Color(hex: "#1C1C1E")            // System card bg
-    static let foticoSurface = Color(hex: "#2C2C2E")           // System surface
-    static let foticoFilmGrain = Color(hex: "#3A322A")         // Warm sepia tint
+    // Lumé Brand Colors — "Golden Hour" Palette
+    static let lumePrimary = Color(hex: "#D4AF70")             // Lumé Gold — accent, CTAs, tints
+    static let lumeSecondary = Color(hex: "#A68A4B")           // Antique Brass — labels, captions
+    static let lumeAccent = Color(hex: "#F5E6C8")              // Warm Cream — hover, subtle fills
+    static let lumeSuccess = Color(hex: "#34C759")             // System green
+    static let lumeWarning = Color(hex: "#FF453A")             // System red
+    static let lumeDark = Color(hex: "#0F0D08")                // Dark Roast — primary background
+    static let lumeCardBg = Color(hex: "#1A1610")              // Warm dark card bg
+    static let lumeSurface = Color(hex: "#2A2419")             // Warm dark surface
+    static let lumeFilmGrain = Color(hex: "#3A322A")           // Warm sepia tint
+    static let lumeLinen = Color(hex: "#FAF6EF")               // Linen — light backgrounds (future)
 }

@@ -11,7 +11,7 @@ struct PaywallView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.foticoDark.ignoresSafeArea()
+                Color.lumeDark.ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 28) {
@@ -66,9 +66,9 @@ struct PaywallView: View {
         VStack(spacing: 12) {
             Image(systemName: "crown.fill")
                 .font(.system(size: 48))
-                .foregroundColor(Color.foticoPrimary)
+                .foregroundColor(Color.lumePrimary)
 
-            Text("Fotico Pro")
+            Text("Lumé Pro")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
 
@@ -90,7 +90,7 @@ struct PaywallView: View {
             featureRow(icon: "wand.and.stars", title: "Filtros LUT Profesionales", description: "Color grading cinematográfico")
         }
         .padding()
-        .background(Color.foticoCardBg)
+        .background(Color.lumeCardBg)
         .cornerRadius(16)
     }
 
@@ -98,7 +98,7 @@ struct PaywallView: View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundColor(Color.foticoPrimary)
+                .foregroundColor(Color.lumePrimary)
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -135,7 +135,7 @@ struct PaywallView: View {
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
-                                .background(Color.foticoPrimary)
+                                .background(Color.lumePrimary)
                                 .cornerRadius(4)
                         }
 
@@ -156,16 +156,16 @@ struct PaywallView: View {
                         if isAnnual {
                             Text("Ahorra ~50%")
                                 .font(.caption2)
-                                .foregroundColor(Color.foticoSuccess)
+                                .foregroundColor(Color.lumeSuccess)
                         }
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(isSelected ? Color.foticoSurface : Color.foticoCardBg)
+                    .background(isSelected ? Color.lumeSurface : Color.lumeCardBg)
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(isSelected ? Color.foticoPrimary : Color.foticoSurface, lineWidth: isSelected ? 2 : 1)
+                            .stroke(isSelected ? Color.lumePrimary : Color.lumeSurface, lineWidth: isSelected ? 2 : 1)
                     )
                 }
             }
@@ -203,7 +203,7 @@ struct PaywallView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(Color.foticoPrimary)
+            .background(Color.lumePrimary)
             .foregroundColor(.black)
             .cornerRadius(12)
         }

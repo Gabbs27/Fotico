@@ -6,7 +6,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Color.foticoDark.ignoresSafeArea()
+            Color.lumeDark.ignoresSafeArea()
 
             TabView(selection: $currentPage) {
                 welcomePage.tag(0)
@@ -26,9 +26,9 @@ struct OnboardingView: View {
 
             Image(systemName: "camera.aperture")
                 .font(.system(size: 80))
-                .foregroundColor(Color.foticoPrimary)
+                .foregroundColor(Color.lumePrimary)
 
-            Text("FOTICO")
+            Text("LUMÉ")
                 .font(.system(size: 48, weight: .bold))
                 .tracking(8)
                 .foregroundColor(.white)
@@ -84,7 +84,7 @@ struct OnboardingView: View {
 
             Image(systemName: "sparkles")
                 .font(.system(size: 60))
-                .foregroundColor(Color.foticoPrimary)
+                .foregroundColor(Color.lumePrimary)
 
             Text("¡Listo para crear!")
                 .font(.title)
@@ -108,7 +108,7 @@ struct OnboardingView: View {
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.foticoPrimary)
+                    .background(Color.lumePrimary)
                     .cornerRadius(12)
             }
             .padding(.horizontal, 40)
@@ -123,7 +123,7 @@ struct OnboardingView: View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundColor(Color.foticoPrimary)
+                .foregroundColor(Color.lumePrimary)
                 .frame(width: 40)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -140,7 +140,7 @@ struct OnboardingView: View {
             Spacer()
         }
         .padding()
-        .background(Color.foticoCardBg)
+        .background(Color.lumeCardBg)
         .cornerRadius(12)
     }
 

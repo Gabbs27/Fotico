@@ -83,7 +83,7 @@ struct AdjustmentPanelView: View {
             HStack {
                 Image(systemName: icon)
                     .font(.caption)
-                    .foregroundColor(Color.foticoPrimary)
+                    .foregroundColor(Color.lumePrimary)
                     .frame(width: 20)
 
                 Text(label)
@@ -95,7 +95,7 @@ struct AdjustmentPanelView: View {
                 Text(formattedValue(value.wrappedValue, label: label))
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundColor(value.wrappedValue != defaultValue ? Color.foticoPrimary : .gray)
+                    .foregroundColor(value.wrappedValue != defaultValue ? Color.lumePrimary : .gray)
 
                 if value.wrappedValue != defaultValue {
                     Button {
@@ -105,7 +105,7 @@ struct AdjustmentPanelView: View {
                     } label: {
                         Image(systemName: "arrow.counterclockwise")
                             .font(.caption2)
-                            .foregroundColor(Color.foticoWarning)
+                            .foregroundColor(Color.lumeWarning)
                     }
                 }
             }
@@ -119,7 +119,7 @@ struct AdjustmentPanelView: View {
                     isEditing = false
                 }
             })
-            .tint(Color.foticoPrimary)
+            .tint(Color.lumePrimary)
             .onChange(of: value.wrappedValue) { _, _ in
                 onUpdate()
             }

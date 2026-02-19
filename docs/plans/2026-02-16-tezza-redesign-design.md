@@ -1,8 +1,8 @@
-# Fotico v2: Tezza-Inspired Redesign
+# Lumé v2: Tezza-Inspired Redesign
 
 ## Overview
 
-Transform Fotico from a simple photo editor into a Tezza-style aesthetic photo editing app with accounts, subscriptions, premium LUT presets, batch editing, and texture overlays. All data stored locally in Documents & Data.
+Transform Lumé from a simple photo editor into a Tezza-style aesthetic photo editing app with accounts, subscriptions, premium LUT presets, batch editing, and texture overlays. All data stored locally in Documents & Data.
 
 ## 1. Architecture Changes
 
@@ -58,8 +58,8 @@ enum SubscriptionTier: String, Codable {
 ### Plans
 | Plan | Price | Product ID |
 |------|-------|------------|
-| Fotico Pro Monthly | $4.99/mo | `com.fotico.pro.monthly` |
-| Fotico Pro Annual | $29.99/yr | `com.fotico.pro.annual` |
+| Lumé Pro Monthly | $4.99/mo | `com.lume.pro.monthly` |
+| Lumé Pro Annual | $29.99/yr | `com.lume.pro.annual` |
 
 ### Implementation
 - `SubscriptionService` using StoreKit 2 `Product`, `Transaction`

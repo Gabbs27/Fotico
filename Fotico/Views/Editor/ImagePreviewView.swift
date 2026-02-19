@@ -31,7 +31,7 @@ struct ImagePreviewView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Color.foticoDark
+                Color.lumeDark
 
                 if let ciImage = ciImage {
                     // GPU-rendered path — no CGImage creation
@@ -56,7 +56,7 @@ struct ImagePreviewView: View {
                 if isProcessing {
                     ProgressView()
                         .progressViewStyle(.circular)
-                        .tint(Color.foticoPrimary)
+                        .tint(Color.lumePrimary)
                         .scaleEffect(0.8)
                         .padding(8)
                         .background(Color.black.opacity(0.5))
