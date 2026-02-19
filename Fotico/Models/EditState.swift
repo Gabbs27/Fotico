@@ -29,6 +29,14 @@ struct EditState: Sendable, Equatable, Codable {
     var fisheyeIntensity: Double = 0.0   // 0.0...1.0
     var thresholdLevel: Double = 0.0     // 0.0...1.0 (0 = off)
 
+    // Pro effects
+    var dustIntensity: Double = 0.0             // 0.0...1.0
+    var halationIntensity: Double = 0.0         // 0.0...1.0
+    var chromaticAberrationIntensity: Double = 0.0 // 0.0...1.0
+    var filmBurnIntensity: Double = 0.0         // 0.0...1.0
+    var softDiffusionIntensity: Double = 0.0    // 0.0...1.0
+    var letterboxIntensity: Double = 0.0        // 0.0...1.0
+
     // Overlay
     var overlayId: String?
     var overlayIntensity: Double = 0.7   // 0.0...1.0

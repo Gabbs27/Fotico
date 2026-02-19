@@ -36,6 +36,12 @@ class ImageFilterService: @unchecked Sendable {
     // Preset filter cache: [filterName: CIFilter]
     private var presetFilterCache: [String: CIFilter] = [:]
 
+    // Cached dust overlay CIImage (loaded once, reused per render)
+    private lazy var dustCIImage: CIImage? = {
+        guard let dustImage = UIImage(named: "dust_01") else { return nil }
+        return CIImage(image: dustImage)
+    }()
+
     init() {
         self.context = RenderEngine.shared.context
     }
@@ -179,6 +185,13 @@ class ImageFilterService: @unchecked Sendable {
             case "grain":
                 // Apply grain as part of the preset (e.g., Retro)
                 result = applySimpleGrain(to: result, intensity: param.value, size: 0.5)
+            case "bloom":
+                let presetBloom = CIFilter(name: "CIBloom")!
+                presetBloom.setValue(result, forKey: kCIInputImageKey)
+                presetBloom.setValue(param.value, forKey: kCIInputIntensityKey)
+                presetBloom.setValue(10.0, forKey: kCIInputRadiusKey)
+                let extent = result.extent
+                result = presetBloom.outputImage?.cropped(to: extent) ?? result
             default:
                 break
             }
@@ -288,6 +301,31 @@ class ImageFilterService: @unchecked Sendable {
 
         if state.grainIntensity > 0 {
             result = applySimpleGrain(to: result, intensity: state.grainIntensity, size: state.grainSize)
+        }
+
+        // Pro effects
+        if state.chromaticAberrationIntensity > 0 {
+            result = applyChromaticAberration(to: result, intensity: state.chromaticAberrationIntensity)
+        }
+
+        if state.halationIntensity > 0 {
+            result = applyHalation(to: result, intensity: state.halationIntensity)
+        }
+
+        if state.softDiffusionIntensity > 0 {
+            result = applySoftDiffusion(to: result, intensity: state.softDiffusionIntensity)
+        }
+
+        if state.filmBurnIntensity > 0 {
+            result = applyFilmBurn(to: result, intensity: state.filmBurnIntensity)
+        }
+
+        if state.dustIntensity > 0 {
+            result = applyDust(to: result, intensity: state.dustIntensity)
+        }
+
+        if state.letterboxIntensity > 0 {
+            result = applyLetterbox(to: result, intensity: state.letterboxIntensity)
         }
 
         // Ensure finite extent
@@ -430,6 +468,229 @@ class ImageFilterService: @unchecked Sendable {
         add.setValue(scaledNoise, forKey: kCIInputImageKey)
         add.setValue(image, forKey: kCIInputBackgroundImageKey)
         return add.outputImage ?? image
+    }
+
+    // MARK: - Dust
+
+    private func applyDust(to image: CIImage, intensity: Double) -> CIImage {
+        // Use cached dust overlay (loaded once, not per frame)
+        guard var dustCI = dustCIImage else { return image }
+
+        let extent = image.extent
+
+        // Scale dust to fill image
+        let scaleX = extent.width / dustCI.extent.width
+        let scaleY = extent.height / dustCI.extent.height
+        dustCI = dustCI.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+
+        // Adjust opacity via alpha
+        let alphaFilter = CIFilter(name: "CIColorMatrix")!
+        alphaFilter.setValue(dustCI, forKey: kCIInputImageKey)
+        alphaFilter.setValue(CIVector(x: 1, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        alphaFilter.setValue(CIVector(x: 0, y: 1, z: 0, w: 0), forKey: "inputGVector")
+        alphaFilter.setValue(CIVector(x: 0, y: 0, z: 1, w: 0), forKey: "inputBVector")
+        alphaFilter.setValue(CIVector(x: 0, y: 0, z: 0, w: CGFloat(intensity)), forKey: "inputAVector")
+        dustCI = alphaFilter.outputImage ?? dustCI
+
+        // Screen blend for bright dust particles
+        let screenBlend = CIFilter(name: "CIScreenBlendMode")!
+        screenBlend.setValue(dustCI, forKey: kCIInputImageKey)
+        screenBlend.setValue(image, forKey: kCIInputBackgroundImageKey)
+        return screenBlend.outputImage?.cropped(to: extent) ?? image
+    }
+
+    // MARK: - Halation
+
+    private func applyHalation(to image: CIImage, intensity: Double) -> CIImage {
+        let extent = image.extent
+
+        // 1. Extract highlights by boosting exposure and clamping
+        let highlightExposure = CIFilter(name: "CIExposureAdjust")!
+        highlightExposure.setValue(image, forKey: kCIInputImageKey)
+        highlightExposure.setValue(1.5, forKey: kCIInputEVKey)
+        guard let brightened = highlightExposure.outputImage else { return image }
+
+        // Clamp to highlight range
+        let clamp = CIFilter(name: "CIColorClamp")!
+        clamp.setValue(brightened, forKey: kCIInputImageKey)
+        clamp.setValue(CIVector(x: 0.6, y: 0.6, z: 0.6, w: 1), forKey: "inputMinComponents")
+        clamp.setValue(CIVector(x: 1, y: 1, z: 1, w: 1), forKey: "inputMaxComponents")
+        guard let highlights = clamp.outputImage else { return image }
+
+        // 2. Blur the highlights heavily (scale radius to resolution)
+        let blur = CIFilter(name: "CIGaussianBlur")!
+        blur.setValue(highlights, forKey: kCIInputImageKey)
+        let maxDim = max(extent.width, extent.height)
+        blur.setValue((maxDim / 1200.0) * 30.0 * intensity, forKey: kCIInputRadiusKey)
+        guard let blurred = blur.outputImage?.cropped(to: extent) else { return image }
+
+        // 3. Tint warm red/orange
+        let tint = CIFilter(name: "CIColorMatrix")!
+        tint.setValue(blurred, forKey: kCIInputImageKey)
+        tint.setValue(CIVector(x: 1.0, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        tint.setValue(CIVector(x: 0, y: 0.4, z: 0, w: 0), forKey: "inputGVector")
+        tint.setValue(CIVector(x: 0, y: 0, z: 0.15, w: 0), forKey: "inputBVector")
+        tint.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        guard let tinted = tint.outputImage else { return image }
+
+        // 4. Screen blend back onto original
+        let blend = CIFilter(name: "CIScreenBlendMode")!
+        blend.setValue(tinted, forKey: kCIInputImageKey)
+        blend.setValue(image, forKey: kCIInputBackgroundImageKey)
+        guard let blended = blend.outputImage?.cropped(to: extent) else { return image }
+
+        // 5. Mix with original based on intensity
+        return blendImages(original: image, filtered: blended, intensity: intensity)
+    }
+
+    // MARK: - Chromatic Aberration
+
+    private func applyChromaticAberration(to image: CIImage, intensity: Double) -> CIImage {
+        let extent = image.extent
+        let maxDim = max(extent.width, extent.height)
+        let offsetAmount = intensity * 8.0 * (maxDim / 1200.0)
+
+        // Separate channels
+        let redF = CIFilter(name: "CIColorMatrix")!
+        redF.setValue(image, forKey: kCIInputImageKey)
+        redF.setValue(CIVector(x: 1, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        redF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputGVector")
+        redF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputBVector")
+        redF.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        let redChannel = redF.outputImage?
+            .transformed(by: CGAffineTransform(translationX: offsetAmount, y: 0))
+            .cropped(to: extent) ?? image
+
+        let greenF = CIFilter(name: "CIColorMatrix")!
+        greenF.setValue(image, forKey: kCIInputImageKey)
+        greenF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        greenF.setValue(CIVector(x: 0, y: 1, z: 0, w: 0), forKey: "inputGVector")
+        greenF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputBVector")
+        greenF.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        let greenChannel = greenF.outputImage?.cropped(to: extent) ?? image
+
+        let blueF = CIFilter(name: "CIColorMatrix")!
+        blueF.setValue(image, forKey: kCIInputImageKey)
+        blueF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputRVector")
+        blueF.setValue(CIVector(x: 0, y: 0, z: 0, w: 0), forKey: "inputGVector")
+        blueF.setValue(CIVector(x: 0, y: 0, z: 1, w: 0), forKey: "inputBVector")
+        blueF.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
+        let blueChannel = blueF.outputImage?
+            .transformed(by: CGAffineTransform(translationX: -offsetAmount, y: 0))
+            .cropped(to: extent) ?? image
+
+        // Recompose
+        let addRG = CIFilter(name: "CIAdditionCompositing")!
+        addRG.setValue(redChannel, forKey: kCIInputImageKey)
+        addRG.setValue(greenChannel, forKey: kCIInputBackgroundImageKey)
+        let rg = addRG.outputImage ?? image
+
+        let addRGB = CIFilter(name: "CIAdditionCompositing")!
+        addRGB.setValue(blueChannel, forKey: kCIInputImageKey)
+        addRGB.setValue(rg, forKey: kCIInputBackgroundImageKey)
+        let aberrated = addRGB.outputImage?.cropped(to: extent) ?? image
+
+        // Create radial mask: sharp center, effect on edges
+        let center = CIVector(x: extent.midX, y: extent.midY)
+        let maskGradient = CIFilter(name: "CIRadialGradient")!
+        maskGradient.setValue(center, forKey: "inputCenter")
+        maskGradient.setValue(min(extent.width, extent.height) * 0.25, forKey: "inputRadius0")
+        maskGradient.setValue(min(extent.width, extent.height) * 0.7, forKey: "inputRadius1")
+        maskGradient.setValue(CIColor(red: 0, green: 0, blue: 0, alpha: 1), forKey: "inputColor0")
+        maskGradient.setValue(CIColor(red: 1, green: 1, blue: 1, alpha: 1), forKey: "inputColor1")
+        guard let mask = maskGradient.outputImage?.cropped(to: extent) else { return aberrated }
+
+        // Blend using mask: original in center, aberrated on edges
+        let blendWithMask = CIFilter(name: "CIBlendWithMask")!
+        blendWithMask.setValue(aberrated, forKey: kCIInputImageKey)
+        blendWithMask.setValue(image, forKey: kCIInputBackgroundImageKey)
+        blendWithMask.setValue(mask, forKey: kCIInputMaskImageKey)
+        return blendWithMask.outputImage?.cropped(to: extent) ?? aberrated
+    }
+
+    // MARK: - Film Burn
+
+    private func applyFilmBurn(to image: CIImage, intensity: Double) -> CIImage {
+        let extent = image.extent
+
+        // Create warm gradient from corner
+        let gradient = CIFilter(name: "CILinearGradient")!
+        gradient.setValue(CIVector(x: extent.width * 0.9, y: extent.height * 0.85), forKey: "inputPoint0")
+        gradient.setValue(CIVector(x: extent.width * 0.3, y: extent.height * 0.2), forKey: "inputPoint1")
+        gradient.setValue(CIColor(red: 1.0, green: 0.5, blue: 0.1, alpha: CGFloat(intensity) * 0.8), forKey: "inputColor0")
+        gradient.setValue(CIColor(red: 1.0, green: 0.2, blue: 0.0, alpha: 0), forKey: "inputColor1")
+        guard let burn = gradient.outputImage?.cropped(to: extent) else { return image }
+
+        // Screen blend
+        let blend = CIFilter(name: "CIScreenBlendMode")!
+        blend.setValue(burn, forKey: kCIInputImageKey)
+        blend.setValue(image, forKey: kCIInputBackgroundImageKey)
+        return blend.outputImage?.cropped(to: extent) ?? image
+    }
+
+    // MARK: - Soft Diffusion
+
+    private func applySoftDiffusion(to image: CIImage, intensity: Double) -> CIImage {
+        let extent = image.extent
+
+        // 1. Blur the image (scale radius to resolution)
+        let blur = CIFilter(name: "CIGaussianBlur")!
+        blur.setValue(image, forKey: kCIInputImageKey)
+        let maxDim = max(extent.width, extent.height)
+        blur.setValue((maxDim / 1200.0) * 20.0 * intensity, forKey: kCIInputRadiusKey)
+        guard let blurred = blur.outputImage?.cropped(to: extent) else { return image }
+
+        // 2. Brighten the blurred version slightly to push highlights
+        let brighten = CIFilter(name: "CIExposureAdjust")!
+        brighten.setValue(blurred, forKey: kCIInputImageKey)
+        brighten.setValue(0.3 * intensity, forKey: kCIInputEVKey)
+        let brightBlur = brighten.outputImage ?? blurred
+
+        // 3. Screen blend: adds the bright blur onto original
+        let screen = CIFilter(name: "CIScreenBlendMode")!
+        screen.setValue(brightBlur, forKey: kCIInputImageKey)
+        screen.setValue(image, forKey: kCIInputBackgroundImageKey)
+        guard let screened = screen.outputImage?.cropped(to: extent) else { return image }
+
+        // 4. Mix with original at reduced strength
+        return blendImages(original: image, filtered: screened, intensity: intensity * 0.6)
+    }
+
+    // MARK: - Letterbox
+
+    private func applyLetterbox(to image: CIImage, intensity: Double) -> CIImage {
+        let extent = image.extent
+
+        // Calculate bar height for 2.39:1 cinematic ratio
+        let currentRatio = extent.width / extent.height
+        let targetRatio: CGFloat = 2.39
+        guard currentRatio < targetRatio else { return image }
+
+        let fullBarFraction = (1.0 - currentRatio / targetRatio) / 2.0
+        let barHeight = extent.height * fullBarFraction * CGFloat(intensity)
+        guard barHeight > 1 else { return image }
+
+        // Create black bars
+        let black = CIFilter(name: "CIConstantColorGenerator")!
+        black.setValue(CIColor(red: 0, green: 0, blue: 0, alpha: 1), forKey: kCIInputColorKey)
+        guard let blackImage = black.outputImage else { return image }
+
+        // Bottom bar
+        let bottomBar = blackImage.cropped(to: CGRect(x: extent.origin.x, y: extent.origin.y,
+                                                       width: extent.width, height: barHeight))
+        let compBottom = CIFilter(name: "CISourceOverCompositing")!
+        compBottom.setValue(bottomBar, forKey: kCIInputImageKey)
+        compBottom.setValue(image, forKey: kCIInputBackgroundImageKey)
+        guard let withBottom = compBottom.outputImage else { return image }
+
+        // Top bar
+        let topBarY = extent.origin.y + extent.height - barHeight
+        let topBar = blackImage.cropped(to: CGRect(x: extent.origin.x, y: topBarY,
+                                                    width: extent.width, height: barHeight))
+        let compTop = CIFilter(name: "CISourceOverCompositing")!
+        compTop.setValue(topBar, forKey: kCIInputImageKey)
+        compTop.setValue(withBottom, forKey: kCIInputBackgroundImageKey)
+        return compTop.outputImage?.cropped(to: extent) ?? image
     }
 
     // MARK: - Helpers

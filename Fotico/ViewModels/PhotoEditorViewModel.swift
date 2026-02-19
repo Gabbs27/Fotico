@@ -160,6 +160,12 @@ class PhotoEditorViewModel: ObservableObject {
         case .glitch: editState.glitchIntensity = intensity
         case .fisheye: editState.fisheyeIntensity = intensity
         case .threshold: editState.thresholdLevel = intensity
+        case .dust: editState.dustIntensity = intensity
+        case .halation: editState.halationIntensity = intensity
+        case .chromaticAberration: editState.chromaticAberrationIntensity = intensity
+        case .filmBurn: editState.filmBurnIntensity = intensity
+        case .softDiffusion: editState.softDiffusionIntensity = intensity
+        case .letterbox: editState.letterboxIntensity = intensity
         }
         requestRender()
     }
@@ -174,6 +180,12 @@ class PhotoEditorViewModel: ObservableObject {
         case .glitch: return editState.glitchIntensity
         case .fisheye: return editState.fisheyeIntensity
         case .threshold: return editState.thresholdLevel
+        case .dust: return editState.dustIntensity
+        case .halation: return editState.halationIntensity
+        case .chromaticAberration: return editState.chromaticAberrationIntensity
+        case .filmBurn: return editState.filmBurnIntensity
+        case .softDiffusion: return editState.softDiffusionIntensity
+        case .letterbox: return editState.letterboxIntensity
         }
     }
 

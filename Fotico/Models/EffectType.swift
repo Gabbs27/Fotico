@@ -10,6 +10,14 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
     case fisheye
     case threshold
 
+    // New pro effects
+    case dust
+    case halation
+    case chromaticAberration
+    case filmBurn
+    case softDiffusion
+    case letterbox
+
     nonisolated var id: String { rawValue }
 
     nonisolated var displayName: String {
@@ -22,6 +30,12 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
         case .glitch: return "Glitch"
         case .fisheye: return "Ojo de Pez"
         case .threshold: return "Umbral"
+        case .dust: return "Polvo"
+        case .halation: return "Halación"
+        case .chromaticAberration: return "Aberración"
+        case .filmBurn: return "Quemadura"
+        case .softDiffusion: return "Difusión"
+        case .letterbox: return "Cinemascope"
         }
     }
 
@@ -35,6 +49,12 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
         case .glitch: return "waveform.path.ecg"
         case .fisheye: return "eye.circle"
         case .threshold: return "square.split.diagonal"
+        case .dust: return "aqi.medium"
+        case .halation: return "sun.haze.fill"
+        case .chromaticAberration: return "rainbow"
+        case .filmBurn: return "flame.fill"
+        case .softDiffusion: return "drop.fill"
+        case .letterbox: return "rectangle.expand.vertical"
         }
     }
 }
