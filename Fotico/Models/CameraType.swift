@@ -18,7 +18,7 @@ struct CameraType: Identifiable, Sendable, Equatable {
         CameraType(id: "normal", name: "Normal", icon: "camera",
                    lutFileName: nil,
                    grainIntensity: 0, vignetteIntensity: 0, bloomIntensity: 0, lightLeakEnabled: false),
-        CameraType(id: "disposable", name: "Disposable", icon: "camera.compact",
+        CameraType(id: "disposable", name: "Disposable", icon: "camera.metering.spot",
                    lutFileName: "disposable.cube",
                    grainIntensity: 0.3, vignetteIntensity: 1.5, bloomIntensity: 0, lightLeakEnabled: true),
         CameraType(id: "polaroid", name: "Polaroid", icon: "camera.viewfinder",

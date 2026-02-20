@@ -7,7 +7,7 @@ enum CameraToolbarTab: String, CaseIterable, Sendable {
         switch self {
         case .grid: return "grid"
         case .texture: return "line.3.horizontal"
-        case .fx: return "fx"
+        case .fx: return "wand.and.stars"
         case .flash: return "bolt.fill"
         }
     }

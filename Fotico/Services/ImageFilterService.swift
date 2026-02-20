@@ -444,28 +444,31 @@ class ImageFilterService: @unchecked Sendable {
 
         // Use fresh noise filter to avoid concurrent access issues
         let noise = CIFilter(name: "CIRandomGenerator")!
-        guard let noiseImage = noise.outputImage?.cropped(to: extent) else { return image }
+        guard let noiseImage = noise.outputImage else { return image }
+
+        // Scale noise FIRST (while still infinite extent), then crop to image bounds.
+        // Previously: crop → scale caused the grain to only cover one corner because
+        // scaling a finite rect moves/magnifies it away from the image extent.
+        let maxDim = max(extent.width, extent.height)
+        let resolutionScale = maxDim / 2000.0
+        let userScale = 0.5 + size
+        let totalScale = max(resolutionScale * userScale, 0.1)
+        let transform = CGAffineTransform(scaleX: totalScale, y: totalScale)
+        let scaledNoise = noiseImage.transformed(by: transform).cropped(to: extent)
 
         let scale = Float(intensity * 0.3)
         let matrix = CIFilter(name: "CIColorMatrix")!
-        matrix.setValue(noiseImage, forKey: kCIInputImageKey)
+        matrix.setValue(scaledNoise, forKey: kCIInputImageKey)
         matrix.setValue(CIVector(x: CGFloat(scale), y: 0, z: 0, w: 0), forKey: "inputRVector")
         matrix.setValue(CIVector(x: 0, y: CGFloat(scale), z: 0, w: 0), forKey: "inputGVector")
         matrix.setValue(CIVector(x: 0, y: 0, z: CGFloat(scale), w: 0), forKey: "inputBVector")
         matrix.setValue(CIVector(x: 0, y: 0, z: 0, w: 1), forKey: "inputAVector")
         matrix.setValue(CIVector(x: CGFloat(-scale / 2), y: CGFloat(-scale / 2), z: CGFloat(-scale / 2), w: 0), forKey: "inputBiasVector")
 
-        guard let grayNoise = matrix.outputImage else { return image }
-
-        let maxDim = max(extent.width, extent.height)
-        let resolutionScale = maxDim / 2000.0
-        let userScale = 0.5 + size
-        let totalScale = max(resolutionScale * userScale, 0.1)
-        let transform = CGAffineTransform(scaleX: totalScale, y: totalScale)
-        let scaledNoise = grayNoise.transformed(by: transform).cropped(to: extent)
+        guard let grayNoise = matrix.outputImage?.cropped(to: extent) else { return image }
 
         let add = CIFilter(name: "CIAdditionCompositing")!
-        add.setValue(scaledNoise, forKey: kCIInputImageKey)
+        add.setValue(grayNoise, forKey: kCIInputImageKey)
         add.setValue(image, forKey: kCIInputBackgroundImageKey)
         return add.outputImage ?? image
     }
