@@ -16,18 +16,12 @@ struct ToolBarView: View {
                         Text(tool.displayName)
                             .font(.caption2)
                     }
-                    .foregroundColor(selectedTool == tool ? Color.lumePrimary : .gray)
+                    .foregroundColor(selectedTool == tool ? Color.lumePrimary : .lumeTextSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
                 }
             }
         }
         .background(Color.lumeCardBg)
-        .overlay(
-            Rectangle()
-                .fill(Color.lumeSurface)
-                .frame(height: 0.5),
-            alignment: .top
-        )
     }
 }

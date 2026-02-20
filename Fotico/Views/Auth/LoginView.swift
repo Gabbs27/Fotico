@@ -19,7 +19,7 @@ struct LoginView: View {
 
                 Text("Film & Effects")
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.lumeTextSecondary)
             }
 
             Spacer()
@@ -44,7 +44,7 @@ struct LoginView: View {
                 } label: {
                     Text("Continuar sin cuenta")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.lumeTextSecondary)
                 }
             }
             .padding(.horizontal, 40)

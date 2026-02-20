@@ -7,6 +7,7 @@ struct LumeApp: App {
         WindowGroup {
             HomeTabView()
                 .preferredColorScheme(.dark)
+                .task { HapticManager.warmUp() }
         }
         .modelContainer(for: [UserProfile.self, PhotoProject.self, SavedEdit.self])
     }

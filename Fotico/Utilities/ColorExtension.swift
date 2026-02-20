@@ -36,4 +36,7 @@ extension Color {
     static let lumeSurface = Color(hex: "#2A2419")             // Warm dark surface
     static let lumeFilmGrain = Color(hex: "#3A322A")           // Warm sepia tint
     static let lumeLinen = Color(hex: "#FAF6EF")               // Linen — light backgrounds (future)
+    static let lumeTextSecondary = Color(hex: "#8A7D6A")       // Warm gray for secondary text
+    static let lumeDisabled = Color(hex: "#5A5045")            // Warm gray for disabled states
+    static let lumeDivider = Color(hex: "#2F2820")             // Warm divider color
 }

@@ -455,10 +455,10 @@ enum EditorTool: String, CaseIterable, Sendable {
 
     nonisolated var displayName: String {
         switch self {
-        case .presets: return "Presets"
+        case .presets: return "Filtros"
         case .adjust: return "Ajustes"
         case .effects: return "Efectos"
-        case .overlays: return "Overlays"
+        case .overlays: return "Texturas"
         case .crop: return "Rotar"
         }
     }

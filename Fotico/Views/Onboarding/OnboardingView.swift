@@ -35,11 +35,11 @@ struct OnboardingView: View {
 
             Text("Film & Effects")
                 .font(.title3)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
 
             Text("Tu editor de fotos con estilo de película")
                 .font(.subheadline)
-                .foregroundColor(.gray.opacity(0.8))
+                .foregroundColor(.lumeTextSecondary.opacity(0.8))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
@@ -62,8 +62,9 @@ struct OnboardingView: View {
                 .foregroundColor(.white)
 
             VStack(spacing: 20) {
-                featureCard(icon: "camera.filters", title: "40+ Presets", description: "Presets profesionales inspirados en Kodak, Fuji, Polaroid")
                 featureCard(icon: "camera.fill", title: "Cámara con Filtros", description: "Aplica filtros en tiempo real mientras capturas")
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.lumePrimary, lineWidth: 1))
+                featureCard(icon: "camera.filters", title: "40+ Presets", description: "Presets profesionales inspirados en Kodak, Fuji, Polaroid")
                 featureCard(icon: "wand.and.stars", title: "Efectos Avanzados", description: "Grano, light leaks, bloom, viñeta y más")
                 featureCard(icon: "square.on.square", title: "Overlays", description: "Texturas de polvo, luz, marcos y papel")
             }
@@ -93,7 +94,7 @@ struct OnboardingView: View {
 
             Text("Empieza a editar tus fotos con estilo profesional")
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
@@ -134,7 +135,7 @@ struct OnboardingView: View {
 
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.lumeTextSecondary)
             }
 
             Spacer()
@@ -153,7 +154,7 @@ struct OnboardingView: View {
             Image(systemName: "chevron.right")
                 .font(.caption2)
         }
-        .foregroundColor(.gray.opacity(0.5))
+        .foregroundColor(Color.lumeSecondary.opacity(0.6))
         .padding(.bottom, 40)
     }
 }

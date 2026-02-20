@@ -14,8 +14,8 @@ enum CameraToolbarTab: String, CaseIterable, Sendable {
 
     var label: String {
         switch self {
-        case .grid: return "Grid"
-        case .texture: return "Texture"
+        case .grid: return "Rejilla"
+        case .texture: return "Textura"
         case .fx: return "FX"
         case .flash: return "Flash"
         }
@@ -69,7 +69,7 @@ struct CameraToolbarView: View {
                             Image(systemName: tab.icon)
                                 .font(.system(size: 16))
                             Text(tab.label)
-                                .font(.system(size: 9, weight: .medium))
+                                .font(.system(size: 11, weight: .medium))
                         }
                         .foregroundColor(selectedTab == tab ? Color.lumePrimary : .white.opacity(0.6))
                         .frame(maxWidth: .infinity)
@@ -93,28 +93,28 @@ struct CameraToolbarView: View {
 
     private var gridOptions: some View {
         HStack(spacing: 12) {
-            chipButton("Off", selected: gridMode == .off) { gridMode = .off }
-            chipButton("Thirds", selected: gridMode == .thirds) { gridMode = .thirds }
-            chipButton("Center", selected: gridMode == .center) { gridMode = .center }
-            chipButton("Golden", selected: gridMode == .golden) { gridMode = .golden }
+            chipButton("No", selected: gridMode == .off) { gridMode = .off }
+            chipButton("Tercios", selected: gridMode == .thirds) { gridMode = .thirds }
+            chipButton("Centro", selected: gridMode == .center) { gridMode = .center }
+            chipButton("Áureo", selected: gridMode == .golden) { gridMode = .golden }
         }
         .padding(.horizontal, 16)
     }
 
     private var textureOptions: some View {
         HStack(spacing: 12) {
-            chipButton("Off", selected: grainLevel == .off) { grainLevel = .off }
-            chipButton("Light", selected: grainLevel == .light) { grainLevel = .light }
-            chipButton("Medium", selected: grainLevel == .medium) { grainLevel = .medium }
-            chipButton("Heavy", selected: grainLevel == .heavy) { grainLevel = .heavy }
+            chipButton("No", selected: grainLevel == .off) { grainLevel = .off }
+            chipButton("Leve", selected: grainLevel == .light) { grainLevel = .light }
+            chipButton("Medio", selected: grainLevel == .medium) { grainLevel = .medium }
+            chipButton("Fuerte", selected: grainLevel == .heavy) { grainLevel = .heavy }
         }
         .padding(.horizontal, 16)
     }
 
     private var fxOptions: some View {
         HStack(spacing: 12) {
-            chipButton("Light Leak", selected: lightLeakOn) { lightLeakOn.toggle() }
-            chipButton("Vignette", selected: vignetteOn) { vignetteOn.toggle() }
+            chipButton("Fuga de luz", selected: lightLeakOn) { lightLeakOn.toggle() }
+            chipButton("Viñeta", selected: vignetteOn) { vignetteOn.toggle() }
             chipButton("Bloom", selected: bloomOn) { bloomOn.toggle() }
         }
         .padding(.horizontal, 16)
@@ -122,8 +122,8 @@ struct CameraToolbarView: View {
 
     private var flashOptions: some View {
         HStack(spacing: 12) {
-            chipButton("Off", selected: flashMode == .off) { onFlashSet(.off) }
-            chipButton("On", selected: flashMode == .on) { onFlashSet(.on) }
+            chipButton("No", selected: flashMode == .off) { onFlashSet(.off) }
+            chipButton("Sí", selected: flashMode == .on) { onFlashSet(.on) }
             chipButton("Auto", selected: flashMode == .auto) { onFlashSet(.auto) }
             chipButton("Vintage", selected: flashMode == .vintage) { onFlashSet(.vintage) }
         }

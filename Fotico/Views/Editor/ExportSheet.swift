@@ -21,9 +21,31 @@ struct ExportSheet: View {
                 VStack(spacing: 8) {
                     HStack {
                         Text("Resolución")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                         Spacer()
                         Text("\(Int(image.size.width))x\(Int(image.size.height))")
+                            .foregroundColor(.white)
+                    }
+                    .font(.subheadline)
+
+                    Divider().overlay(Color.lumeDivider)
+
+                    HStack {
+                        Text("Proporción")
+                            .foregroundColor(.lumeTextSecondary)
+                        Spacer()
+                        Text(aspectRatioLabel(for: image.size))
+                            .foregroundColor(.white)
+                    }
+                    .font(.subheadline)
+
+                    Divider().overlay(Color.lumeDivider)
+
+                    HStack {
+                        Text("Formato")
+                            .foregroundColor(.lumeTextSecondary)
+                        Spacer()
+                        Text("HEIC")
                             .foregroundColor(.white)
                     }
                     .font(.subheadline)
@@ -56,7 +78,7 @@ struct ExportSheet: View {
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.white)
+                        .background(Color.lumePrimary)
                         .cornerRadius(12)
                     }
                     .disabled(isSaving)
@@ -89,5 +111,24 @@ struct ExportSheet: View {
             }
         }
         .preferredColorScheme(.dark)
+    }
+
+    private func aspectRatioLabel(for size: CGSize) -> String {
+        let w = Int(size.width)
+        let h = Int(size.height)
+        let d = gcd(w, h)
+        guard d > 0 else { return "\(w):\(h)" }
+        let rw = w / d
+        let rh = h / d
+        // Simplify common ratios
+        if rw == 4 && rh == 3 { return "4:3" }
+        if rw == 3 && rh == 2 { return "3:2" }
+        if rw == 16 && rh == 9 { return "16:9" }
+        if rw == 1 && rh == 1 { return "1:1" }
+        return "\(rw):\(rh)"
+    }
+
+    private func gcd(_ a: Int, _ b: Int) -> Int {
+        b == 0 ? a : gcd(b, a % b)
     }
 }

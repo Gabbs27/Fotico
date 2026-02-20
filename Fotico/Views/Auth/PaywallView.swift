@@ -40,7 +40,7 @@ struct PaywallView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                             .font(.title2)
                     }
                 }
@@ -74,7 +74,7 @@ struct PaywallView: View {
 
             Text("Desbloquea todo el potencial creativo")
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 20)
@@ -109,7 +109,7 @@ struct PaywallView: View {
 
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.lumeTextSecondary)
             }
 
             Spacer()
@@ -151,7 +151,7 @@ struct PaywallView: View {
 
                         Text(isAnnual ? "por año" : "por mes")
                             .font(.caption)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
 
                         if isAnnual {
                             Text("Ahorra ~50%")
@@ -227,12 +227,12 @@ struct PaywallView: View {
             } label: {
                 Text("Restaurar compras")
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.lumeTextSecondary)
             }
 
             Text("La suscripción se renueva automáticamente. Puedes cancelar en cualquier momento desde Ajustes.")
                 .font(.caption2)
-                .foregroundColor(.gray.opacity(0.7))
+                .foregroundColor(.lumeTextSecondary.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
         }

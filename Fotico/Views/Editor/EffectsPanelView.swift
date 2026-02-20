@@ -4,9 +4,33 @@ struct EffectsPanelView: View {
     @ObservedObject var editorVM: PhotoEditorViewModel
 
     @State private var selectedEffect: EffectType?
+    @State private var selectedCategory: EffectCategory? = nil
+
+    private var filteredEffects: [EffectType] {
+        if let cat = selectedCategory {
+            return EffectType.allCases.filter { $0.category == cat }
+        }
+        return Array(EffectType.allCases)
+    }
 
     var body: some View {
         VStack(spacing: 12) {
+            // Category filter chips
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
+                        selectedCategory = nil
+                    }
+                    ForEach(EffectCategory.allCases, id: \.rawValue) { cat in
+                        CategoryChipView(name: cat.rawValue, icon: cat.icon, isSelected: selectedCategory == cat) {
+                            selectedCategory = cat
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+            .padding(.top, 8)
+
             // Effect intensity slider (shown when effect is selected)
             if let effect = selectedEffect {
                 VStack(spacing: 4) {
@@ -54,7 +78,7 @@ struct EffectsPanelView: View {
                     GridItem(.flexible()),
                     GridItem(.flexible())
                 ], spacing: 16) {
-                    ForEach(EffectType.allCases) { effect in
+                    ForEach(filteredEffects) { effect in
                         effectButton(effect)
                     }
                 }
@@ -78,7 +102,7 @@ struct EffectsPanelView: View {
             VStack(spacing: 8) {
                 Image(systemName: effect.icon)
                     .font(.title2)
-                    .foregroundColor(isActive ? Color.lumePrimary : .gray)
+                    .foregroundColor(isActive ? Color.lumePrimary : .lumeDisabled)
                     .frame(width: 56, height: 56)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
@@ -91,9 +115,11 @@ struct EffectsPanelView: View {
 
                 Text(effect.displayName)
                     .font(.caption2)
-                    .foregroundColor(isActive ? Color.lumePrimary : .gray)
+                    .foregroundColor(isActive ? Color.lumePrimary : .lumeDisabled)
                     .lineLimit(1)
             }
+            .accessibilityLabel(effect.displayName)
         }
     }
+
 }

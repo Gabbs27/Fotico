@@ -3,10 +3,10 @@ import SwiftUI
 struct PremiumBadge: View {
     var body: some View {
         Image(systemName: "lock.fill")
-            .font(.system(size: 10))
+            .font(.system(size: 12))
             .foregroundColor(.white)
-            .padding(4)
-            .background(Color.black.opacity(0.7))
+            .padding(5)
+            .background(Color.lumePrimary.opacity(0.9))
             .clipShape(Circle())
     }
 }

@@ -88,14 +88,14 @@ struct AdjustmentPanelView: View {
 
                 Text(label)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.lumeTextSecondary)
 
                 Spacer()
 
                 Text(formattedValue(value.wrappedValue, label: label))
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundColor(value.wrappedValue != defaultValue ? Color.lumePrimary : .gray)
+                    .foregroundColor(value.wrappedValue != defaultValue ? Color.lumePrimary : .lumeTextSecondary)
 
                 if value.wrappedValue != defaultValue {
                     Button {
@@ -129,14 +129,29 @@ struct AdjustmentPanelView: View {
     private func formattedValue(_ value: Double, label: String) -> String {
         switch label {
         case "Temperatura":
-            return "\(Int(value))K"
+            // 6500K is neutral, map to relative scale
+            let normalized = Int((value - 6500) / 35)
+            return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
         case "Tinte":
             return value >= 0 ? "+\(Int(value))" : "\(Int(value))"
+        case "Contraste", "Saturación":
+            // 1.0 is neutral (display as 0), range 0-2 maps to -100 to +100
+            let normalized = Int((value - 1.0) * 100)
+            return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
+        case "Brillo":
+            // 0 is neutral, range -1 to 1 maps to -100 to +100
+            let normalized = Int(value * 100)
+            return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
+        case "Exposición":
+            // 0 is neutral, show with 1 decimal
+            let formatted = String(format: "%+.1f", value)
+            return formatted
+        case "Vibrancia", "Nitidez":
+            let normalized = Int(value * 100)
+            return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
         default:
-            if value >= 0 {
-                return "+\(String(format: "%.2f", value))"
-            }
-            return String(format: "%.2f", value)
+            let normalized = Int(value * 100)
+            return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
         }
     }
 }

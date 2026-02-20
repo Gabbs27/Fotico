@@ -19,7 +19,7 @@ struct CameraLaunchView: View {
                     .foregroundColor(.black)
                     .padding(.horizontal, 32)
                     .padding(.vertical, 14)
-                    .background(Color.white)
+                    .background(Color.lumePrimary)
                     .cornerRadius(12)
                 }
             }
@@ -29,6 +29,9 @@ struct CameraLaunchView: View {
                 showCamera = false
                 onPhotoCaptured?(image)
             }
+        }
+        .onAppear {
+            showCamera = true
         }
     }
 }

@@ -24,13 +24,13 @@ struct ProjectsGridView: View {
                     VStack(spacing: 16) {
                         Image(systemName: "photo.on.rectangle.angled")
                             .font(.system(size: 48))
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                         Text("Sin proyectos")
                             .font(.headline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                         Text("Las fotos editadas aparecerán aquí")
                             .font(.subheadline)
-                            .foregroundColor(.gray.opacity(0.7))
+                            .foregroundColor(.lumeTextSecondary.opacity(0.7))
                     }
                 } else {
                     ScrollView {
@@ -89,7 +89,7 @@ struct ProjectsGridView: View {
                     .frame(height: 120)
                     .overlay(
                         Image(systemName: "photo")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                     )
             }
 
@@ -100,7 +100,7 @@ struct ProjectsGridView: View {
 
             Text(project.modifiedAt.formatted(.dateTime.month().day()))
                 .font(.caption2)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
         }
         .contextMenu {
             Button(role: .destructive) {

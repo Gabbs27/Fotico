@@ -16,7 +16,7 @@ struct CropView: View {
 
                     Text("Rotación")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.lumeTextSecondary)
 
                     Spacer()
 

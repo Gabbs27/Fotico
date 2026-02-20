@@ -54,6 +54,7 @@
 		DD44EE55FF6600112233AABB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DD55EE66FF001122AA33BB /* ProfileView.swift */; };
 		3B8E62D1A9C0F74589ABCDEF /* LUTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A3F91B2C8D4E5F601234567 /* LUTService.swift */; };
 		EE66FF00112233AABB44CC55 /* PremiumBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF77001122334455AABB6688 /* PremiumBadge.swift */; };
+		CC66FF00112233AABB44CC01 /* CategoryChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC77001122334455AABB6601 /* CategoryChipView.swift */; };
 		B2C3D4E5F6071819AABBCCDD /* ProjectStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071819AABBCC /* ProjectStorageService.swift */; };
 		D4E5F6071819AABBCCDDEEFF /* ProjectsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6071819AABBCCDDEE /* ProjectsViewModel.swift */; };
 		F1A2B3C4D5E6071800000001 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6071800000002 /* AuthService.swift */; };
@@ -149,6 +150,7 @@
 		44DD55EE66FF001122AA33BB /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		7A3F91B2C8D4E5F601234567 /* LUTService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LUTService.swift; sourceTree = "<group>"; };
 		FF77001122334455AABB6688 /* PremiumBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumBadge.swift; sourceTree = "<group>"; };
+		CC77001122334455AABB6601 /* CategoryChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryChipView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6071819AABBCC /* ProjectStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectStorageService.swift; sourceTree = "<group>"; };
 		C3D4E5F6071819AABBCCDDEE /* ProjectsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsViewModel.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6071800000002 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -385,6 +387,7 @@
 		E5ACFCEC3ACB96323CD936AB /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				CC77001122334455AABB6601 /* CategoryChipView.swift */,
 				BB2233445566778899001122 /* MetalImageView.swift */,
 				FF77001122334455AABB6688 /* PremiumBadge.swift */,
 			);
@@ -595,6 +598,7 @@
 				CC33DD44EE55FF66001122AA /* ProjectsGridView.swift in Sources */,
 				DD44EE55FF6600112233AABB /* ProfileView.swift in Sources */,
 				EE66FF00112233AABB44CC55 /* PremiumBadge.swift in Sources */,
+				CC66FF00112233AABB44CC01 /* CategoryChipView.swift in Sources */,
 				B2C3D4E5F6071819AABBCCDD /* ProjectStorageService.swift in Sources */,
 				D4E5F6071819AABBCCDDEEFF /* ProjectsViewModel.swift in Sources */,
 				F1A2B3C4D5E6071800000001 /* AuthService.swift in Sources */,

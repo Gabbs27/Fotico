@@ -12,7 +12,7 @@ struct PresetGridView: View {
     let onIntensityChange: ((Double) -> Void)?
     let onLockedPresetTapped: () -> Void
 
-    @State private var selectedCategory: PresetCategory? = nil
+    @State private var selectedCategory: PresetCategory? = .featured
 
     private var filteredPresets: [FilterPreset] {
         if let category = selectedCategory {
@@ -82,7 +82,7 @@ struct PresetGridView: View {
         HStack(spacing: 10) {
             Text("Intensidad")
                 .font(.caption2)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
 
             Slider(value: $presetIntensity, in: 0...1, step: 0.01)
                 .tint(Color.lumePrimary)
@@ -104,34 +104,17 @@ struct PresetGridView: View {
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
-                chipButton(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
+                CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
                     selectedCategory = nil
                 }
 
                 ForEach(PresetCategory.allCases, id: \.rawValue) { category in
-                    chipButton(name: category.displayName, icon: category.icon, isSelected: selectedCategory == category) {
+                    CategoryChipView(name: category.displayName, icon: category.icon, isSelected: selectedCategory == category) {
                         selectedCategory = category
                     }
                 }
             }
             .padding(.horizontal, 12)
-        }
-    }
-
-    private func chipButton(name: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 3) {
-                Image(systemName: icon)
-                    .font(.system(size: 10))
-                Text(name)
-                    .font(.caption2)
-                    .fontWeight(.medium)
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(isSelected ? Color.lumePrimary : Color.lumeSurface)
-            .foregroundColor(isSelected ? .black : .gray)
-            .cornerRadius(14)
         }
     }
 
@@ -158,7 +141,7 @@ struct PresetGridView: View {
                             .overlay(
                                 Image(systemName: id == nil ? "photo" : "camera.filters")
                                     .font(.title3)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.lumeTextSecondary)
                             )
                     }
 
@@ -177,9 +160,10 @@ struct PresetGridView: View {
                 Text(name)
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(isSelected ? .white : .gray)
+                    .foregroundColor(isSelected ? .white : .lumeTextSecondary)
                     .lineLimit(1)
             }
         }
+        .accessibilityLabel(name)
     }
 }

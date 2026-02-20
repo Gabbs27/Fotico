@@ -18,7 +18,7 @@ struct CameraTypeStripView: View {
                                 .font(.system(size: 22))
                                 .frame(width: 44, height: 44)
                             Text(cameraType.name)
-                                .font(.system(size: 10, weight: .medium))
+                                .font(.system(size: 11, weight: .medium))
                                 .lineLimit(1)
                         }
                         .foregroundColor(selectedId == cameraType.id ? Color.lumePrimary : .white.opacity(0.7))

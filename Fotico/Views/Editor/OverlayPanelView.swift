@@ -19,7 +19,7 @@ struct OverlayPanelView: View {
                     HStack {
                         Text("Intensidad")
                             .font(.caption)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                         Spacer()
                         Text("\(Int(editorVM.editState.overlayIntensity * 100))%")
                             .font(.caption)
@@ -40,12 +40,12 @@ struct OverlayPanelView: View {
             // Category chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    categoryChip(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
+                    CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
                         selectedCategory = nil
                     }
 
                     ForEach(OverlayCategory.allCases, id: \.rawValue) { category in
-                        categoryChip(name: category.displayName, icon: category.icon, isSelected: selectedCategory == category) {
+                        CategoryChipView(name: category.displayName, icon: category.icon, isSelected: selectedCategory == category) {
                             selectedCategory = category
                         }
                     }
@@ -71,12 +71,12 @@ struct OverlayPanelView: View {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 8)
                                         .fill(Color.lumeSurface)
-                                        .frame(width: 68, height: 68)
+                                        .frame(width: 72, height: 72)
 
                                     Image(overlay.fileName)
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
-                                        .frame(width: 68, height: 68)
+                                        .frame(width: 72, height: 72)
                                         .cornerRadius(8)
                                         .clipped()
                                 }
@@ -87,31 +87,15 @@ struct OverlayPanelView: View {
 
                                 Text(overlay.displayName)
                                     .font(.caption2)
-                                    .foregroundColor(isSelected ? Color.lumePrimary : .gray)
+                                    .foregroundColor(isSelected ? Color.lumePrimary : .lumeTextSecondary)
                                     .lineLimit(1)
                             }
                         }
+                        .accessibilityLabel(overlay.displayName)
                     }
                 }
                 .padding(.horizontal)
             }
-        }
-    }
-
-    private func categoryChip(name: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.caption2)
-                Text(name)
-                    .font(.caption)
-                    .fontWeight(.medium)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(isSelected ? Color.lumePrimary : Color.lumeSurface)
-            .foregroundColor(isSelected ? .black : .gray)
-            .cornerRadius(16)
         }
     }
 
@@ -124,10 +108,10 @@ struct OverlayPanelView: View {
             VStack(spacing: 6) {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.lumeSurface)
-                    .frame(width: 68, height: 68)
+                    .frame(width: 72, height: 72)
                     .overlay(
                         Image(systemName: icon)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
@@ -136,7 +120,7 @@ struct OverlayPanelView: View {
 
                 Text(name)
                     .font(.caption2)
-                    .foregroundColor(isSelected ? Color.lumePrimary : .gray)
+                    .foregroundColor(isSelected ? Color.lumePrimary : .lumeTextSecondary)
                     .lineLimit(1)
             }
         }

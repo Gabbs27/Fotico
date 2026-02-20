@@ -1,5 +1,11 @@
 import SwiftUI
 import SwiftData
+import StoreKit
+
+private enum AppLinks {
+    static let appStore = URL(string: "https://apps.apple.com/app/lume")!
+    static let support = URL(string: "mailto:soporte@lume.app")!
+}
 
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
@@ -21,8 +27,10 @@ struct ProfileView: View {
                         settingsSection(title: "Cuenta") {
                             if authService.isAuthenticated {
                                 settingsRow(icon: "person.fill", title: authService.currentUser?.displayName ?? "Usuario")
+                                Divider().padding(.leading, 52).overlay(Color.lumeDivider)
                                 if let email = authService.currentUser?.email {
                                     settingsRow(icon: "envelope.fill", title: email)
+                                    Divider().padding(.leading, 52).overlay(Color.lumeDivider)
                                 }
                                 settingsRow(icon: "crown.fill", title: "Plan: \(authService.currentUser?.tier.rawValue.capitalized ?? "Free")", color: Color.lumePrimary)
                             } else {
@@ -36,9 +44,25 @@ struct ProfileView: View {
 
                         // App section
                         settingsSection(title: "App") {
-                            settingsRow(icon: "star.fill", title: "Calificar Lumé", color: .yellow)
-                            settingsRow(icon: "square.and.arrow.up", title: "Compartir Lumé")
-                            settingsRow(icon: "questionmark.circle.fill", title: "Ayuda")
+                            Button {
+                                if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                                    SKStoreReviewController.requestReview(in: scene)
+                                }
+                            } label: {
+                                settingsRow(icon: "star.fill", title: "Calificar Lumé", color: .yellow)
+                            }
+
+                            Divider().padding(.leading, 52).overlay(Color.lumeDivider)
+
+                            ShareLink(item: AppLinks.appStore) {
+                                settingsRow(icon: "square.and.arrow.up", title: "Compartir Lumé")
+                            }
+
+                            Divider().padding(.leading, 52).overlay(Color.lumeDivider)
+
+                            Link(destination: AppLinks.support) {
+                                settingsRow(icon: "questionmark.circle.fill", title: "Ayuda")
+                            }
                         }
 
                         // Danger zone
@@ -55,7 +79,7 @@ struct ProfileView: View {
                         // Version
                         Text("Lumé v2.0")
                             .font(.caption)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.lumeTextSecondary)
                             .padding(.top, 16)
                     }
                     .padding()
@@ -83,7 +107,7 @@ struct ProfileView: View {
                 .overlay(
                     Image(systemName: authService.isAuthenticated ? "person.fill" : "person.crop.circle")
                         .font(.system(size: 32))
-                        .foregroundColor(authService.isAuthenticated ? Color.lumePrimary : .gray)
+                        .foregroundColor(authService.isAuthenticated ? Color.lumePrimary : .lumeDisabled)
                 )
 
             Text(authService.isAuthenticated ? (authService.currentUser?.displayName ?? "Usuario") : "Invitado")
@@ -98,7 +122,7 @@ struct ProfileView: View {
             if !title.isEmpty {
                 Text(title)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.lumeTextSecondary)
                     .textCase(.uppercase)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
@@ -127,7 +151,7 @@ struct ProfileView: View {
 
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

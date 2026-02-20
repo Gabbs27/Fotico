@@ -150,9 +150,9 @@ struct CameraView: View {
             viewModel.cameraService.setZoom(level.factor)
         } label: {
             Text(level.label)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(isActive ? .black : .white)
-                .frame(width: 36, height: 36)
+                .frame(width: 44, height: 44)
                 .background(isActive ? Color.white : Color.white.opacity(0.2))
                 .clipShape(Circle())
         }
@@ -202,7 +202,7 @@ struct CameraView: View {
         VStack(spacing: 16) {
             Image(systemName: "camera.fill")
                 .font(.system(size: 48))
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeDisabled)
 
             Text("Acceso a la Camara")
                 .font(.title2)
@@ -210,7 +210,7 @@ struct CameraView: View {
 
             Text("Lumé necesita acceso a tu camara para tomar fotos con efectos vintage.")
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
 

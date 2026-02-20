@@ -140,9 +140,9 @@ enum PresetCategory: String, CaseIterable, Sendable {
 
     nonisolated var displayName: String {
         switch self {
-        case .featured: return "Featured"
+        case .featured: return "Destacados"
         case .cleanGirl: return "Clean Girl"
-        case .soft: return "Soft"
+        case .soft: return "Suave"
         case .film: return "Film"
         case .vintage: return "Vintage"
         }

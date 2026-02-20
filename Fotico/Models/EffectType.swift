@@ -1,5 +1,21 @@
 import Foundation
 
+enum EffectCategory: String, CaseIterable {
+    case film = "Film"
+    case lens = "Lente"
+    case stylize = "Estilo"
+    case pro = "Pro"
+
+    var icon: String {
+        switch self {
+        case .film: return "film"
+        case .lens: return "camera.filters"
+        case .stylize: return "paintbrush.pointed"
+        case .pro: return "star.fill"
+        }
+    }
+}
+
 enum EffectType: String, CaseIterable, Sendable, Identifiable {
     case grain
     case lightLeak
@@ -55,6 +71,15 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
         case .filmBurn: return "flame.fill"
         case .softDiffusion: return "drop.fill"
         case .letterbox: return "rectangle.expand.vertical"
+        }
+    }
+
+    nonisolated var category: EffectCategory {
+        switch self {
+        case .grain, .dust, .halation, .filmBurn: return .film
+        case .bloom, .softDiffusion, .chromaticAberration, .fisheye: return .lens
+        case .solarize, .glitch, .threshold, .letterbox: return .stylize
+        case .vignette, .lightLeak: return .pro
         }
     }
 }

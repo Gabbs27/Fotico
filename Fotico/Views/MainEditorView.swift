@@ -102,7 +102,7 @@ struct MainEditorView: View {
 
             // Tool panels
             toolPanel
-                .frame(height: 280)
+                .frame(height: panelHeight)
                 .background(Color.lumeCardBg)
                 .animation(.easeInOut(duration: 0.2), value: editorVM.currentTool)
 
@@ -135,7 +135,7 @@ struct MainEditorView: View {
                     editorVM.undo()
                 } label: {
                     Image(systemName: "arrow.uturn.backward")
-                        .foregroundColor(editorVM.canUndo ? .white : .gray)
+                        .foregroundColor(editorVM.canUndo ? .white : .lumeDisabled)
                 }
                 .disabled(!editorVM.canUndo)
                 .accessibilityLabel("Deshacer")
@@ -144,7 +144,7 @@ struct MainEditorView: View {
                     editorVM.redo()
                 } label: {
                     Image(systemName: "arrow.uturn.forward")
-                        .foregroundColor(editorVM.canRedo ? .white : .gray)
+                        .foregroundColor(editorVM.canRedo ? .white : .lumeDisabled)
                 }
                 .disabled(!editorVM.canRedo)
                 .accessibilityLabel("Rehacer")
@@ -153,35 +153,41 @@ struct MainEditorView: View {
             Spacer()
 
             HStack(spacing: 16) {
-                // Copy/Paste edits
-                Button {
-                    editorVM.copyEdits()
-                } label: {
-                    Image(systemName: "doc.on.doc")
-                        .foregroundColor(!editorVM.editState.isDefault ? .white : .gray)
-                }
-                .disabled(editorVM.editState.isDefault)
-                .accessibilityLabel("Copiar ediciones")
-
-                Button {
-                    editorVM.pasteEdits()
-                } label: {
-                    Image(systemName: "doc.on.clipboard")
-                        .foregroundColor(clipboard.hasContent ? Color.lumePrimary : .gray)
-                }
-                .disabled(!clipboard.hasContent)
-                .accessibilityLabel("Pegar ediciones")
-
-                if !editorVM.editState.isDefault {
+                Menu {
                     Button {
+                        editorVM.copyEdits()
+                    } label: {
+                        Label("Copiar ajustes", systemImage: "doc.on.doc")
+                    }
+                    .disabled(editorVM.editState.isDefault)
+
+                    Button {
+                        editorVM.pasteEdits()
+                    } label: {
+                        Label("Pegar ajustes", systemImage: "doc.on.clipboard")
+                    }
+                    .disabled(!clipboard.hasContent)
+
+                    Button(role: .destructive) {
                         editorVM.resetEdits()
                     } label: {
-                        Text("Reset")
-                            .font(.subheadline)
-                            .foregroundColor(Color.lumeWarning)
+                        Label("Restablecer", systemImage: "arrow.counterclockwise")
                     }
-                    .accessibilityLabel("Restablecer ediciones")
+                    .disabled(editorVM.editState.isDefault)
+
+                    Divider()
+
+                    Button {
+                        editorVM.showSaveProjectSheet = true
+                    } label: {
+                        Label("Guardar proyecto", systemImage: "folder.badge.plus")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.title3)
+                        .foregroundColor(.white)
                 }
+                .accessibilityLabel("Más opciones")
 
                 Button {
                     Task { await editorVM.exportImage() }
@@ -191,20 +197,23 @@ struct MainEditorView: View {
                         .foregroundColor(Color.lumePrimary)
                 }
                 .accessibilityLabel("Guardar imagen")
-
-                Button {
-                    editorVM.showSaveProjectSheet = true
-                } label: {
-                    Image(systemName: "folder.badge.plus")
-                        .font(.title3)
-                        .foregroundColor(.white)
-                }
-                .accessibilityLabel("Guardar proyecto")
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(Color.lumeCardBg)
+    }
+
+    // MARK: - Panel Height
+
+    private var panelHeight: CGFloat {
+        switch editorVM.currentTool {
+        case .crop: return 180
+        case .presets: return 300
+        case .adjust: return 280
+        case .effects: return 300
+        case .overlays: return 280
+        }
     }
 
     // MARK: - Tool Panel
@@ -255,9 +264,9 @@ struct MainEditorView: View {
                 .tracking(8)
                 .foregroundColor(.white)
 
-            Text("Film & Effects")
+            Text("Film y Efectos")
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(.lumeTextSecondary)
 
             Spacer().frame(height: 20)
 
@@ -273,7 +282,7 @@ struct MainEditorView: View {
                 .foregroundColor(.black)
                 .padding(.horizontal, 32)
                 .padding(.vertical, 14)
-                .background(Color.white)
+                .background(Color.lumePrimary)
                 .cornerRadius(12)
             }
 
