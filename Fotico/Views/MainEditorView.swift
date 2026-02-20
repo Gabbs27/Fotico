@@ -208,11 +208,11 @@ struct MainEditorView: View {
 
     private var panelHeight: CGFloat {
         switch editorVM.currentTool {
-        case .crop: return 180
-        case .presets: return 300
-        case .adjust: return 280
-        case .effects: return 300
-        case .overlays: return 280
+        case .crop: return 150
+        case .presets: return 240
+        case .adjust: return 220
+        case .effects: return 240
+        case .overlays: return 220
         }
     }
 
