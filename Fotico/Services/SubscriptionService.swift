@@ -13,6 +13,7 @@ class SubscriptionService: ObservableObject {
     #endif
 
     private let productIDs = ["com.lume.pro.monthly", "com.lume.pro.annual"]
+    private var updateListenerTask: Task<Void, Never>?
 
     func loadProducts() async {
         do {
@@ -56,8 +57,11 @@ class SubscriptionService: ObservableObject {
     }
 
     func listenForUpdates() {
-        Task {
+        // Cancel previous listener to prevent accumulation
+        updateListenerTask?.cancel()
+        updateListenerTask = Task {
             for await result in Transaction.updates {
+                guard !Task.isCancelled else { break }
                 if case .verified(let transaction) = result {
                     await transaction.finish()
                     await checkSubscriptionStatus()

@@ -5,6 +5,7 @@ import SwiftData
 class ProjectsViewModel: ObservableObject {
     @Published var projects: [PhotoProject] = []
     @Published var isLoading = false
+    @Published var errorMessage: String?
 
     private var modelContext: ModelContext?
 
@@ -15,22 +16,39 @@ class ProjectsViewModel: ObservableObject {
 
     func fetchProjects() {
         guard let context = modelContext else { return }
+        isLoading = true
+        defer { isLoading = false }
         let descriptor = FetchDescriptor<PhotoProject>(sortBy: [SortDescriptor(\.modifiedAt, order: .reverse)])
-        projects = (try? context.fetch(descriptor)) ?? []
+        do {
+            projects = try context.fetch(descriptor)
+        } catch {
+            errorMessage = "No se pudieron cargar los proyectos"
+            projects = []
+        }
     }
 
     func saveProject(name: String, image: UIImage, editState: EditState) {
         guard let context = modelContext else { return }
 
         let projectId = UUID().uuidString
-        guard let imagePath = ProjectStorageService.shared.saveOriginalImage(image, projectId: projectId) else { return }
+        guard let imagePath = ProjectStorageService.shared.saveOriginalImage(image, projectId: projectId) else {
+            errorMessage = "No se pudo guardar la imagen"
+            return
+        }
 
-        let editStateData = (try? JSONEncoder().encode(editState)) ?? Data()
+        guard let editStateData = try? JSONEncoder().encode(editState) else {
+            errorMessage = "No se pudo codificar el estado de edición"
+            return
+        }
         let project = PhotoProject(name: name, originalImagePath: imagePath, editStateData: editStateData)
         project.thumbnailData = ProjectStorageService.shared.generateThumbnail(image)
 
         context.insert(project)
-        try? context.save()
+        do {
+            try context.save()
+        } catch {
+            errorMessage = "No se pudo guardar el proyecto"
+        }
         fetchProjects()
     }
 
@@ -38,7 +56,11 @@ class ProjectsViewModel: ObservableObject {
         guard let context = modelContext else { return }
         ProjectStorageService.shared.deleteImage(fileName: project.originalImagePath)
         context.delete(project)
-        try? context.save()
+        do {
+            try context.save()
+        } catch {
+            errorMessage = "No se pudo eliminar el proyecto"
+        }
         fetchProjects()
     }
 

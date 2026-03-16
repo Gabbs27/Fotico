@@ -73,10 +73,11 @@ struct CameraToolbarView: View {
                         }
                         .foregroundColor(selectedTab == tab ? Color.lumePrimary : .white.opacity(0.6))
                         .frame(maxWidth: .infinity)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
                     }
                 }
             }
-            .padding(.vertical, 6)
             .background(Color.black.opacity(0.6))
         }
     }
@@ -136,13 +137,15 @@ struct CameraToolbarView: View {
             HapticManager.selection()
         } label: {
             Text(name)
-                .font(.caption2)
+                .font(.caption)
                 .fontWeight(.medium)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .frame(minHeight: 44)
                 .background(selected ? Color.lumePrimary : Color.white.opacity(0.15))
                 .foregroundColor(selected ? .black : .white)
                 .cornerRadius(14)
+                .contentShape(Rectangle())
         }
     }
 }

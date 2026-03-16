@@ -13,8 +13,27 @@ struct PresetGridView: View {
     let onLockedPresetTapped: () -> Void
 
     @State private var selectedCategory: PresetCategory? = .featured
+    @AppStorage("favoritePresetIds") private var favoritePresetIdsString: String = ""
+    @State private var showFavoritesOnly = false
+
+    private var favoritePresetIds: Set<String> {
+        Set(favoritePresetIdsString.split(separator: ",").map(String.init))
+    }
+
+    private func toggleFavorite(_ presetId: String) {
+        var ids = favoritePresetIds
+        if ids.contains(presetId) {
+            ids.remove(presetId)
+        } else {
+            ids.insert(presetId)
+        }
+        favoritePresetIdsString = ids.sorted().joined(separator: ",")
+    }
 
     private var filteredPresets: [FilterPreset] {
+        if showFavoritesOnly {
+            return presets.filter { favoritePresetIds.contains($0.id) }
+        }
         if let category = selectedCategory {
             return presets.filter { $0.category == category }
         }
@@ -22,9 +41,10 @@ struct PresetGridView: View {
     }
 
     private let columns = [
-        GridItem(.flexible(), spacing: 10),
-        GridItem(.flexible(), spacing: 10),
-        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8),
     ]
 
     var body: some View {
@@ -41,7 +61,7 @@ struct PresetGridView: View {
 
             // Grid
             ScrollView(.vertical, showsIndicators: false) {
-                LazyVGrid(columns: columns, spacing: 10) {
+                LazyVGrid(columns: columns, spacing: 8) {
                     // Original (no filter)
                     gridItem(
                         id: nil,
@@ -104,13 +124,24 @@ struct PresetGridView: View {
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
-                CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
+                CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil && !showFavoritesOnly) {
                     selectedCategory = nil
+                    showFavoritesOnly = false
+                }
+
+                CategoryChipView(
+                    name: "\u{2605}",
+                    icon: "star.fill",
+                    isSelected: showFavoritesOnly
+                ) {
+                    showFavoritesOnly.toggle()
+                    if showFavoritesOnly { selectedCategory = nil }
                 }
 
                 ForEach(PresetCategory.allCases, id: \.rawValue) { category in
                     CategoryChipView(name: category.displayName, icon: category.icon, isSelected: selectedCategory == category) {
                         selectedCategory = category
+                        showFavoritesOnly = false
                     }
                 }
             }
@@ -127,32 +158,50 @@ struct PresetGridView: View {
             VStack(spacing: 4) {
                 ZStack(alignment: .topTrailing) {
                     if let thumbnail {
-                        Image(uiImage: thumbnail)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(minWidth: 0, maxWidth: .infinity)
+                        // Square container first, then fill+clip inside
+                        Color.clear
                             .aspectRatio(1, contentMode: .fit)
-                            .clipped()
-                            .cornerRadius(10)
+                            .overlay(
+                                Image(uiImage: thumbnail)
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                     } else {
-                        RoundedRectangle(cornerRadius: 10)
+                        RoundedRectangle(cornerRadius: 8)
                             .fill(Color.lumeSurface)
                             .aspectRatio(1, contentMode: .fit)
                             .overlay(
                                 Image(systemName: id == nil ? "photo" : "camera.filters")
-                                    .font(.title3)
+                                    .font(.body)
                                     .foregroundColor(.lumeTextSecondary)
                             )
                     }
 
                     if isLocked {
                         PremiumBadge()
-                            .offset(x: -4, y: 4)
+                            .offset(x: -3, y: 3)
+                    }
+
+                    if id != nil {
+                        Button {
+                            HapticManager.impact(.light)
+                            toggleFavorite(id!)
+                        } label: {
+                            Image(systemName: favoritePresetIds.contains(id!) ? "heart.fill" : "heart")
+                                .font(.caption2)
+                                .foregroundColor(favoritePresetIds.contains(id!) ? .red : .white.opacity(0.7))
+                                .padding(4)
+                                .background(Color.black.opacity(0.4))
+                                .clipShape(Circle())
+                        }
+                        .offset(x: 3, y: -3)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                     }
                 }
                 .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(isSelected ? Color.lumePrimary : Color.clear, lineWidth: 2.5)
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(isSelected ? Color.lumePrimary : Color.clear, lineWidth: 2)
                 )
                 .scaleEffect(isSelected ? 1.03 : 1.0)
                 .animation(.easeOut(duration: 0.15), value: isSelected)

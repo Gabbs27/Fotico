@@ -6,6 +6,7 @@ struct ToolBarView: View {
     var body: some View {
         HStack(spacing: 0) {
             ForEach(EditorTool.allCases, id: \.rawValue) { tool in
+                let isSelected = selectedTool == tool
                 Button {
                     HapticManager.selection()
                     selectedTool = tool
@@ -16,9 +17,17 @@ struct ToolBarView: View {
                         Text(tool.displayName)
                             .font(.caption2)
                     }
-                    .foregroundColor(selectedTool == tool ? Color.lumePrimary : .lumeTextSecondary)
+                    .foregroundColor(isSelected ? Color.lumePrimary : .lumeTextSecondary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
+                    .frame(minHeight: 44)
+                    .overlay(alignment: .bottom) {
+                        if isSelected {
+                            Capsule()
+                                .fill(Color.lumePrimary)
+                                .frame(width: 24, height: 3)
+                                .offset(y: 2)
+                        }
+                    }
                 }
             }
         }

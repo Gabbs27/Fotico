@@ -12,7 +12,7 @@
 		29BC25AF7446B8810F7B31C1 /* FilterPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDF80977A4F5AED1D02D616 /* FilterPreset.swift */; };
 		2B7E9B06F6EE87AFF17A2197 /* ImagePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D85D0F652FEF3B63F2D724 /* ImagePreviewView.swift */; };
 		342D5194508073E6699F4062 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC00CE2941ED29EFAE28D3F8 /* ColorExtension.swift */; };
-		3F62CA28C541DCAEC8698A52 /* ExportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB96FD9B88185888576BA7DC /* ExportSheet.swift */; };
+
 		46BF1CC765816B7AF0A6511E /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AC8C9A5E6B67576FC17B434 /* Photos.framework */; };
 		4DB1DF7A6F41D38DCF26EC89 /* BloomShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5599A90FD0ADDDDAF7FA2F7E /* BloomShader.metal */; };
 		5EC23F350999D782E6F4F6B7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FB2C3542684B1CDBDA33992 /* AVFoundation.framework */; };
@@ -33,11 +33,11 @@
 		D09E69FA2103D4E1E57CCC13 /* ToolBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212CFF362D57F821DA1547D8 /* ToolBarView.swift */; };
 		D210E3E55BB8571E9A17BB4D /* LumeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C2496338EBADD2A8CCBF4A /* LumeApp.swift */; };
 		D38AC5EB13F1A7637DBEA3BA /* LightLeakShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 35EB6A0D4837D48F86251373 /* LightLeakShader.metal */; };
+		MB01AABB00CC11DD22EE33FF /* MaskCompositeShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = MB01AA00BB11CC22DD33EE44 /* MaskCompositeShader.metal */; };
 		D9F4877CD35FF4299EDBAA4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1558C1C11DE01745C37E65F4 /* Assets.xcassets */; };
 		E358AC8A1AE458B80230507D /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696854199B0343E679E72511 /* CameraViewModel.swift */; };
 		E5DDC17F8E58FA3F654113EC /* ImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123525D54C77139F019ED046 /* ImageExtensions.swift */; };
 		E804466147F1D1CBE7A14E92 /* MetalKernelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AF6182A7989512164360ECE /* MetalKernelService.swift */; };
-		E9242C63150F2D94A87C3DF3 /* DebounceModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DCA5619748BF7D5302F470 /* DebounceModifier.swift */; };
 		F3D6E43451011130F2B024ED /* EditState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2305F7EBB877817426CACC9 /* EditState.swift */; };
 		F537B69E8A7220763FB3EBFF /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A8F513701A08A996998038 /* CameraView.swift */; };
 		F55FF2C77EA92AFD33724ED8 /* ImageFilterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE77CC2D7DA2B378FDE452C /* ImageFilterService.swift */; };
@@ -60,6 +60,8 @@
 		F1A2B3C4D5E6071800000001 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6071800000002 /* AuthService.swift */; };
 		F1A2B3C4D5E6071800000003 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6071800000004 /* LoginView.swift */; };
 		A0B1C2D3E4F5061728394A5B /* OverlayPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C1D2E3F4050617283940AB /* OverlayPanelView.swift */; };
+		TX01AABB00CC11DD22EE33F1 /* TextToolPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TX01AA00BB11CC22DD33EE41 /* TextToolPanelView.swift */; };
+		TX02AABB00CC11DD22EE33F2 /* TextOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TX02AA00BB11CC22DD33EE42 /* TextOverlayView.swift */; };
 		AA00BB11CC22DD33EE44FF55 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00BB11CC22DD33EE44FF56 /* SubscriptionService.swift */; };
 		BB11CC22DD33EE44FF550066 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11CC22DD33EE44FF550067 /* PaywallView.swift */; };
 		CC22DD33EE44FF5500661177 /* EditClipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC22DD33EE44FF5500661178 /* EditClipboard.swift */; };
@@ -99,6 +101,22 @@
 		LB0042BBBBBBBBBBBBBBBB /* ft_lush.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0042AAAAAAAAAAAAAAAA /* ft_lush.cube */; };
 		LB0043BBBBBBBBBBBBBBBB /* ft_mood.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0043AAAAAAAAAAAAAAAA /* ft_mood.cube */; };
 		LB0044BBBBBBBBBBBBBBBB /* ft_vintage.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0044AAAAAAAAAAAAAAAA /* ft_vintage.cube */; };
+		LB0050BBBBBBBBBBBBBBBB /* sf_muse.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0050AAAAAAAAAAAAAAAA /* sf_muse.cube */; };
+		LB0051BBBBBBBBBBBBBBBB /* sf_haze.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0051AAAAAAAAAAAAAAAA /* sf_haze.cube */; };
+		LB0052BBBBBBBBBBBBBBBB /* sf_matte.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0052AAAAAAAAAAAAAAAA /* sf_matte.cube */; };
+		LB0053BBBBBBBBBBBBBBBB /* sf_dusk.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0053AAAAAAAAAAAAAAAA /* sf_dusk.cube */; };
+		LB0054BBBBBBBBBBBBBBBB /* sf_ivory.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0054AAAAAAAAAAAAAAAA /* sf_ivory.cube */; };
+		LB0055BBBBBBBBBBBBBBBB /* sf_noir.cube in Resources */ = {isa = PBXBuildFile; fileRef = LR0055AAAAAAAAAAAAAAAA /* sf_noir.cube */; };
+		B1A2C3D4E5F6A7B8C9D0E1F3 /* BeforeAfterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A2C3D4E5F6A7B8C9D0E1F2 /* BeforeAfterView.swift */; };
+		MP01AABB00CC11DD22EE33FF /* MaskPaintingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP01AA00BB11CC22DD33EE44 /* MaskPaintingView.swift */; };
+		C1D2E3F4A5B6C7D8E9F0A1B3 /* ColorTonePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B6C7D8E9F0A1B2 /* ColorTonePanelView.swift */; };
+		HS01AABB00CC11DD22EE33FF /* HSLShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = HS01AA00BB11CC22DD33EE44 /* HSLShader.metal */; };
+		HS02AABB00CC11DD22EE33FF /* HSLPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HS02AA00BB11CC22DD33EE44 /* HSLPanelView.swift */; };
+		ED01AABB00CC11DD22EE3301 /* edge_polaroid_border.png in Resources */ = {isa = PBXBuildFile; fileRef = ED01AA00BB11CC22DD33EE01 /* edge_polaroid_border.png */; };
+		ED02AABB00CC11DD22EE3302 /* edge_35mm_border.png in Resources */ = {isa = PBXBuildFile; fileRef = ED02AA00BB11CC22DD33EE02 /* edge_35mm_border.png */; };
+		ED03AABB00CC11DD22EE3303 /* edge_inset.png in Resources */ = {isa = PBXBuildFile; fileRef = ED03AA00BB11CC22DD33EE03 /* edge_inset.png */; };
+		ED04AABB00CC11DD22EE3304 /* edge_round.png in Resources */ = {isa = PBXBuildFile; fileRef = ED04AA00BB11CC22DD33EE04 /* edge_round.png */; };
+		ES01AABB00CC11DD22EE3301 /* EditShareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ES01AA00BB11CC22DD33EE01 /* EditShareService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -116,9 +134,9 @@
 		4809EB16ABE2A6CA7B5FC772 /* EffectsPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectsPanelView.swift; sourceTree = "<group>"; };
 		4AF6182A7989512164360ECE /* MetalKernelService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalKernelService.swift; sourceTree = "<group>"; };
 		5599A90FD0ADDDDAF7FA2F7E /* BloomShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BloomShader.metal; sourceTree = "<group>"; };
+		MB01AA00BB11CC22DD33EE44 /* MaskCompositeShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MaskCompositeShader.metal; sourceTree = "<group>"; };
 		5C549E27111B7DF1B1E2D672 /* GrainShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GrainShader.metal; sourceTree = "<group>"; };
 		5D91AECEF9AA91E4CB36F597 /* CropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
-		62DCA5619748BF7D5302F470 /* DebounceModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebounceModifier.swift; sourceTree = "<group>"; };
 		65D85D0F652FEF3B63F2D724 /* ImagePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewView.swift; sourceTree = "<group>"; };
 		696854199B0343E679E72511 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		786E358EDBA949DFA7409C13 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -136,7 +154,7 @@
 		D3C2496338EBADD2A8CCBF4A /* LumeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumeApp.swift; sourceTree = "<group>"; };
 		E500C087AA366E851D8242A4 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		EC00CE2941ED29EFAE28D3F8 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
-		FB96FD9B88185888576BA7DC /* ExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportSheet.swift; sourceTree = "<group>"; };
+
 		FDE77CC2D7DA2B378FDE452C /* ImageFilterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterService.swift; sourceTree = "<group>"; };
 		BB2233445566778899001122 /* MetalImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalImageView.swift; sourceTree = "<group>"; };
 		AA1122334455667788990011 /* RenderEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderEngine.swift; sourceTree = "<group>"; };
@@ -156,6 +174,8 @@
 		F1A2B3C4D5E6071800000002 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6071800000004 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		B0C1D2E3F4050617283940AB /* OverlayPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPanelView.swift; sourceTree = "<group>"; };
+		TX01AA00BB11CC22DD33EE41 /* TextToolPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToolPanelView.swift; sourceTree = "<group>"; };
+		TX02AA00BB11CC22DD33EE42 /* TextOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayView.swift; sourceTree = "<group>"; };
 		AA00BB11CC22DD33EE44FF56 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
 		BB11CC22DD33EE44FF550067 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		CC22DD33EE44FF5500661178 /* EditClipboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditClipboard.swift; sourceTree = "<group>"; };
@@ -195,6 +215,22 @@
 		LR0042AAAAAAAAAAAAAAAA /* ft_lush.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = ft_lush.cube; sourceTree = "<group>"; };
 		LR0043AAAAAAAAAAAAAAAA /* ft_mood.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = ft_mood.cube; sourceTree = "<group>"; };
 		LR0044AAAAAAAAAAAAAAAA /* ft_vintage.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = ft_vintage.cube; sourceTree = "<group>"; };
+		LR0050AAAAAAAAAAAAAAAA /* sf_muse.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = sf_muse.cube; sourceTree = "<group>"; };
+		LR0051AAAAAAAAAAAAAAAA /* sf_haze.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = sf_haze.cube; sourceTree = "<group>"; };
+		LR0052AAAAAAAAAAAAAAAA /* sf_matte.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = sf_matte.cube; sourceTree = "<group>"; };
+		LR0053AAAAAAAAAAAAAAAA /* sf_dusk.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = sf_dusk.cube; sourceTree = "<group>"; };
+		LR0054AAAAAAAAAAAAAAAA /* sf_ivory.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = sf_ivory.cube; sourceTree = "<group>"; };
+		LR0055AAAAAAAAAAAAAAAA /* sf_noir.cube */ = {isa = PBXFileReference; lastKnownFileType = text; path = sf_noir.cube; sourceTree = "<group>"; };
+		B1A2C3D4E5F6A7B8C9D0E1F2 /* BeforeAfterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeforeAfterView.swift; sourceTree = "<group>"; };
+		MP01AA00BB11CC22DD33EE44 /* MaskPaintingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskPaintingView.swift; sourceTree = "<group>"; };
+		C1D2E3F4A5B6C7D8E9F0A1B2 /* ColorTonePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTonePanelView.swift; sourceTree = "<group>"; };
+		HS01AA00BB11CC22DD33EE44 /* HSLShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = HSLShader.metal; sourceTree = "<group>"; };
+		HS02AA00BB11CC22DD33EE44 /* HSLPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSLPanelView.swift; sourceTree = "<group>"; };
+		ED01AA00BB11CC22DD33EE01 /* edge_polaroid_border.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edge_polaroid_border.png; sourceTree = "<group>"; };
+		ED02AA00BB11CC22DD33EE02 /* edge_35mm_border.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edge_35mm_border.png; sourceTree = "<group>"; };
+		ED03AA00BB11CC22DD33EE03 /* edge_inset.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edge_inset.png; sourceTree = "<group>"; };
+		ED04AA00BB11CC22DD33EE04 /* edge_round.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edge_round.png; sourceTree = "<group>"; };
+		ES01AA00BB11CC22DD33EE01 /* EditShareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditShareService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,11 +254,16 @@
 			isa = PBXGroup;
 			children = (
 				98CF72719CECEAAD38260AB6 /* AdjustmentPanelView.swift */,
+				B1A2C3D4E5F6A7B8C9D0E1F2 /* BeforeAfterView.swift */,
+				C1D2E3F4A5B6C7D8E9F0A1B2 /* ColorTonePanelView.swift */,
 				5D91AECEF9AA91E4CB36F597 /* CropView.swift */,
 				4809EB16ABE2A6CA7B5FC772 /* EffectsPanelView.swift */,
-				FB96FD9B88185888576BA7DC /* ExportSheet.swift */,
+				HS02AA00BB11CC22DD33EE44 /* HSLPanelView.swift */,
 				65D85D0F652FEF3B63F2D724 /* ImagePreviewView.swift */,
+				MP01AA00BB11CC22DD33EE44 /* MaskPaintingView.swift */,
 				B0C1D2E3F4050617283940AB /* OverlayPanelView.swift */,
+				TX01AA00BB11CC22DD33EE41 /* TextToolPanelView.swift */,
+				TX02AA00BB11CC22DD33EE42 /* TextOverlayView.swift */,
 				CEBBDEEDB060842ABA5B6735 /* PresetGridView.swift */,
 				212CFF362D57F821DA1547D8 /* ToolBarView.swift */,
 			);
@@ -241,6 +282,7 @@
 				A7AAC2AEDE1E9E9D82824989 /* Metal */,
 				1558C1C11DE01745C37E65F4 /* Assets.xcassets */,
 				CAFE00LUT0GRP000000000A /* LUTs */,
+				ED00GRP0000000000000001 /* Edges */,
 			);
 			path = Fotico;
 			sourceTree = "<group>";
@@ -249,7 +291,6 @@
 			isa = PBXGroup;
 			children = (
 				EC00CE2941ED29EFAE28D3F8 /* ColorExtension.swift */,
-				62DCA5619748BF7D5302F470 /* DebounceModifier.swift */,
 				320E8FDD1018D987BF801EE1 /* HapticManager.swift */,
 				123525D54C77139F019ED046 /* ImageExtensions.swift */,
 			);
@@ -277,6 +318,7 @@
 				F1A2B3C4D5E6071800000002 /* AuthService.swift */,
 				AA00BB11CC22DD33EE44FF56 /* SubscriptionService.swift */,
 				CC22DD33EE44FF5500661178 /* EditClipboard.swift */,
+				ES01AA00BB11CC22DD33EE01 /* EditShareService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -317,6 +359,8 @@
 				5599A90FD0ADDDDAF7FA2F7E /* BloomShader.metal */,
 				5C549E27111B7DF1B1E2D672 /* GrainShader.metal */,
 				35EB6A0D4837D48F86251373 /* LightLeakShader.metal */,
+				MB01AA00BB11CC22DD33EE44 /* MaskCompositeShader.metal */,
+				HS01AA00BB11CC22DD33EE44 /* HSLShader.metal */,
 			);
 			path = Metal;
 			sourceTree = "<group>";
@@ -460,8 +504,25 @@
 				LR0043AAAAAAAAAAAAAAAA /* ft_mood.cube */,
 				LR0044AAAAAAAAAAAAAAAA /* ft_vintage.cube */,
 				LR0025AAAAAAAAAAAAAAAA /* vhs.cube */,
+				LR0050AAAAAAAAAAAAAAAA /* sf_muse.cube */,
+				LR0051AAAAAAAAAAAAAAAA /* sf_haze.cube */,
+				LR0052AAAAAAAAAAAAAAAA /* sf_matte.cube */,
+				LR0053AAAAAAAAAAAAAAAA /* sf_dusk.cube */,
+				LR0054AAAAAAAAAAAAAAAA /* sf_ivory.cube */,
+				LR0055AAAAAAAAAAAAAAAA /* sf_noir.cube */,
 			);
 			path = "Resources/LUTs";
+			sourceTree = "<group>";
+		};
+		ED00GRP0000000000000001 /* Edges */ = {
+			isa = PBXGroup;
+			children = (
+				ED01AA00BB11CC22DD33EE01 /* edge_polaroid_border.png */,
+				ED02AA00BB11CC22DD33EE02 /* edge_35mm_border.png */,
+				ED03AA00BB11CC22DD33EE03 /* edge_inset.png */,
+				ED04AA00BB11CC22DD33EE04 /* edge_round.png */,
+			);
+			path = "Resources/Edges";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -548,6 +609,16 @@
 				LB0043BBBBBBBBBBBBBBBB /* ft_mood.cube in Resources */,
 				LB0044BBBBBBBBBBBBBBBB /* ft_vintage.cube in Resources */,
 				LB0025BBBBBBBBBBBBBBBB /* vhs.cube in Resources */,
+				LB0050BBBBBBBBBBBBBBBB /* sf_muse.cube in Resources */,
+				LB0051BBBBBBBBBBBBBBBB /* sf_haze.cube in Resources */,
+				LB0052BBBBBBBBBBBBBBBB /* sf_matte.cube in Resources */,
+				LB0053BBBBBBBBBBBBBBBB /* sf_dusk.cube in Resources */,
+				LB0054BBBBBBBBBBBBBBBB /* sf_ivory.cube in Resources */,
+				LB0055BBBBBBBBBBBBBBBB /* sf_noir.cube in Resources */,
+				ED01AABB00CC11DD22EE3301 /* edge_polaroid_border.png in Resources */,
+				ED02AABB00CC11DD22EE3302 /* edge_35mm_border.png in Resources */,
+				ED03AABB00CC11DD22EE3303 /* edge_inset.png in Resources */,
+				ED04AABB00CC11DD22EE3304 /* edge_round.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,14 +637,13 @@
 				E804466147F1D1CBE7A14E92 /* MetalKernelService.swift in Sources */,
 				13BCE6A1B057362A71D9047E /* PhotoLibraryService.swift in Sources */,
 				342D5194508073E6699F4062 /* ColorExtension.swift in Sources */,
-				E9242C63150F2D94A87C3DF3 /* DebounceModifier.swift in Sources */,
 				F56657F9BE138D29001162C4 /* HapticManager.swift in Sources */,
 				E5DDC17F8E58FA3F654113EC /* ImageExtensions.swift in Sources */,
 				A3612E3E1D70C965DF59CDF2 /* PhotoEditorViewModel.swift in Sources */,
 				8069BD72C3F990DB2BD0F690 /* AdjustmentPanelView.swift in Sources */,
 				CEE5B94F7E147A1A0A5E2001 /* CropView.swift in Sources */,
 				9C1B5E31AA8CDF35E65C730D /* EffectsPanelView.swift in Sources */,
-				3F62CA28C541DCAEC8698A52 /* ExportSheet.swift in Sources */,
+
 				2B7E9B06F6EE87AFF17A2197 /* ImagePreviewView.swift in Sources */,
 				0E5718C0807E06F67CA5CCB0 /* PresetGridView.swift in Sources */,
 				D09E69FA2103D4E1E57CCC13 /* ToolBarView.swift in Sources */,
@@ -581,6 +651,9 @@
 				4DB1DF7A6F41D38DCF26EC89 /* BloomShader.metal in Sources */,
 				D039B9434B85F691608582BC /* GrainShader.metal in Sources */,
 				D38AC5EB13F1A7637DBEA3BA /* LightLeakShader.metal in Sources */,
+				MB01AABB00CC11DD22EE33FF /* MaskCompositeShader.metal in Sources */,
+				HS01AABB00CC11DD22EE33FF /* HSLShader.metal in Sources */,
+				HS02AABB00CC11DD22EE33FF /* HSLPanelView.swift in Sources */,
 				858CD9935ED3458DF35DBC3D /* CameraService.swift in Sources */,
 				E358AC8A1AE458B80230507D /* CameraViewModel.swift in Sources */,
 				F537B69E8A7220763FB3EBFF /* CameraView.swift in Sources */,
@@ -612,6 +685,12 @@
 				CA02AA00BB11CC22DD33EE01 /* CameraTypeStripView.swift in Sources */,
 				CA03AA00BB11CC22DD33EE01 /* CameraToolbarView.swift in Sources */,
 				CA04AA00BB11CC22DD33EE01 /* GridOverlayView.swift in Sources */,
+				MP01AABB00CC11DD22EE33FF /* MaskPaintingView.swift in Sources */,
+				TX01AABB00CC11DD22EE33F1 /* TextToolPanelView.swift in Sources */,
+				TX02AABB00CC11DD22EE33F2 /* TextOverlayView.swift in Sources */,
+				B1A2C3D4E5F6A7B8C9D0E1F3 /* BeforeAfterView.swift in Sources */,
+				ES01AABB00CC11DD22EE3301 /* EditShareService.swift in Sources */,
+				C1D2E3F4A5B6C7D8E9F0A1B3 /* ColorTonePanelView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -626,8 +705,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Lumé necesita acceso a tu camara para tomar fotos con efectos vintage";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Lumé necesita permiso para guardar fotos editadas en tu galeria";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Lumé necesita acceso a tu cámara para tomar fotos con efectos vintage";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Lumé necesita permiso para guardar fotos editadas en tu galería";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -655,8 +734,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Lumé necesita acceso a tu camara para tomar fotos con efectos vintage";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Lumé necesita permiso para guardar fotos editadas en tu galeria";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Lumé necesita acceso a tu cámara para tomar fotos con efectos vintage";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Lumé necesita permiso para guardar fotos editadas en tu galería";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

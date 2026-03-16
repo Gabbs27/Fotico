@@ -37,6 +37,7 @@ class CameraService: NSObject, ObservableObject {
     private let processingQueue = DispatchQueue(label: "com.lume.camera", qos: .userInitiated)
     private var currentDevice: AVCaptureDevice?
     private var photoContinuation: CheckedContinuation<UIImage?, Never>?
+    private var photoTimeoutTask: Task<Void, Never>?
 
     // MARK: - Permissions
 
@@ -269,10 +270,15 @@ class CameraService: NSObject, ObservableObject {
         // Force-apply zoom right before capture
         setZoom(currentZoom, animated: false)
 
+        // Cancel any previous timeout
+        photoTimeoutTask?.cancel()
+        photoTimeoutTask = nil
+
         let image: UIImage? = await withCheckedContinuation { continuation in
             // Guard against rapid double-tap: if a previous continuation exists,
             // resume it with nil before overwriting to prevent a leaked continuation.
             if let existing = self.photoContinuation {
+                self.photoContinuation = nil
                 existing.resume(returning: nil)
             }
             self.photoContinuation = continuation
@@ -300,8 +306,9 @@ class CameraService: NSObject, ObservableObject {
 
             // Safety timeout: if the delegate is never called (e.g., session stopped),
             // resume the continuation after 5 seconds to prevent hanging forever.
-            Task { @MainActor [weak self] in
+            photoTimeoutTask = Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .seconds(5))
+                guard !Task.isCancelled else { return }
                 if let continuation = self?.photoContinuation {
                     self?.photoContinuation = nil
                     continuation.resume(returning: nil)
@@ -366,23 +373,27 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
         let photoData = photo.fileDataRepresentation()
 
         Task { @MainActor in
+            // Cancel the safety timeout — delegate was called
+            self.photoTimeoutTask?.cancel()
+            self.photoTimeoutTask = nil
+
+            guard let continuation = self.photoContinuation else { return }
+            self.photoContinuation = nil
+
             if let error = error {
                 self.errorMessage = "Error al capturar foto: \(error.localizedDescription)"
-                self.photoContinuation?.resume(returning: nil)
-                self.photoContinuation = nil
+                continuation.resume(returning: nil)
                 return
             }
 
             guard let data = photoData,
                   let image = UIImage(data: data) else {
-                self.photoContinuation?.resume(returning: nil)
-                self.photoContinuation = nil
+                continuation.resume(returning: nil)
                 return
             }
 
             self.capturedPhoto = image
-            self.photoContinuation?.resume(returning: image)
-            self.photoContinuation = nil
+            continuation.resume(returning: image)
         }
     }
 }

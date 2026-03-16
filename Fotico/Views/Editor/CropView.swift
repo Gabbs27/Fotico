@@ -2,11 +2,34 @@ import SwiftUI
 
 struct CropView: View {
     @Binding var rotation: Double
+    @Binding var cropAspectRatio: CropAspectRatio
     var onRotationChanged: () -> Void
     var onCommit: () -> Void
 
     var body: some View {
         VStack(spacing: 16) {
+            // Aspect Ratio chips
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(CropAspectRatio.allCases, id: \.rawValue) { ratio in
+                        Button {
+                            HapticManager.selection()
+                            onCommit()
+                            cropAspectRatio = ratio
+                        } label: {
+                            Text(ratio.displayName)
+                                .font(.caption.weight(.medium))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(cropAspectRatio == ratio ? Color.lumePrimary : Color.lumeSurface)
+                                .foregroundColor(cropAspectRatio == ratio ? .black : .white)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+
             // Rotation
             VStack(spacing: 4) {
                 HStack {
@@ -28,7 +51,7 @@ struct CropView: View {
                 .padding(.horizontal)
 
                 Slider(value: $rotation, in: -180...180, step: 0.5)
-                    .tint(.white)
+                    .tint(Color.lumePrimary)
                     .padding(.horizontal)
                     .onChange(of: rotation) { _, _ in
                         onRotationChanged()
@@ -45,12 +68,12 @@ struct CropView: View {
                     onRotationChanged()
                 } label: {
                     Label("Girar", systemImage: "rotate.left")
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
                         .background(Color.lumeSurface)
-                        .cornerRadius(8)
+                        .cornerRadius(10)
                 }
 
                 Button {
@@ -59,13 +82,13 @@ struct CropView: View {
                     rotation = 0
                     onRotationChanged()
                 } label: {
-                    Label("Reset", systemImage: "arrow.counterclockwise")
-                        .font(.caption)
+                    Label("Restablecer", systemImage: "arrow.counterclockwise")
+                        .font(.subheadline)
                         .foregroundColor(Color.lumeWarning)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
                         .background(Color.lumeSurface)
-                        .cornerRadius(8)
+                        .cornerRadius(10)
                 }
             }
 

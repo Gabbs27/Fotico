@@ -12,6 +12,7 @@ struct MainEditorView: View {
     @State private var showCamera = false
     @State private var showDiscardAlert = false
     @State private var showPaywall = false
+    @State private var showBeforeAfter = false
 
     var body: some View {
         ZStack {
@@ -34,7 +35,7 @@ struct MainEditorView: View {
                         return
                     }
                     guard let image = UIImage(data: data) else {
-                        editorVM.errorMessage = "La imagen no es valida"
+                        editorVM.errorMessage = "La imagen no es válida"
                         pickerItem = nil
                         return
                     }
@@ -69,6 +70,15 @@ struct MainEditorView: View {
                 editorVM.loadImage(capturedImage)
             }
         }
+        .fullScreenCover(isPresented: $showBeforeAfter) {
+            if let original = editorVM.originalImage?.toCIImage() {
+                BeforeAfterView(
+                    originalCIImage: original,
+                    editedCIImage: editorVM.editedCIImage,
+                    onDismiss: { showBeforeAfter = false }
+                )
+            }
+        }
         .onChange(of: editorVM.showSaveProjectSheet) { _, show in
             if show {
                 let name = "Foto \(Date().formatted(.dateTime.month(.abbreviated).day().hour().minute()))"
@@ -85,7 +95,7 @@ struct MainEditorView: View {
             }
             Button("Cancelar", role: .cancel) {}
         } message: {
-            Text("Tienes ediciones sin guardar. Si sales se perderan.")
+            Text("Tienes ediciones sin guardar. Si sales se perderán.")
         }
     }
 
@@ -99,6 +109,27 @@ struct MainEditorView: View {
             // Image preview — GPU-rendered via MetalImageView (no CGImage creation)
             ImagePreviewView(ciImage: editorVM.editedCIImage, uiImage: editorVM.editedImage, isProcessing: editorVM.isProcessing)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay {
+                    if editorVM.editState.motionBlurMaskEnabled && editorVM.currentTool == .effects {
+                        GeometryReader { geometry in
+                            MaskPaintingView(
+                                viewModel: editorVM,
+                                imageSize: editorVM.proxyImageSize,
+                                displaySize: geometry.size
+                            )
+                        }
+                    }
+                }
+                .overlay {
+                    if editorVM.currentTool == .text && !editorVM.editState.textLayers.isEmpty {
+                        GeometryReader { geometry in
+                            TextOverlayView(
+                                viewModel: editorVM,
+                                displaySize: geometry.size
+                            )
+                        }
+                    }
+                }
 
             // Tool panels
             toolPanel
@@ -125,6 +156,7 @@ struct MainEditorView: View {
                 Image(systemName: "xmark")
                     .font(.title3)
                     .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
             }
             .accessibilityLabel("Cerrar")
 
@@ -136,6 +168,7 @@ struct MainEditorView: View {
                 } label: {
                     Image(systemName: "arrow.uturn.backward")
                         .foregroundColor(editorVM.canUndo ? .white : .lumeDisabled)
+                        .frame(width: 44, height: 44)
                 }
                 .disabled(!editorVM.canUndo)
                 .accessibilityLabel("Deshacer")
@@ -145,9 +178,20 @@ struct MainEditorView: View {
                 } label: {
                     Image(systemName: "arrow.uturn.forward")
                         .foregroundColor(editorVM.canRedo ? .white : .lumeDisabled)
+                        .frame(width: 44, height: 44)
                 }
                 .disabled(!editorVM.canRedo)
                 .accessibilityLabel("Rehacer")
+
+                Button {
+                    showBeforeAfter = true
+                } label: {
+                    Image(systemName: "eye")
+                        .foregroundColor(!editorVM.editState.isDefault ? .white : .lumeDisabled)
+                        .frame(width: 44, height: 44)
+                }
+                .disabled(editorVM.editState.isDefault)
+                .accessibilityLabel("Antes/Después")
             }
 
             Spacer()
@@ -182,6 +226,13 @@ struct MainEditorView: View {
                     } label: {
                         Label("Guardar proyecto", systemImage: "folder.badge.plus")
                     }
+
+                    Button {
+                        EditShareService.presentShareSheet(editState: editorVM.editState)
+                    } label: {
+                        Label("Compartir edición", systemImage: "square.and.arrow.up")
+                    }
+                    .disabled(editorVM.editState.isDefault)
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .font(.title3)
@@ -206,13 +257,18 @@ struct MainEditorView: View {
 
     // MARK: - Panel Height
 
+    /// Proportional panel height based on screen size (roughly 30-35% of screen)
     private var panelHeight: CGFloat {
+        let screenHeight = UIScreen.main.bounds.height
         switch editorVM.currentTool {
-        case .crop: return 150
-        case .presets: return 240
-        case .adjust: return 220
-        case .effects: return 240
-        case .overlays: return 220
+        case .crop: return screenHeight * 0.20
+        case .presets: return screenHeight * 0.30
+        case .adjust: return screenHeight * 0.28
+        case .effects: return screenHeight * 0.30
+        case .overlays: return screenHeight * 0.28
+        case .colorTone: return screenHeight * 0.30
+        case .hsl: return screenHeight * 0.30
+        case .text: return screenHeight * 0.28
         }
     }
 
@@ -244,12 +300,27 @@ struct MainEditorView: View {
             EffectsPanelView(editorVM: editorVM)
         case .overlays:
             OverlayPanelView(editorVM: editorVM)
+        case .colorTone:
+            ColorTonePanelView(editState: $editorVM.editState) {
+                editorVM.updateAdjustment()
+            } onCommit: {
+                editorVM.commitAdjustment()
+            }
         case .crop:
             CropView(
                 rotation: $editorVM.editState.rotation,
+                cropAspectRatio: $editorVM.editState.cropAspectRatio,
                 onRotationChanged: { editorVM.updateRotation(editorVM.editState.rotation) },
                 onCommit: { editorVM.commitRotation() }
             )
+        case .hsl:
+            HSLPanelView(editState: $editorVM.editState) {
+                editorVM.updateAdjustment()
+            } onCommit: {
+                editorVM.commitAdjustment()
+            }
+        case .text:
+            TextToolPanelView(editorVM: editorVM)
         }
     }
 

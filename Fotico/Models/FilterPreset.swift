@@ -1,15 +1,10 @@
 import Foundation
 
-enum PresetTier: String, Codable, Sendable {
-    case free
-    case pro
-}
-
 struct FilterPreset: Identifiable, Sendable {
     let id: String
     let name: String
     let category: PresetCategory
-    let tier: PresetTier
+    let tier: SubscriptionTier
     let lutFileName: String?        // e.g. "kodak_gold.cube" — nil means CIFilter chain
     let ciFilterName: String?
     let parameters: [FilterParameter]
@@ -18,7 +13,7 @@ struct FilterPreset: Identifiable, Sendable {
 
     // Convenience init with defaults for backward compatibility
     init(id: String, name: String, category: PresetCategory,
-         tier: PresetTier = .free, lutFileName: String? = nil,
+         tier: SubscriptionTier = .free, lutFileName: String? = nil,
          ciFilterName: String? = nil, parameters: [FilterParameter] = [],
          defaultIntensity: Double = 1.0, sortOrder: Int = 0) {
         self.id = id
@@ -126,6 +121,58 @@ struct FilterPreset: Identifiable, Sendable {
                      category: .vintage, lutFileName: "nostalgia.cube", sortOrder: 302),
         FilterPreset(id: "vhs", name: "VHS",
                      category: .vintage, lutFileName: "vhs.cube", sortOrder: 303),
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // MARK: Soft Focus
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        FilterPreset(id: "sf_muse", name: "Muse",
+                     category: .softFocus, lutFileName: "sf_muse.cube",
+                     parameters: [
+                         FilterParameter(key: "grain", value: 0.55, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "vignette", value: 0.50, minValue: 0, maxValue: 2),
+                         FilterParameter(key: "softDiffusion", value: 0.40, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "bloom", value: 0.15, minValue: 0, maxValue: 1),
+                     ], sortOrder: 400),
+        FilterPreset(id: "sf_haze", name: "Haze",
+                     category: .softFocus, lutFileName: "sf_haze.cube",
+                     parameters: [
+                         FilterParameter(key: "grain", value: 0.40, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "vignette", value: 0.35, minValue: 0, maxValue: 2),
+                         FilterParameter(key: "softDiffusion", value: 0.55, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "bloom", value: 0.25, minValue: 0, maxValue: 1),
+                     ], sortOrder: 401),
+        FilterPreset(id: "sf_matte", name: "Matte",
+                     category: .softFocus, lutFileName: "sf_matte.cube",
+                     parameters: [
+                         FilterParameter(key: "grain", value: 0.50, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "vignette", value: 0.40, minValue: 0, maxValue: 2),
+                         FilterParameter(key: "softDiffusion", value: 0.30, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "bloom", value: 0.10, minValue: 0, maxValue: 1),
+                     ], sortOrder: 402),
+        FilterPreset(id: "sf_dusk", name: "Dusk",
+                     category: .softFocus, lutFileName: "sf_dusk.cube",
+                     parameters: [
+                         FilterParameter(key: "grain", value: 0.45, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "vignette", value: 0.45, minValue: 0, maxValue: 2),
+                         FilterParameter(key: "softDiffusion", value: 0.35, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "bloom", value: 0.20, minValue: 0, maxValue: 1),
+                     ], sortOrder: 403),
+        FilterPreset(id: "sf_ivory", name: "Ivory",
+                     category: .softFocus, lutFileName: "sf_ivory.cube",
+                     parameters: [
+                         FilterParameter(key: "grain", value: 0.35, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "vignette", value: 0.30, minValue: 0, maxValue: 2),
+                         FilterParameter(key: "softDiffusion", value: 0.45, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "bloom", value: 0.30, minValue: 0, maxValue: 1),
+                     ], sortOrder: 404),
+        FilterPreset(id: "sf_noir", name: "Noir",
+                     category: .softFocus, lutFileName: "sf_noir.cube",
+                     parameters: [
+                         FilterParameter(key: "grain", value: 0.60, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "vignette", value: 0.55, minValue: 0, maxValue: 2),
+                         FilterParameter(key: "softDiffusion", value: 0.25, minValue: 0, maxValue: 1),
+                         FilterParameter(key: "bloom", value: 0.10, minValue: 0, maxValue: 1),
+                     ], sortOrder: 405),
     ]
 }
 
@@ -137,24 +184,27 @@ enum PresetCategory: String, CaseIterable, Sendable {
     case soft
     case film
     case vintage
+    case softFocus
 
-    nonisolated var displayName: String {
+    var displayName: String {
         switch self {
         case .featured: return "Destacados"
         case .cleanGirl: return "Clean Girl"
         case .soft: return "Suave"
         case .film: return "Film"
         case .vintage: return "Vintage"
+        case .softFocus: return "Soft Focus"
         }
     }
 
-    nonisolated var icon: String {
+    var icon: String {
         switch self {
         case .featured: return "star.fill"
         case .cleanGirl: return "sparkles"
         case .soft: return "cloud.fill"
         case .film: return "film"
         case .vintage: return "clock.arrow.circlepath"
+        case .softFocus: return "camera.filters"
         }
     }
 }

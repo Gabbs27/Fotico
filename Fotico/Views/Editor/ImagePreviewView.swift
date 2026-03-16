@@ -14,6 +14,7 @@ struct ImagePreviewView: View {
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
     @State private var viewSize: CGSize = .zero
+    @State private var hitBoundary = false
 
     init(ciImage: CIImage? = nil, uiImage: UIImage? = nil, isProcessing: Bool = false) {
         self.ciImage = ciImage
@@ -73,9 +74,20 @@ struct ImagePreviewView: View {
         MagnifyGesture()
             .onChanged { value in
                 let newScale = lastScale * value.magnification
-                scale = min(max(newScale, 1.0), 5.0)
+                let clamped = min(max(newScale, 1.0), 5.0)
+                // Haptic when hitting zoom boundaries
+                if (clamped == 1.0 && newScale < 1.0) || (clamped == 5.0 && newScale > 5.0) {
+                    if !hitBoundary {
+                        HapticManager.impact(.light)
+                        hitBoundary = true
+                    }
+                } else {
+                    hitBoundary = false
+                }
+                scale = clamped
             }
             .onEnded { _ in
+                hitBoundary = false
                 lastScale = scale
                 if scale <= 1.0 {
                     withAnimation(.spring(response: 0.3)) {
@@ -97,10 +109,21 @@ struct ImagePreviewView: View {
                         width: lastOffset.width + value.translation.width,
                         height: lastOffset.height + value.translation.height
                     )
-                    offset = clampedOffset(proposed, in: size)
+                    let clamped = clampedOffset(proposed, in: size)
+                    // Haptic when hitting pan boundaries
+                    if clamped.width != proposed.width || clamped.height != proposed.height {
+                        if !hitBoundary {
+                            HapticManager.impact(.light)
+                            hitBoundary = true
+                        }
+                    } else {
+                        hitBoundary = false
+                    }
+                    offset = clamped
                 }
             }
             .onEnded { _ in
+                hitBoundary = false
                 lastOffset = offset
             }
     }

@@ -30,9 +30,6 @@ struct LoginView: View {
                     request.requestedScopes = [.fullName, .email]
                 } onCompletion: { result in
                     authService.handleSignIn(result: result, modelContext: modelContext)
-                    if authService.isAuthenticated {
-                        onComplete()
-                    }
                 }
                 .signInWithAppleButtonStyle(.white)
                 .frame(height: 50)
@@ -52,5 +49,8 @@ struct LoginView: View {
             Spacer().frame(height: 40)
         }
         .background(Color.lumeDark.ignoresSafeArea())
+        .onChange(of: authService.isAuthenticated) { _, isAuth in
+            if isAuth { onComplete() }
+        }
     }
 }

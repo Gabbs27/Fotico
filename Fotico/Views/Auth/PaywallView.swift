@@ -232,7 +232,7 @@ struct PaywallView: View {
 
             Text("La suscripción se renueva automáticamente. Puedes cancelar en cualquier momento desde Ajustes.")
                 .font(.caption2)
-                .foregroundColor(.lumeTextSecondary.opacity(0.7))
+                .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
         }

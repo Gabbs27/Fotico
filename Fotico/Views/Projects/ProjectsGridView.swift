@@ -27,10 +27,10 @@ struct ProjectsGridView: View {
                             .foregroundColor(.lumeTextSecondary)
                         Text("Sin proyectos")
                             .font(.headline)
-                            .foregroundColor(.lumeTextSecondary)
+                            .foregroundColor(.white)
                         Text("Las fotos editadas aparecerán aquí")
                             .font(.subheadline)
-                            .foregroundColor(.lumeTextSecondary.opacity(0.7))
+                            .foregroundColor(.lumeTextSecondary)
                     }
                 } else {
                     ScrollView {

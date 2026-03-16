@@ -13,15 +13,17 @@ struct CategoryChipView: View {
         }) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 11))
+                    .font(.system(size: 12))
                 Text(name)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 14)
+            .frame(minHeight: 44)
             .background(isSelected ? Color.lumePrimary : Color.lumeCardBg)
             .foregroundColor(isSelected ? .black : .lumeTextSecondary)
             .cornerRadius(12)
+            .contentShape(Rectangle())
         }
+        .accessibilityLabel("\(name)\(isSelected ? ", seleccionada" : "")")
     }
 }

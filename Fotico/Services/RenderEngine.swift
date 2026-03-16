@@ -46,13 +46,14 @@ final class RenderEngine: @unchecked Sendable {
             .priorityRequestLow: false,
         ])
 
-        // Listen for memory warnings
+        // Listen for memory warnings (singleton lives forever, observer matches lifetime)
         NotificationCenter.default.addObserver(
             forName: UIApplication.didReceiveMemoryWarningNotification,
             object: nil,
             queue: .main
-        ) { [weak self] _ in
-            self?.clearCaches()
+        ) { _ in
+            // Use explicit shared reference since singleton can't be deallocated
+            RenderEngine.shared.clearCaches()
         }
     }
 

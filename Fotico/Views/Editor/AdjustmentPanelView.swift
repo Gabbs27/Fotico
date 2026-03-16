@@ -67,6 +67,27 @@ struct AdjustmentPanelView: View {
                     range: 0.0...2.0,
                     defaultValue: 0
                 )
+                adjustmentSlider(
+                    label: "Luces",
+                    icon: "sun.max.trianglebadge.exclamationmark",
+                    value: $editState.highlights,
+                    range: -1.0...1.0,
+                    defaultValue: 0
+                )
+                adjustmentSlider(
+                    label: "Sombras",
+                    icon: "moon.fill",
+                    value: $editState.shadows,
+                    range: -1.0...1.0,
+                    defaultValue: 0
+                )
+                adjustmentSlider(
+                    label: "Claridad",
+                    icon: "diamond",
+                    value: $editState.clarity,
+                    range: 0.0...2.0,
+                    defaultValue: 0
+                )
             }
             .padding()
         }
@@ -106,6 +127,8 @@ struct AdjustmentPanelView: View {
                         Image(systemName: "arrow.counterclockwise")
                             .font(.caption2)
                             .foregroundColor(Color.lumeWarning)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
                 }
             }
@@ -149,6 +172,12 @@ struct AdjustmentPanelView: View {
         case "Vibrancia", "Nitidez":
             let normalized = Int(value * 100)
             return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
+        case "Luces", "Sombras":
+            let normalized = Int(value * 100)
+            return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
+        case "Claridad":
+            let normalized = Int(value * 100)
+            return "+\(normalized)"
         default:
             let normalized = Int(value * 100)
             return normalized >= 0 ? "+\(normalized)" : "\(normalized)"

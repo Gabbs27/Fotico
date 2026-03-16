@@ -3,7 +3,6 @@ import Combine
 
 struct CameraView: View {
     @StateObject private var viewModel = CameraViewModel()
-    @ObservedObject private var subscriptionService = SubscriptionService.shared
     @Environment(\.dismiss) private var dismiss
     @State private var showPaywall = false
 
@@ -98,7 +97,7 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.4))
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Cerrar camara")
+            .accessibilityLabel("Cerrar cámara")
 
             Spacer()
 
@@ -114,7 +113,7 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.4))
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Cambiar camara")
+            .accessibilityLabel("Cambiar cámara")
         }
         .padding(.horizontal)
         .padding(.top, 8)
@@ -204,11 +203,11 @@ struct CameraView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.lumeDisabled)
 
-            Text("Acceso a la Camara")
+            Text("Acceso a la Cámara")
                 .font(.title2)
                 .foregroundColor(.white)
 
-            Text("Lumé necesita acceso a tu camara para tomar fotos con efectos vintage.")
+            Text("Lumé necesita acceso a tu cámara para tomar fotos con efectos vintage.")
                 .font(.subheadline)
                 .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
@@ -224,7 +223,7 @@ struct CameraView: View {
                     .foregroundColor(.black)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
-                    .background(Color.white)
+                    .background(Color.lumePrimary)
                     .cornerRadius(10)
             }
         }

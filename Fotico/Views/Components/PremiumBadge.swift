@@ -8,5 +8,6 @@ struct PremiumBadge: View {
             .padding(5)
             .background(Color.lumePrimary.opacity(0.9))
             .clipShape(Circle())
+            .accessibilityLabel("Contenido premium")
     }
 }

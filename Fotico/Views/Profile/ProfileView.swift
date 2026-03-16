@@ -37,7 +37,7 @@ struct ProfileView: View {
                                 Button {
                                     showLogin = true
                                 } label: {
-                                    settingsRow(icon: "person.badge.plus", title: "Iniciar sesion", color: Color.lumePrimary)
+                                    settingsRow(icon: "person.badge.plus", title: "Iniciar sesión", color: Color.lumePrimary)
                                 }
                             }
                         }
@@ -71,13 +71,13 @@ struct ProfileView: View {
                                 Button {
                                     authService.signOut()
                                 } label: {
-                                    settingsRow(icon: "rectangle.portrait.and.arrow.right", title: "Cerrar sesion", color: .red)
+                                    settingsRow(icon: "rectangle.portrait.and.arrow.right", title: "Cerrar sesión", color: .red)
                                 }
                             }
                         }
 
                         // Version
-                        Text("Lumé v2.0")
+                        Text("Lumé v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
                             .font(.caption)
                             .foregroundColor(.lumeTextSecondary)
                             .padding(.top, 16)
@@ -154,6 +154,7 @@ struct ProfileView: View {
                 .foregroundColor(.lumeTextSecondary)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
     }
 }

@@ -1,10 +1,23 @@
 import Foundation
 
-enum EffectCategory: String, CaseIterable {
+enum EffectCategory: String, CaseIterable, Sendable, Identifiable {
     case film = "Film"
     case lens = "Lente"
     case stylize = "Estilo"
     case pro = "Pro"
+    case blur = "Blur"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .film: return "Film"
+        case .lens: return "Lente"
+        case .stylize: return "Estilo"
+        case .pro: return "Pro"
+        case .blur: return "Blur"
+        }
+    }
 
     var icon: String {
         switch self {
@@ -12,6 +25,7 @@ enum EffectCategory: String, CaseIterable {
         case .lens: return "camera.filters"
         case .stylize: return "paintbrush.pointed"
         case .pro: return "star.fill"
+        case .blur: return "aqi.low"
         }
     }
 }
@@ -26,17 +40,20 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
     case fisheye
     case threshold
 
-    // New pro effects
+    // Pro effects
     case dust
     case halation
     case chromaticAberration
     case filmBurn
     case softDiffusion
     case letterbox
+    case motionBlur
+    case filmBlur
+    case lowRes
 
-    nonisolated var id: String { rawValue }
+    var id: String { rawValue }
 
-    nonisolated var displayName: String {
+    var displayName: String {
         switch self {
         case .grain: return "Grano"
         case .lightLeak: return "Fuga de Luz"
@@ -52,10 +69,13 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
         case .filmBurn: return "Quemadura"
         case .softDiffusion: return "Difusión"
         case .letterbox: return "Cinemascope"
+        case .motionBlur: return "Motion Blur"
+        case .filmBlur: return "Film Blur"
+        case .lowRes: return "Low-Res"
         }
     }
 
-    nonisolated var icon: String {
+    var icon: String {
         switch self {
         case .grain: return "circle.dotted"
         case .lightLeak: return "sun.max.fill"
@@ -71,15 +91,19 @@ enum EffectType: String, CaseIterable, Sendable, Identifiable {
         case .filmBurn: return "flame.fill"
         case .softDiffusion: return "drop.fill"
         case .letterbox: return "rectangle.expand.vertical"
+        case .motionBlur: return "lines.measurement.horizontal"
+        case .filmBlur: return "aqi.medium"
+        case .lowRes: return "square.resize.down"
         }
     }
 
-    nonisolated var category: EffectCategory {
+    var category: EffectCategory {
         switch self {
         case .grain, .dust, .halation, .filmBurn: return .film
         case .bloom, .softDiffusion, .chromaticAberration, .fisheye: return .lens
-        case .solarize, .glitch, .threshold, .letterbox: return .stylize
+        case .solarize, .glitch, .threshold, .letterbox, .lowRes: return .stylize
         case .vignette, .lightLeak: return .pro
+        case .motionBlur, .filmBlur: return .blur
         }
     }
 }

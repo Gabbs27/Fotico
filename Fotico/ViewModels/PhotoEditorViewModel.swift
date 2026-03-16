@@ -15,6 +15,14 @@ class PhotoEditorViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var exportSuccess = false
     @Published var showSaveProjectSheet = false
+    @Published var isMaskPainting: Bool = false
+    @Published var maskBrushMode: MaskBrushMode = .brush
+    @Published var maskBrushSize: CGFloat = 40.0
+
+    enum MaskBrushMode {
+        case brush   // paints white (apply effect)
+        case eraser  // paints black (remove effect)
+    }
 
     // Separate filter service per queue — CIFilter is NOT thread-safe
     private let filterService = ImageFilterService()       // For renderQueue only
@@ -29,6 +37,7 @@ class PhotoEditorViewModel: ObservableObject {
     private var renderGeneration = 0  // Incremented on clearImage to invalidate in-flight renders
     private let renderQueue = DispatchQueue(label: "com.lume.render", qos: .userInteractive)
     private let exportQueue = DispatchQueue(label: "com.lume.export", qos: .userInitiated)
+    private var thumbnailTask: Task<Void, Never>?
 
     // Undo/Redo
     private var undoStack: [EditState] = []
@@ -166,6 +175,9 @@ class PhotoEditorViewModel: ObservableObject {
         case .filmBurn: editState.filmBurnIntensity = intensity
         case .softDiffusion: editState.softDiffusionIntensity = intensity
         case .letterbox: editState.letterboxIntensity = intensity
+        case .motionBlur: editState.motionBlurIntensity = intensity
+        case .filmBlur: editState.filmBlurIntensity = intensity
+        case .lowRes: editState.lowResIntensity = intensity
         }
         requestRender()
     }
@@ -186,6 +198,9 @@ class PhotoEditorViewModel: ObservableObject {
         case .filmBurn: return editState.filmBurnIntensity
         case .softDiffusion: return editState.softDiffusionIntensity
         case .letterbox: return editState.letterboxIntensity
+        case .motionBlur: return editState.motionBlurIntensity
+        case .filmBlur: return editState.filmBlurIntensity
+        case .lowRes: return editState.lowResIntensity
         }
     }
 
@@ -207,6 +222,71 @@ class PhotoEditorViewModel: ObservableObject {
     }
 
     func commitOverlayChange() {
+        pushUndo()
+    }
+
+    // MARK: - Motion Blur Mask
+
+    func updateMotionBlurAngle(_ angle: Double) {
+        pushUndo()
+        editState.motionBlurAngle = angle
+        requestRender()
+    }
+
+    func toggleMotionBlurMask() {
+        pushUndo()
+        editState.motionBlurMaskEnabled.toggle()
+        requestRender()
+    }
+
+    func updateMotionBlurMask(_ maskData: Data?) {
+        editState.motionBlurMask = maskData
+        requestRender()
+    }
+
+    func toggleMotionBlurMaskInvert() {
+        pushUndo()
+        editState.motionBlurMaskInverted.toggle()
+        requestRender()
+    }
+
+    func clearMotionBlurMask() {
+        pushUndo()
+        editState.motionBlurMask = nil
+        editState.motionBlurMaskEnabled = false
+        editState.motionBlurMaskInverted = false
+        requestRender()
+    }
+
+    var proxyImageSize: CGSize {
+        guard let proxy = proxyCIImage else {
+            return editedCIImage?.extent.size ?? .zero
+        }
+        return proxy.extent.size
+    }
+
+    // MARK: - Text Layers
+
+    func addTextLayer() {
+        pushUndo()
+        let layer = TextLayer(id: UUID().uuidString)
+        editState.textLayers.append(layer)
+        requestRender()
+    }
+
+    func updateTextLayer(_ layer: TextLayer) {
+        guard let index = editState.textLayers.firstIndex(where: { $0.id == layer.id }) else { return }
+        editState.textLayers[index] = layer
+        requestRender()
+    }
+
+    func removeTextLayer(_ layerId: String) {
+        pushUndo()
+        editState.textLayers.removeAll { $0.id == layerId }
+        requestRender()
+    }
+
+    func commitTextChange() {
         pushUndo()
     }
 
@@ -287,18 +367,16 @@ class PhotoEditorViewModel: ObservableObject {
         guard let ciImage = originalCIImage else { return }
         let allPresets = FilterPreset.allPresets
 
-        Task {
+        thumbnailTask?.cancel()
+        thumbnailTask = Task { [weak self] in
             let thumbnails = await withCheckedContinuation { (continuation: CheckedContinuation<[String: UIImage], Never>) in
                 let thumbnailSize = CGSize(width: 80, height: 80)
-                // Use thread-safe wrapper to collect results
                 let collector = ThumbnailCollector()
                 let group = DispatchGroup()
 
                 for preset in allPresets {
                     group.enter()
                     DispatchQueue.global(qos: .utility).async {
-                        // Each thread gets its own ImageFilterService instance
-                        // because CIFilter is NOT thread-safe
                         let threadService = ImageFilterService()
                         if let thumbnail = threadService.generateThumbnail(
                             from: ciImage,
@@ -315,7 +393,8 @@ class PhotoEditorViewModel: ObservableObject {
                     continuation.resume(returning: collector.results)
                 }
             }
-            self.presetThumbnails = thumbnails
+            guard !Task.isCancelled else { return }
+            self?.presetThumbnails = thumbnails
         }
     }
 
@@ -364,10 +443,25 @@ class PhotoEditorViewModel: ObservableObject {
 
     func saveAsProject(name: String, modelContext: ModelContext) {
         guard let image = originalImage else { return }
-        let vm = ProjectsViewModel()
-        vm.setModelContext(modelContext)
-        vm.saveProject(name: name, image: image, editState: editState)
-        HapticManager.notification(.success)
+
+        let projectId = UUID().uuidString
+        guard let imagePath = ProjectStorageService.shared.saveOriginalImage(image, projectId: projectId) else {
+            errorMessage = "No se pudo guardar la imagen"
+            return
+        }
+        guard let editStateData = try? JSONEncoder().encode(editState) else {
+            errorMessage = "No se pudo guardar el estado de edición"
+            return
+        }
+        let project = PhotoProject(name: name, originalImagePath: imagePath, editStateData: editStateData)
+        project.thumbnailData = ProjectStorageService.shared.generateThumbnail(image)
+        modelContext.insert(project)
+        do {
+            try modelContext.save()
+            HapticManager.notification(.success)
+        } catch {
+            errorMessage = "Error al guardar el proyecto"
+        }
     }
 
     // MARK: - Undo/Redo
@@ -413,6 +507,10 @@ class PhotoEditorViewModel: ObservableObject {
 
     func clearImage() {
         renderGeneration += 1  // Invalidate any in-flight renders
+        isRendering = false
+        pendingRender = false
+        thumbnailTask?.cancel()
+        thumbnailTask = nil
         originalImage = nil
         editedImage = nil
         editedCIImage = nil
@@ -452,24 +550,33 @@ enum EditorTool: String, CaseIterable, Sendable {
     case effects
     case overlays
     case crop
+    case colorTone
+    case hsl
+    case text
 
-    nonisolated var displayName: String {
+    var displayName: String {
         switch self {
         case .presets: return "Filtros"
         case .adjust: return "Ajustes"
         case .effects: return "Efectos"
         case .overlays: return "Texturas"
         case .crop: return "Rotar"
+        case .colorTone: return "Tono"
+        case .hsl: return "HSL"
+        case .text: return "Texto"
         }
     }
 
-    nonisolated var icon: String {
+    var icon: String {
         switch self {
         case .presets: return "camera.filters"
         case .adjust: return "slider.horizontal.3"
         case .effects: return "sparkles"
         case .overlays: return "square.on.square"
         case .crop: return "crop"
+        case .colorTone: return "circle.lefthalf.filled"
+        case .hsl: return "circle.hexagongrid"
+        case .text: return "textformat"
         }
     }
 }

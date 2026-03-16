@@ -51,6 +51,8 @@ struct EffectsPanelView: View {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.caption)
                                     .foregroundColor(Color.lumeWarning)
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
                             }
                         }
                     }
@@ -68,6 +70,97 @@ struct EffectsPanelView: View {
                     .padding(.horizontal)
                 }
                 .padding(.top, 8)
+            }
+
+            // Motion Blur extra controls
+            if selectedEffect == .motionBlur {
+                VStack(spacing: 12) {
+                    // Direction slider
+                    HStack {
+                        Text("Dirección")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text("\(Int(editorVM.editState.motionBlurAngle))°")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: Binding(
+                        get: { editorVM.editState.motionBlurAngle },
+                        set: { editorVM.updateMotionBlurAngle($0) }
+                    ), in: 0...360, step: 1)
+                    .tint(.primary)
+
+                    // Mask controls row
+                    HStack(spacing: 12) {
+                        Button {
+                            editorVM.toggleMotionBlurMask()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: editorVM.editState.motionBlurMaskEnabled ? "paintbrush.fill" : "paintbrush")
+                                Text(editorVM.editState.motionBlurMaskEnabled ? "MASK: ON" : "MASK: OFF")
+                                    .font(.caption.weight(.semibold))
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(editorVM.editState.motionBlurMaskEnabled ? Color.primary : Color.clear)
+                            .foregroundStyle(editorVM.editState.motionBlurMaskEnabled ? Color(UIColor.systemBackground) : .primary)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.primary.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+
+                        if editorVM.editState.motionBlurMaskEnabled {
+                            Button {
+                                editorVM.maskBrushMode = editorVM.maskBrushMode == .brush ? .eraser : .brush
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: editorVM.maskBrushMode == .brush ? "paintbrush.pointed.fill" : "eraser.fill")
+                                    Text(editorVM.maskBrushMode == .brush ? "Pincel" : "Borrar")
+                                        .font(.caption.weight(.medium))
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color.primary.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            }
+
+                            // In/Out toggle — controls whether blur applies inside or outside painted area
+                            Button {
+                                editorVM.toggleMotionBlurMaskInvert()
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: editorVM.editState.motionBlurMaskInverted ? "rectangle.dashed.badge.record" : "rectangle.inset.filled")
+                                    Text(editorVM.editState.motionBlurMaskInverted ? "Out" : "In")
+                                        .font(.caption.weight(.medium))
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(editorVM.editState.motionBlurMaskInverted ? Color.orange.opacity(0.2) : Color.primary.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            }
+                        }
+
+                        Spacer()
+                    }
+
+                    if editorVM.editState.motionBlurMaskEnabled {
+                        HStack {
+                            Text("Tamaño")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Slider(value: $editorVM.maskBrushSize, in: 10...100, step: 1)
+                                .tint(.primary)
+                            Text("\(Int(editorVM.maskBrushSize))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .frame(width: 30)
+                        }
+                    }
+                }
+                .padding(.horizontal)
             }
 
             // Effect grid
@@ -102,7 +195,7 @@ struct EffectsPanelView: View {
             VStack(spacing: 8) {
                 Image(systemName: effect.icon)
                     .font(.title2)
-                    .foregroundColor(isActive ? Color.lumePrimary : .lumeDisabled)
+                    .foregroundColor(isActive ? Color.lumePrimary : .lumeTextSecondary)
                     .frame(width: 56, height: 56)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
@@ -115,7 +208,7 @@ struct EffectsPanelView: View {
 
                 Text(effect.displayName)
                     .font(.caption2)
-                    .foregroundColor(isActive ? Color.lumePrimary : .lumeDisabled)
+                    .foregroundColor(isActive ? Color.lumePrimary : .lumeTextSecondary)
                     .lineLimit(1)
             }
             .accessibilityLabel(effect.displayName)

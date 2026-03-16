@@ -20,15 +20,15 @@ class CameraViewModel: ObservableObject {
     @Published var toolbarBloomOn: Bool = false
     @Published var selectedToolbarTab: CameraToolbarTab? = nil
 
-    let cameraService = CameraService()
+    private(set) var cameraService = CameraService()
 
     private let ciContext: CIContext
     private let processingQueue = DispatchQueue(label: "com.lume.processing", qos: .userInitiated)
     private var previewCancellable: AnyCancellable?
 
-    // Semaphore-based frame dropping: if GPU is busy, drop the frame.
-    // Value of 1 = at most one preview frame being processed at a time.
-    private let frameSemaphore = DispatchSemaphore(value: 1)
+    // Frame dropping: if still processing previous frame, drop the new one.
+    // Bool flag is safe because check-and-set happens on @MainActor (single-threaded).
+    private var isProcessingFrame = false
 
     init() {
         self.ciContext = RenderEngine.shared.cameraContext
@@ -55,16 +55,15 @@ class CameraViewModel: ObservableObject {
         cameraService.stopSession()
     }
 
-    // MARK: - Live Preview Processing (semaphore-gated)
+    // MARK: - Live Preview Processing (frame-gated)
     //
-    // Uses semaphore instead of frame skip counter:
-    // - If processing slot is free -> process this frame
-    // - If still processing previous frame -> drop this frame
+    // If processing slot is free -> process this frame
+    // If still processing previous frame -> drop this frame
     // This adapts to GPU speed: fast GPU = no drops, slow GPU = drops excess frames.
 
     private func processPreviewFrame(_ ciImage: CIImage) {
-        // Non-blocking check: if already processing, drop this frame
-        guard frameSemaphore.wait(timeout: .now()) == .success else { return }
+        guard !isProcessingFrame else { return }
+        isProcessingFrame = true
 
         let cameraType = selectedCameraType
         let extraGrain = grainLevel
@@ -72,13 +71,7 @@ class CameraViewModel: ObservableObject {
         let fxVignette = toolbarVignetteOn
         let fxBloom = toolbarBloomOn
 
-        let semaphore = frameSemaphore  // Capture before weak self
         processingQueue.async { [weak self] in
-            guard let self else {
-                semaphore.signal()  // Signal even if self is deallocated
-                return
-            }
-
             var result = ciImage
 
             // Downscale preview for faster processing
@@ -117,13 +110,13 @@ class CameraViewModel: ObservableObject {
                 result = CameraFilters.addLightLeak(to: result, intensity: CameraFilters.lightLeakIntensity)
             }
 
-            // Pass CIImage directly -- MetalImageView will render it on GPU
-            // No createCGImage needed!
             let finalImage = result
 
+            // Signal slot free BEFORE dispatching to main — don't hold the slot
+            // while waiting for the main queue to schedule.
             DispatchQueue.main.async { [weak self] in
                 self?.processedPreviewCIImage = finalImage
-                semaphore.signal()  // Use captured semaphore, not self?.frameSemaphore
+                self?.isProcessingFrame = false
             }
         }
     }

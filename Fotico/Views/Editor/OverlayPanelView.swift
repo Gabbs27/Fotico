@@ -71,12 +71,12 @@ struct OverlayPanelView: View {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 8)
                                         .fill(Color.lumeSurface)
-                                        .frame(width: 72, height: 72)
+                                        .frame(width: 88, height: 88)
 
                                     Image(overlay.fileName)
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
-                                        .frame(width: 72, height: 72)
+                                        .frame(width: 88, height: 88)
                                         .cornerRadius(8)
                                         .clipped()
                                 }
@@ -108,7 +108,7 @@ struct OverlayPanelView: View {
             VStack(spacing: 6) {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.lumeSurface)
-                    .frame(width: 72, height: 72)
+                    .frame(width: 88, height: 88)
                     .overlay(
                         Image(systemName: icon)
                             .foregroundColor(.lumeTextSecondary)

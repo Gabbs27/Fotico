@@ -1,22 +1,20 @@
 import UIKit
 import CoreImage
 import CoreImage.CIFilterBuiltins
-import Combine
 
 /// Image filter pipeline using CIFilter chains for presets, adjustments, and effects.
 /// Uses shared RenderEngine for GPU-accelerated rendering.
 ///
-/// ⚠️ NOT thread-safe internally — CIFilter instances are mutable and reused.
-/// Create ONE instance per serial DispatchQueue. Do NOT share across concurrent queues.
-/// Marked @unchecked Sendable to allow capture in DispatchQueue closures — the caller
-/// is responsible for ensuring single-queue access.
+/// ⚠️ NOT thread-safe — create ONE instance per serial DispatchQueue.
+/// Marked @unchecked Sendable to allow capture in DispatchQueue.async closures.
+/// Callers MUST ensure single-queue access (e.g. one instance per DispatchQueue).
 ///
 /// Performance optimizations:
 /// - CIFilter instances cached and reused within one instance
 /// - Identity filters skipped (no work for default parameter values)
 /// - Color adjustments ordered first for kernel fusion (single GPU pass)
 /// - Shared CIContext from RenderEngine (avoids ~50-100ms context creation)
-class ImageFilterService: @unchecked Sendable {
+final class ImageFilterService: @unchecked Sendable {
     private let context: CIContext
 
     // MARK: - CIFilter instances (per-instance, NOT shared across threads)
@@ -31,6 +29,12 @@ class ImageFilterService: @unchecked Sendable {
     private let dissolveFilter = CIFilter(name: "CIDissolveTransition")!
     private let noiseFilter = CIFilter(name: "CIRandomGenerator")!
     private let colorMatrixFilter = CIFilter(name: "CIColorMatrix")!
+    private let highlightShadowFilter = CIFilter(name: "CIHighlightShadowAdjust")!
+    private let clarityFilter = CIFilter(name: "CIUnsharpMask")!
+    private let motionBlurFilter = CIFilter(name: "CIMotionBlur")!
+    private let gaussianBlurFilter = CIFilter(name: "CIGaussianBlur")!
+    private let pixellateFilter = CIFilter(name: "CIPixellate")!
+    private let posterizeFilter = CIFilter(name: "CIColorPosterize")!
     private let addCompFilter = CIFilter(name: "CIAdditionCompositing")!
 
     // Preset filter cache: [filterName: CIFilter]
@@ -41,6 +45,9 @@ class ImageFilterService: @unchecked Sendable {
         guard let dustImage = UIImage(named: "dust_01") else { return nil }
         return CIImage(image: dustImage)
     }()
+
+    // Cached overlay CIImages (loaded once per overlay ID, reused per render)
+    private var overlayCIImageCache: [String: CIImage] = [:]
 
     init() {
         self.context = RenderEngine.shared.context
@@ -95,6 +102,11 @@ class ImageFilterService: @unchecked Sendable {
         // 5.5. Apply overlay (texture compositing)
         if let overlayId = state.overlayId {
             image = applyOverlay(overlayId, to: image, intensity: state.overlayIntensity)
+        }
+
+        // 5.6. Apply text layers
+        if !state.textLayers.isEmpty {
+            image = applyTextLayers(state.textLayers, to: image)
         }
 
         // 6. Safety: ensure the result has a finite extent (CIRandomGenerator etc. produce infinite)
@@ -244,6 +256,139 @@ class ImageFilterService: @unchecked Sendable {
             result = sharpenFilter.outputImage ?? result
         }
 
+        // Highlights & Shadows
+        if state.highlights != 0 || state.shadows != 0 {
+            highlightShadowFilter.setValue(result, forKey: kCIInputImageKey)
+            highlightShadowFilter.setValue(state.highlights, forKey: "inputHighlightAmount")
+            highlightShadowFilter.setValue(state.shadows, forKey: "inputShadowAmount")
+            result = highlightShadowFilter.outputImage ?? result
+        }
+
+        // Clarity (local contrast via unsharp mask with large radius)
+        if state.clarity > 0 {
+            let extent = result.extent
+            let maxDim = max(extent.width, extent.height)
+            clarityFilter.setValue(result, forKey: kCIInputImageKey)
+            clarityFilter.setValue((maxDim / 1200.0) * 15.0, forKey: kCIInputRadiusKey)
+            clarityFilter.setValue(state.clarity * 0.5, forKey: kCIInputIntensityKey)
+            result = clarityFilter.outputImage ?? result
+        }
+
+        // Color Tone (Split Toning)
+        result = applyColorTone(to: result, state: state)
+
+        // HSL per-color adjustments
+        result = applyHSLAdjustments(to: result, adjustments: state.hslAdjustments)
+
+        return result
+    }
+
+    // MARK: - Color Tone (Split Toning)
+
+    private func applyColorTone(to image: CIImage, state: EditState) -> CIImage {
+        let hasShadowTone = state.shadowToneSaturation > 0
+        let hasHighlightTone = state.highlightToneSaturation > 0
+        guard hasShadowTone || hasHighlightTone else { return image }
+
+        var result = image
+        let extent = image.extent
+
+        if hasShadowTone {
+            let h = state.shadowToneHue
+            let s = state.shadowToneSaturation
+            let (r, g, b) = hsbToRGB(h: h, s: s, b: 0.3)
+
+            let colorGen = CIFilter(name: "CIConstantColorGenerator")!
+            colorGen.setValue(CIColor(red: r, green: g, blue: b, alpha: 1), forKey: kCIInputColorKey)
+            guard let tintImage = colorGen.outputImage?.cropped(to: extent) else { return result }
+
+            let multiply = CIFilter(name: "CIMultiplyBlendMode")!
+            multiply.setValue(tintImage, forKey: kCIInputImageKey)
+            multiply.setValue(result, forKey: kCIInputBackgroundImageKey)
+            if let multiplied = multiply.outputImage?.cropped(to: extent) {
+                result = blendImages(original: result, filtered: multiplied, intensity: s * 0.4)
+            }
+        }
+
+        if hasHighlightTone {
+            let h = state.highlightToneHue
+            let s = state.highlightToneSaturation
+            let (r, g, b) = hsbToRGB(h: h, s: s, b: 0.9)
+
+            let colorGen = CIFilter(name: "CIConstantColorGenerator")!
+            colorGen.setValue(CIColor(red: r, green: g, blue: b, alpha: 1), forKey: kCIInputColorKey)
+            guard let tintImage = colorGen.outputImage?.cropped(to: extent) else { return result }
+
+            let screen = CIFilter(name: "CIScreenBlendMode")!
+            screen.setValue(tintImage, forKey: kCIInputImageKey)
+            screen.setValue(result, forKey: kCIInputBackgroundImageKey)
+            if let screened = screen.outputImage?.cropped(to: extent) {
+                result = blendImages(original: result, filtered: screened, intensity: s * 0.3)
+            }
+        }
+
+        return result
+    }
+
+    private func hsbToRGB(h: Double, s: Double, b: Double) -> (CGFloat, CGFloat, CGFloat) {
+        let c = b * s
+        let x = c * (1 - abs((h * 6).truncatingRemainder(dividingBy: 2) - 1))
+        let m = b - c
+        let (r1, g1, b1): (Double, Double, Double)
+        switch Int(h * 6) % 6 {
+        case 0: (r1, g1, b1) = (c, x, 0)
+        case 1: (r1, g1, b1) = (x, c, 0)
+        case 2: (r1, g1, b1) = (0, c, x)
+        case 3: (r1, g1, b1) = (0, x, c)
+        case 4: (r1, g1, b1) = (x, 0, c)
+        default: (r1, g1, b1) = (c, 0, x)
+        }
+        return (CGFloat(r1 + m), CGFloat(g1 + m), CGFloat(b1 + m))
+    }
+
+    // MARK: - HSL Adjustments
+
+    private func applyHSLAdjustments(to image: CIImage, adjustments: [String: HSLAdjustment]) -> CIImage {
+        guard !adjustments.isEmpty else { return image }
+
+        var result = image
+
+        for (colorKey, adj) in adjustments {
+            guard let _ = HSLColorRange(rawValue: colorKey) else { continue }
+            if adj.isDefault { continue }
+
+            // Apply per-color adjustments using CIFilter-based approach
+            if adj.saturation != 0 {
+                let factor = 1.0 + adj.saturation * 0.3
+                let satFilter = CIFilter(name: "CIColorControls")!
+                satFilter.setValue(result, forKey: kCIInputImageKey)
+                satFilter.setValue(factor, forKey: kCIInputSaturationKey)
+                satFilter.setValue(0.0, forKey: kCIInputBrightnessKey)
+                satFilter.setValue(1.0, forKey: kCIInputContrastKey)
+                if let adjusted = satFilter.outputImage {
+                    result = blendImages(original: result, filtered: adjusted, intensity: abs(adj.saturation) * 0.15)
+                }
+            }
+
+            if adj.luminance != 0 {
+                let expFilter = CIFilter(name: "CIExposureAdjust")!
+                expFilter.setValue(result, forKey: kCIInputImageKey)
+                expFilter.setValue(adj.luminance * 0.3, forKey: kCIInputEVKey)
+                if let adjusted = expFilter.outputImage {
+                    result = blendImages(original: result, filtered: adjusted, intensity: abs(adj.luminance) * 0.15)
+                }
+            }
+
+            if adj.hue != 0 {
+                let hueFilter = CIFilter(name: "CIHueAdjust")!
+                hueFilter.setValue(result, forKey: kCIInputImageKey)
+                hueFilter.setValue(adj.hue * .pi, forKey: kCIInputAngleKey)
+                if let adjusted = hueFilter.outputImage {
+                    result = blendImages(original: result, filtered: adjusted, intensity: abs(adj.hue) * 0.3)
+                }
+            }
+        }
+
         return result
     }
 
@@ -252,6 +397,9 @@ class ImageFilterService: @unchecked Sendable {
     func applyEffects(_ state: EditState, to image: CIImage) -> CIImage {
         var result = image
         let sourceExtent = image.extent
+
+        // Motion Blur (with optional mask)
+        result = applyMotionBlur(to: result, state: state)
 
         if state.vignetteIntensity > 0 {
             vignetteFilter.setValue(result, forKey: kCIInputImageKey)
@@ -324,6 +472,14 @@ class ImageFilterService: @unchecked Sendable {
             result = applyDust(to: result, intensity: state.dustIntensity)
         }
 
+        if state.filmBlurIntensity > 0 {
+            result = applyFilmBlur(to: result, intensity: state.filmBlurIntensity)
+        }
+
+        if state.lowResIntensity > 0 {
+            result = applyLowRes(to: result, intensity: state.lowResIntensity)
+        }
+
         if state.letterboxIntensity > 0 {
             result = applyLetterbox(to: result, intensity: state.letterboxIntensity)
         }
@@ -334,6 +490,99 @@ class ImageFilterService: @unchecked Sendable {
         }
 
         return result
+    }
+
+    // MARK: - Motion Blur
+
+    private func applyMotionBlur(to image: CIImage, state: EditState) -> CIImage {
+        guard state.motionBlurIntensity > 0 else { return image }
+
+        let angleRadians = state.motionBlurAngle * .pi / 180.0
+        let maxDim = max(image.extent.width, image.extent.height)
+        let maxRadius = maxDim * 0.03
+        let radius = state.motionBlurIntensity * maxRadius
+
+        motionBlurFilter.setValue(image, forKey: kCIInputImageKey)
+        motionBlurFilter.setValue(radius, forKey: kCIInputRadiusKey)
+        motionBlurFilter.setValue(angleRadians, forKey: kCIInputAngleKey)
+
+        guard let blurred = motionBlurFilter.outputImage else { return image }
+
+        // If mask is enabled and exists, composite using mask
+        if state.motionBlurMaskEnabled, let maskData = state.motionBlurMask,
+           let maskUIImage = UIImage(data: maskData),
+           let maskCGImage = maskUIImage.cgImage {
+
+            let maskCI = CIImage(cgImage: maskCGImage)
+
+            // Feather the mask edges with gaussian blur
+            let featheredMask: CIImage
+            if let blurFilter = CIFilter(name: "CIGaussianBlur") {
+                blurFilter.setValue(maskCI, forKey: kCIInputImageKey)
+                blurFilter.setValue(4.0, forKey: kCIInputRadiusKey)
+                featheredMask = blurFilter.outputImage?.cropped(to: maskCI.extent) ?? maskCI
+            } else {
+                featheredMask = maskCI
+            }
+
+            // Invert mask if "Out" mode — blur outside the painted area instead of inside
+            let finalMask: CIImage
+            if state.motionBlurMaskInverted {
+                let invertFilter = CIFilter(name: "CIColorInvert")!
+                invertFilter.setValue(featheredMask, forKey: kCIInputImageKey)
+                finalMask = invertFilter.outputImage?.cropped(to: featheredMask.extent) ?? featheredMask
+            } else {
+                finalMask = featheredMask
+            }
+
+            // CIBlendWithMask: inputImage shows where mask is white, backgroundImage where mask is black
+            if let blendFilter = CIFilter(name: "CIBlendWithMask") {
+                blendFilter.setValue(blurred.cropped(to: image.extent), forKey: kCIInputImageKey)
+                blendFilter.setValue(image, forKey: kCIInputBackgroundImageKey)
+                blendFilter.setValue(finalMask, forKey: kCIInputMaskImageKey)
+                if let result = blendFilter.outputImage {
+                    return result.cropped(to: image.extent)
+                }
+            }
+        }
+
+        // No mask — blend at intensity
+        return blendImages(original: image, filtered: blurred.cropped(to: image.extent), intensity: state.motionBlurIntensity)
+    }
+
+    // MARK: - Film Blur
+
+    private func applyFilmBlur(to image: CIImage, intensity: Double) -> CIImage {
+        let extent = image.extent
+        let maxDim = max(extent.width, extent.height)
+        let radius = (maxDim / 1200.0) * (2.0 + intensity * 6.0)
+
+        gaussianBlurFilter.setValue(image, forKey: kCIInputImageKey)
+        gaussianBlurFilter.setValue(radius, forKey: kCIInputRadiusKey)
+        guard let blurred = gaussianBlurFilter.outputImage?.cropped(to: extent) else { return image }
+
+        return blendImages(original: image, filtered: blurred, intensity: intensity * 0.7)
+    }
+
+    // MARK: - Low-Res
+
+    private func applyLowRes(to image: CIImage, intensity: Double) -> CIImage {
+        let extent = image.extent
+        let maxDim = max(extent.width, extent.height)
+
+        let pixelSize = (maxDim / 1200.0) * (4.0 + intensity * 20.0)
+        pixellateFilter.setValue(image, forKey: kCIInputImageKey)
+        pixellateFilter.setValue(pixelSize, forKey: kCIInputScaleKey)
+        let center = CIVector(x: extent.midX, y: extent.midY)
+        pixellateFilter.setValue(center, forKey: kCIInputCenterKey)
+        guard let pixellated = pixellateFilter.outputImage else { return image }
+
+        let levels = max(6.0, 30.0 - intensity * 24.0)
+        posterizeFilter.setValue(pixellated, forKey: kCIInputImageKey)
+        posterizeFilter.setValue(levels, forKey: "inputLevels")
+        let posterized = posterizeFilter.outputImage?.cropped(to: extent) ?? pixellated.cropped(to: extent)
+
+        return blendImages(original: image, filtered: posterized, intensity: intensity)
     }
 
     // MARK: - Glitch
@@ -713,6 +962,79 @@ class ImageFilterService: @unchecked Sendable {
         return dissolveFilter.outputImage ?? filtered
     }
 
+    // MARK: - Text Layers
+
+    func applyTextLayers(_ layers: [TextLayer], to image: CIImage) -> CIImage {
+        guard !layers.isEmpty else { return image }
+
+        let extent = image.extent
+
+        // Create CGContext to draw text
+        let width = Int(extent.width)
+        let height = Int(extent.height)
+        guard let cgContext = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: width * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return image }
+
+        // Flip coordinates (CGContext is bottom-left origin)
+        cgContext.translateBy(x: 0, y: CGFloat(height))
+        cgContext.scaleBy(x: 1, y: -1)
+
+        for layer in layers {
+            let fontSize = CGFloat(24 * layer.scale) * (CGFloat(width) / 390.0) // Scale relative to phone width
+            let font: UIFont
+            switch layer.style {
+            case .minimal:
+                font = UIFont.systemFont(ofSize: fontSize, weight: .light)
+            case .editorial:
+                font = UIFont.systemFont(ofSize: fontSize, weight: .bold)
+            case .mono:
+                font = UIFont.monospacedSystemFont(ofSize: fontSize, weight: .medium)
+            case .analog:
+                font = UIFont.italicSystemFont(ofSize: fontSize)
+            }
+
+            let (r, g, b) = layer.color.uiColor
+            let color = UIColor(red: r, green: g, blue: b, alpha: 1.0)
+
+            let text = layer.style == .editorial ? layer.text.uppercased() : layer.text
+
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: color
+            ]
+
+            if layer.style == .editorial {
+                // Add tracking for editorial style
+                let mutableAttrs = NSMutableDictionary(dictionary: attributes)
+                mutableAttrs[NSAttributedString.Key.kern] = fontSize * 0.1
+            }
+
+            let nsString = text as NSString
+            let textSize = nsString.size(withAttributes: attributes)
+
+            let x = CGFloat(layer.positionX) * CGFloat(width) - textSize.width / 2
+            let y = CGFloat(layer.positionY) * CGFloat(height) - textSize.height / 2
+
+            nsString.draw(at: CGPoint(x: x, y: y), withAttributes: attributes)
+        }
+
+        guard let cgImage = cgContext.makeImage() else { return image }
+        let textCIImage = CIImage(cgImage: cgImage)
+
+        // Composite text over image
+        let composite = CIFilter(name: "CISourceOverCompositing")!
+        composite.setValue(textCIImage, forKey: kCIInputImageKey)
+        composite.setValue(image, forKey: kCIInputBackgroundImageKey)
+        return composite.outputImage?.cropped(to: extent) ?? image
+    }
+
     // MARK: - Rendering
 
     func renderToUIImage(_ ciImage: CIImage) -> UIImage? {
@@ -738,10 +1060,19 @@ class ImageFilterService: @unchecked Sendable {
 
     /// Composites a texture overlay PNG over the image with adjustable opacity.
     /// Uses CISourceOverCompositing for GPU-accelerated compositing.
+    /// Overlay CIImages are cached after first load to avoid per-frame UIImage→CIImage conversion.
     func applyOverlay(_ overlayId: String, to image: CIImage, intensity: Double) -> CIImage {
-        guard let asset = OverlayAsset.allOverlays.first(where: { $0.id == overlayId }),
-              let overlayUIImage = UIImage(named: asset.fileName),
-              var overlayCIImage = CIImage(image: overlayUIImage) else { return image }
+        // Use cached CIImage or load and cache on first access
+        var overlayCIImage: CIImage
+        if let cached = overlayCIImageCache[overlayId] {
+            overlayCIImage = cached
+        } else {
+            guard let asset = OverlayAsset.allOverlays.first(where: { $0.id == overlayId }),
+                  let overlayUIImage = UIImage(named: asset.fileName),
+                  let ciImage = CIImage(image: overlayUIImage) else { return image }
+            overlayCIImageCache[overlayId] = ciImage
+            overlayCIImage = ciImage
+        }
 
         let extent = image.extent
 

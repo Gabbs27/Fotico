@@ -26,22 +26,6 @@ extension UIImage {
         }
     }
 
-    func resized(to targetSize: CGSize) -> UIImage? {
-        let renderer = UIGraphicsImageRenderer(size: targetSize)
-        return renderer.image { _ in
-            self.draw(in: CGRect(origin: .zero, size: targetSize))
-        }
-    }
-
-    func aspectFitSize(in boundingSize: CGSize) -> CGSize {
-        let widthRatio = boundingSize.width / size.width
-        let heightRatio = boundingSize.height / size.height
-        let scale = min(widthRatio, heightRatio)
-        return CGSize(
-            width: size.width * scale,
-            height: size.height * scale
-        )
-    }
 }
 
 extension CIImage {

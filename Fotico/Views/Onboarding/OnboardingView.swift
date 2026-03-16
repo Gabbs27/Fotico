@@ -15,6 +15,28 @@ struct OnboardingView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
+
+            // Skip button (top-right, visible on pages 0-1)
+            VStack {
+                HStack {
+                    Spacer()
+                    if currentPage < 2 {
+                        Button {
+                            onComplete()
+                        } label: {
+                            Text("Omitir")
+                                .font(.subheadline)
+                                .foregroundColor(.lumeTextSecondary)
+                                .padding(.horizontal, 16)
+                                .frame(minHeight: 44)
+                        }
+                        .accessibilityLabel("Omitir introducción")
+                    }
+                }
+                .padding(.top, 8)
+                .padding(.trailing, 8)
+                Spacer()
+            }
         }
     }
 
@@ -45,7 +67,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            swipeHint
+            nextButton
         }
         .padding()
     }
@@ -72,7 +94,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            swipeHint
+            nextButton
         }
         .padding()
     }
@@ -120,6 +142,31 @@ struct OnboardingView: View {
 
     // MARK: - Components
 
+    /// "Siguiente" button for pages 0-1 with swipe hint
+    private var nextButton: some View {
+        VStack(spacing: 8) {
+            Button {
+                withAnimation {
+                    currentPage += 1
+                }
+            } label: {
+                Text("Siguiente")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.lumePrimary)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 40)
+
+            Text("o desliza para continuar")
+                .font(.caption2)
+                .foregroundColor(Color.lumeSecondary.opacity(0.6))
+        }
+        .padding(.bottom, 40)
+    }
+
     private func featureCard(icon: String, title: String, description: String) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
@@ -143,18 +190,5 @@ struct OnboardingView: View {
         .padding()
         .background(Color.lumeCardBg)
         .cornerRadius(12)
-    }
-
-    private var swipeHint: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "chevron.left")
-                .font(.caption2)
-            Text("Desliza")
-                .font(.caption)
-            Image(systemName: "chevron.right")
-                .font(.caption2)
-        }
-        .foregroundColor(Color.lumeSecondary.opacity(0.6))
-        .padding(.bottom, 40)
     }
 }

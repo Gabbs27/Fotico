@@ -8,6 +8,7 @@ class AuthService: ObservableObject {
 
     @Published var isAuthenticated = false
     @Published var currentUser: UserProfile?
+    @Published var errorMessage: String?
 
     private let keychainKey = "com.lume.appleUserID"
 
@@ -57,7 +58,7 @@ class AuthService: ObservableObject {
             HapticManager.notification(.success)
 
         case .failure(let error):
-            print("[Auth] Sign in failed: \(error.localizedDescription)")
+            errorMessage = "No se pudo iniciar sesión: \(error.localizedDescription)"
             HapticManager.notification(.error)
         }
     }
