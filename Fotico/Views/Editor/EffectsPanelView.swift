@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EffectsPanelView: View {
-    @ObservedObject var editorVM: PhotoEditorViewModel
+    var editorVM: PhotoEditorViewModel
 
     @State private var selectedEffect: EffectType?
     @State private var selectedCategory: EffectCategory? = nil
@@ -18,7 +18,7 @@ struct EffectsPanelView: View {
             // Category filter chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
+                    CategoryChipView(name: "All", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
                         selectedCategory = nil
                     }
                     ForEach(EffectCategory.allCases, id: \.rawValue) { cat in
@@ -77,19 +77,19 @@ struct EffectsPanelView: View {
                 VStack(spacing: 12) {
                     // Direction slider
                     HStack {
-                        Text("Dirección")
+                        Text("Direction")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundColor(.lumeTextSecondary)
                         Spacer()
                         Text("\(Int(editorVM.editState.motionBlurAngle))°")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundColor(.lumeTextSecondary)
                     }
                     Slider(value: Binding(
                         get: { editorVM.editState.motionBlurAngle },
                         set: { editorVM.updateMotionBlurAngle($0) }
                     ), in: 0...360, step: 1)
-                    .tint(.primary)
+                    .tint(.lumePrimary)
 
                     // Mask controls row
                     HStack(spacing: 12) {
@@ -103,12 +103,12 @@ struct EffectsPanelView: View {
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(editorVM.editState.motionBlurMaskEnabled ? Color.primary : Color.clear)
-                            .foregroundStyle(editorVM.editState.motionBlurMaskEnabled ? Color(UIColor.systemBackground) : .primary)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .background(editorVM.editState.motionBlurMaskEnabled ? Color.lumePrimary : Color.clear)
+                            .foregroundStyle(editorVM.editState.motionBlurMaskEnabled ? Color.lumeDark : .primary)
+                            .clipShape(RoundedRectangle(cornerRadius: LumeTokens.radiusSmall))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(Color.primary.opacity(0.3), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: LumeTokens.radiusSmall)
+                                    .stroke(Color.lumeDivider, lineWidth: 1)
                             )
                         }
 
@@ -118,13 +118,13 @@ struct EffectsPanelView: View {
                             } label: {
                                 HStack(spacing: 4) {
                                     Image(systemName: editorVM.maskBrushMode == .brush ? "paintbrush.pointed.fill" : "eraser.fill")
-                                    Text(editorVM.maskBrushMode == .brush ? "Pincel" : "Borrar")
+                                    Text(editorVM.maskBrushMode == .brush ? "Brush" : "Eraser")
                                         .font(.caption.weight(.medium))
                                 }
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
-                                .background(Color.primary.opacity(0.1))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .background(Color.lumeSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: LumeTokens.radiusSmall))
                             }
 
                             // In/Out toggle — controls whether blur applies inside or outside painted area
@@ -138,8 +138,8 @@ struct EffectsPanelView: View {
                                 }
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
-                                .background(editorVM.editState.motionBlurMaskInverted ? Color.orange.opacity(0.2) : Color.primary.opacity(0.1))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .background(editorVM.editState.motionBlurMaskInverted ? Color.orange.opacity(0.2) : Color.lumeSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: LumeTokens.radiusSmall))
                             }
                         }
 
@@ -148,14 +148,14 @@ struct EffectsPanelView: View {
 
                     if editorVM.editState.motionBlurMaskEnabled {
                         HStack {
-                            Text("Tamaño")
+                            Text("Size")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundColor(.lumeTextSecondary)
                             Slider(value: $editorVM.maskBrushSize, in: 10...100, step: 1)
-                                .tint(.primary)
+                                .tint(.lumePrimary)
                             Text("\(Int(editorVM.maskBrushSize))")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundColor(.lumeTextSecondary)
                                 .frame(width: 30)
                         }
                     }

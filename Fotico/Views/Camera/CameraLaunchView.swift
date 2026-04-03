@@ -12,7 +12,7 @@ struct CameraLaunchView: View {
                     Image(systemName: "camera.fill")
                         .font(.system(size: 48))
                         .foregroundColor(Color.lumePrimary)
-                    Button("Abrir Cámara") {
+                    Button("Open Camera") {
                         showCamera = true
                     }
                     .font(.headline)
@@ -20,7 +20,7 @@ struct CameraLaunchView: View {
                     .padding(.horizontal, 32)
                     .padding(.vertical, 14)
                     .background(Color.lumePrimary)
-                    .cornerRadius(12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
         }

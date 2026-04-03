@@ -42,6 +42,7 @@ struct ImagePreviewView: View {
                         .gesture(zoomGesture)
                         .simultaneousGesture(panGesture(in: geometry.size))
                         .onTapGesture(count: 2, perform: doubleTap)
+                        .accessibilityLabel("Photo being edited")
                 } else if let uiImage = uiImage {
                     // Fallback UIImage path
                     Image(uiImage: uiImage)
@@ -52,6 +53,7 @@ struct ImagePreviewView: View {
                         .gesture(zoomGesture)
                         .simultaneousGesture(panGesture(in: geometry.size))
                         .onTapGesture(count: 2, perform: doubleTap)
+                        .accessibilityLabel("Photo being edited")
                 }
 
                 if isProcessing {
@@ -61,7 +63,7 @@ struct ImagePreviewView: View {
                         .scaleEffect(0.8)
                         .padding(8)
                         .background(Color.black.opacity(0.5))
-                        .cornerRadius(8)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
         }

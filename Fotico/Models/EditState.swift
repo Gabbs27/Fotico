@@ -171,8 +171,9 @@ struct EditState: Sendable, Equatable, Codable {
     var cropAspectRatio: CropAspectRatio = .free
     var rotation: Double = 0.0           // degrees
 
+    private static let defaultState = EditState()
     var isDefault: Bool {
-        self == EditState()
+        self == Self.defaultState
     }
 
     mutating func reset() {

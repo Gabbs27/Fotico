@@ -40,3 +40,20 @@ extension Color {
     static let lumeDisabled = Color(hex: "#6B6055")            // Warm gray for disabled states (improved contrast)
     static let lumeDivider = Color(hex: "#2F2820")             // Warm divider color
 }
+
+// MARK: - Design Tokens
+
+enum LumeTokens {
+    // Corner Radii
+    static let radiusSmall: CGFloat = 6
+    static let radiusMedium: CGFloat = 10
+    static let radiusLarge: CGFloat = 14
+
+    // Spacing Scale
+    static let spacingXS: CGFloat = 4
+    static let spacingSM: CGFloat = 8
+    static let spacingMD: CGFloat = 12
+    static let spacingLG: CGFloat = 16
+    static let spacingXL: CGFloat = 24
+    static let spacingXXL: CGFloat = 32
+}

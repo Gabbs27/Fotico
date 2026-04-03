@@ -37,7 +37,7 @@ struct CropView: View {
                         .font(.caption)
                         .foregroundColor(.white)
 
-                    Text("Rotación")
+                    Text("Rotation")
                         .font(.caption)
                         .foregroundColor(.lumeTextSecondary)
 
@@ -67,13 +67,13 @@ struct CropView: View {
                     if rotation < -180 { rotation += 360 }
                     onRotationChanged()
                 } label: {
-                    Label("Girar", systemImage: "rotate.left")
+                    Label("Rotate", systemImage: "rotate.left")
                         .font(.subheadline)
                         .foregroundColor(.white)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
                         .background(Color.lumeSurface)
-                        .cornerRadius(10)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
 
                 Button {
@@ -82,13 +82,13 @@ struct CropView: View {
                     rotation = 0
                     onRotationChanged()
                 } label: {
-                    Label("Restablecer", systemImage: "arrow.counterclockwise")
+                    Label("Reset", systemImage: "arrow.counterclockwise")
                         .font(.subheadline)
                         .foregroundColor(Color.lumeWarning)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
                         .background(Color.lumeSurface)
-                        .cornerRadius(10)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
             }
 

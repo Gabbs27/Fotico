@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ToolBarView: View {
     @Binding var selectedTool: EditorTool
+    @Namespace private var toolNamespace
 
     var body: some View {
         HStack(spacing: 0) {
@@ -26,6 +27,7 @@ struct ToolBarView: View {
                                 .fill(Color.lumePrimary)
                                 .frame(width: 24, height: 3)
                                 .offset(y: 2)
+                                .matchedGeometryEffect(id: "toolIndicator", in: toolNamespace)
                         }
                     }
                 }

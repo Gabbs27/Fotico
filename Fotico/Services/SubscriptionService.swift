@@ -2,14 +2,14 @@ import StoreKit
 import SwiftUI
 
 @MainActor
-class SubscriptionService: ObservableObject {
+@Observable class SubscriptionService {
     static let shared = SubscriptionService()
 
-    @Published var products: [Product] = []
+    var products: [Product] = []
     #if DEBUG
-    @Published var isPro = true  // All tiers unlocked for testing
+    var isPro = true  // All tiers unlocked for testing
     #else
-    @Published var isPro = false
+    var isPro = false
     #endif
 
     private let productIDs = ["com.lume.pro.monthly", "com.lume.pro.annual"]

@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 struct CameraView: View {
-    @StateObject private var viewModel = CameraViewModel()
+    @State private var viewModel = CameraViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showPaywall = false
 
@@ -97,7 +97,7 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.4))
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Cerrar cámara")
+            .accessibilityLabel("Close camera")
 
             Spacer()
 
@@ -113,10 +113,10 @@ struct CameraView: View {
                     .background(Color.black.opacity(0.4))
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Cambiar cámara")
+            .accessibilityLabel("Switch camera")
         }
         .padding(.horizontal)
-        .padding(.top, 8)
+        .padding(.top)
     }
 
     // MARK: - Camera Type Strip
@@ -182,7 +182,7 @@ struct CameraView: View {
                     await viewModel.capturePhoto()
                 }
             }
-            .accessibilityLabel("Tomar foto")
+            .accessibilityLabel("Take photo")
 
             Spacer()
 
@@ -203,11 +203,11 @@ struct CameraView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.lumeDisabled)
 
-            Text("Acceso a la Cámara")
+            Text("Camera Access")
                 .font(.title2)
                 .foregroundColor(.white)
 
-            Text("Lumé necesita acceso a tu cámara para tomar fotos con efectos vintage.")
+            Text("Lume needs access to your camera to take photos with vintage effects.")
                 .font(.subheadline)
                 .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
@@ -218,13 +218,13 @@ struct CameraView: View {
                     UIApplication.shared.open(url)
                 }
             } label: {
-                Text("Abrir Ajustes")
+                Text("Open Settings")
                     .font(.headline)
                     .foregroundColor(.black)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(Color.lumePrimary)
-                    .cornerRadius(10)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
     }

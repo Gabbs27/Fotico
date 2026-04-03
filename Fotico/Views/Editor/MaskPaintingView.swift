@@ -3,7 +3,7 @@ import SwiftUI
 /// Overlay view for painting a motion blur mask.
 /// Captures finger gestures and renders strokes to an offscreen CGContext.
 struct MaskPaintingView: View {
-    @ObservedObject var viewModel: PhotoEditorViewModel
+    var viewModel: PhotoEditorViewModel
     let imageSize: CGSize
     let displaySize: CGSize
 

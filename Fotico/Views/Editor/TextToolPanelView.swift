@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TextToolPanelView: View {
-    @ObservedObject var editorVM: PhotoEditorViewModel
+    var editorVM: PhotoEditorViewModel
     @State private var selectedLayerId: String?
 
     private var selectedLayer: TextLayer? {
@@ -16,7 +16,7 @@ struct TextToolPanelView: View {
                 VStack(spacing: 10) {
                     // Text input
                     HStack {
-                        TextField("Texto", text: Binding(
+                        TextField("Text", text: Binding(
                             get: { layer.text },
                             set: { newText in
                                 var updated = layer
@@ -35,6 +35,7 @@ struct TextToolPanelView: View {
                                 .foregroundColor(.lumeWarning)
                                 .frame(width: 44, height: 44)
                         }
+                        .accessibilityLabel("Delete")
                     }
                     .padding(.horizontal)
 
@@ -89,7 +90,7 @@ struct TextToolPanelView: View {
 
                     // Scale slider
                     HStack {
-                        Text("Tamaño")
+                        Text("Size")
                             .font(.caption)
                             .foregroundColor(.lumeTextSecondary)
                         Slider(value: Binding(
@@ -108,7 +109,7 @@ struct TextToolPanelView: View {
                 // No layer selected — show list or add button
                 if editorVM.editState.textLayers.isEmpty {
                     VStack(spacing: 12) {
-                        Text("Sin texto")
+                        Text("No text")
                             .font(.caption)
                             .foregroundColor(.lumeTextSecondary)
 
@@ -116,13 +117,13 @@ struct TextToolPanelView: View {
                             editorVM.addTextLayer()
                             selectedLayerId = editorVM.editState.textLayers.last?.id
                         } label: {
-                            Label("Agregar texto", systemImage: "plus.circle.fill")
+                            Label("Add text", systemImage: "plus.circle.fill")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 24)
                                 .padding(.vertical, 10)
                                 .background(Color.lumePrimary)
-                                .cornerRadius(10)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                     }
                     .frame(maxHeight: .infinity)
@@ -146,7 +147,7 @@ struct TextToolPanelView: View {
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 8)
                                     .background(Color.lumeSurface)
-                                    .cornerRadius(8)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
                                 }
                             }
 
@@ -154,7 +155,7 @@ struct TextToolPanelView: View {
                                 editorVM.addTextLayer()
                                 selectedLayerId = editorVM.editState.textLayers.last?.id
                             } label: {
-                                Label("Agregar", systemImage: "plus")
+                                Label("Add", systemImage: "plus")
                                     .font(.caption)
                                     .foregroundColor(.lumePrimary)
                             }

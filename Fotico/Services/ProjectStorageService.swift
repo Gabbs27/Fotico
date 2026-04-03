@@ -14,27 +14,57 @@ class ProjectStorageService {
         return dir
     }
 
-    func saveOriginalImage(_ image: UIImage, projectId: String) -> String? {
+    enum StorageError: LocalizedError {
+        case jpegConversionFailed
+        case writeFailed(URL, Error)
+        case fileNotFound(String)
+        case dataCorrupted(String)
+
+        var errorDescription: String? {
+            switch self {
+            case .jpegConversionFailed:
+                return "Failed to convert image to JPEG data"
+            case .writeFailed(let url, let underlying):
+                return "Failed to write image to \(url.lastPathComponent): \(underlying.localizedDescription)"
+            case .fileNotFound(let name):
+                return "Image file not found: \(name)"
+            case .dataCorrupted(let name):
+                return "Image data corrupted or unreadable: \(name)"
+            }
+        }
+    }
+
+    func saveOriginalImage(_ image: UIImage, projectId: String) throws -> String {
         let fileName = "\(projectId).jpg"
         let path = projectsDirectory.appendingPathComponent(fileName)
-        guard let data = image.jpegData(compressionQuality: 0.9) else { return nil }
+        guard let data = image.jpegData(compressionQuality: 0.9) else {
+            throw StorageError.jpegConversionFailed
+        }
         do {
             try data.write(to: path)
             return fileName
         } catch {
-            return nil
+            throw StorageError.writeFailed(path, error)
         }
     }
 
-    func loadOriginalImage(fileName: String) -> UIImage? {
+    func loadOriginalImage(fileName: String) throws -> UIImage {
         let path = projectsDirectory.appendingPathComponent(fileName)
-        guard let data = try? Data(contentsOf: path) else { return nil }
-        return UIImage(data: data)
+        let data: Data
+        do {
+            data = try Data(contentsOf: path)
+        } catch {
+            throw StorageError.fileNotFound(fileName)
+        }
+        guard let image = UIImage(data: data) else {
+            throw StorageError.dataCorrupted(fileName)
+        }
+        return image
     }
 
-    func deleteImage(fileName: String) {
+    func deleteImage(fileName: String) throws {
         let path = projectsDirectory.appendingPathComponent(fileName)
-        try? fileManager.removeItem(at: path)
+        try fileManager.removeItem(at: path)
     }
 
     func generateThumbnail(_ image: UIImage, size: CGSize = CGSize(width: 200, height: 200)) -> Data? {

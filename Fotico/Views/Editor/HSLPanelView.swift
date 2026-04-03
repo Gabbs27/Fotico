@@ -12,10 +12,10 @@ struct HSLPanelView: View {
     }
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: LumeTokens.spacingMD) {
             // Color selector chips
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
+                HStack(spacing: LumeTokens.spacingSM) {
                     ForEach(HSLColorRange.allCases, id: \.rawValue) { color in
                         Button {
                             HapticManager.selection()
@@ -30,7 +30,6 @@ struct HSLPanelView: View {
                                         .stroke(selectedColor == color ? Color.white : Color.clear, lineWidth: 2)
                                 )
                                 .overlay(
-                                    // Show dot if this color has adjustments
                                     Group {
                                         if let adj = editState.hslAdjustments[color.rawValue], !adj.isDefault {
                                             Circle()
@@ -40,7 +39,11 @@ struct HSLPanelView: View {
                                         }
                                     }
                                 )
+                                .frame(width: 44, height: 44)
+                                .contentShape(Circle())
                         }
+                        .accessibilityLabel("\(color.displayName) color")
+                        .accessibilityAddTraits(selectedColor == color ? .isSelected : [])
                     }
                 }
                 .padding(.horizontal)
@@ -50,12 +53,11 @@ struct HSLPanelView: View {
                 .font(.caption.weight(.semibold))
                 .foregroundColor(.white)
 
-            // H/S/L sliders
+            // H/S/L sliders — commit only on drag start, update on every tick
             VStack(spacing: 10) {
-                hslSlider(label: "Tono", value: Binding(
+                hslSlider(label: "Hue", value: Binding(
                     get: { adjustmentBinding(for: selectedColor).hue },
                     set: { newVal in
-                        onCommit()
                         var adj = editState.hslAdjustments[selectedColor.rawValue] ?? HSLAdjustment()
                         adj.hue = newVal
                         editState.hslAdjustments[selectedColor.rawValue] = adj.isDefault ? nil : adj
@@ -63,10 +65,9 @@ struct HSLPanelView: View {
                     }
                 ), range: -0.5...0.5)
 
-                hslSlider(label: "Saturacion", value: Binding(
+                hslSlider(label: "Saturation", value: Binding(
                     get: { adjustmentBinding(for: selectedColor).saturation },
                     set: { newVal in
-                        onCommit()
                         var adj = editState.hslAdjustments[selectedColor.rawValue] ?? HSLAdjustment()
                         adj.saturation = newVal
                         editState.hslAdjustments[selectedColor.rawValue] = adj.isDefault ? nil : adj
@@ -74,10 +75,9 @@ struct HSLPanelView: View {
                     }
                 ), range: -1.0...1.0)
 
-                hslSlider(label: "Luminancia", value: Binding(
+                hslSlider(label: "Luminance", value: Binding(
                     get: { adjustmentBinding(for: selectedColor).luminance },
                     set: { newVal in
-                        onCommit()
                         var adj = editState.hslAdjustments[selectedColor.rawValue] ?? HSLAdjustment()
                         adj.luminance = newVal
                         editState.hslAdjustments[selectedColor.rawValue] = adj.isDefault ? nil : adj
@@ -94,7 +94,7 @@ struct HSLPanelView: View {
                     editState.hslAdjustments.removeAll()
                     onUpdate()
                 } label: {
-                    Label("Restablecer", systemImage: "arrow.counterclockwise")
+                    Label("Reset", systemImage: "arrow.counterclockwise")
                         .font(.caption)
                         .foregroundColor(.lumeWarning)
                 }
@@ -109,8 +109,11 @@ struct HSLPanelView: View {
                 .foregroundColor(.lumeTextSecondary)
                 .frame(width: 80, alignment: .leading)
 
-            Slider(value: value, in: range, step: 0.01)
-                .tint(.lumePrimary)
+            Slider(value: value, in: range, step: 0.01) { editing in
+                if editing { onCommit() }
+            }
+            .tint(.lumePrimary)
+            .accessibilityValue("\(Int(value.wrappedValue * 100))")
 
             Text("\(Int(value.wrappedValue * 100))")
                 .font(.caption)

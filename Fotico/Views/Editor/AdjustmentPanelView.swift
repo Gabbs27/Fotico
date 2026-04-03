@@ -12,77 +12,77 @@ struct AdjustmentPanelView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 14) {
                 adjustmentSlider(
-                    label: "Brillo",
+                    label: "Brightness",
                     icon: "sun.max",
                     value: $editState.brightness,
                     range: -1.0...1.0,
                     defaultValue: 0
                 )
                 adjustmentSlider(
-                    label: "Contraste",
+                    label: "Contrast",
                     icon: "circle.righthalf.filled",
                     value: $editState.contrast,
                     range: 0.25...4.0,
                     defaultValue: 1.0
                 )
                 adjustmentSlider(
-                    label: "Saturación",
+                    label: "Saturation",
                     icon: "drop.fill",
                     value: $editState.saturation,
                     range: 0.0...2.0,
                     defaultValue: 1.0
                 )
                 adjustmentSlider(
-                    label: "Exposición",
+                    label: "Exposure",
                     icon: "plusminus.circle",
                     value: $editState.exposure,
                     range: -2.0...2.0,
                     defaultValue: 0
                 )
                 adjustmentSlider(
-                    label: "Temperatura",
+                    label: "Temperature",
                     icon: "thermometer.medium",
                     value: $editState.temperature,
                     range: 2000...10000,
                     defaultValue: 6500
                 )
                 adjustmentSlider(
-                    label: "Tinte",
+                    label: "Tint",
                     icon: "paintpalette",
                     value: $editState.tint,
                     range: -150...150,
                     defaultValue: 0
                 )
                 adjustmentSlider(
-                    label: "Vibrancia",
+                    label: "Vibrance",
                     icon: "wand.and.stars",
                     value: $editState.vibrance,
                     range: -1.0...1.0,
                     defaultValue: 0
                 )
                 adjustmentSlider(
-                    label: "Nitidez",
+                    label: "Sharpness",
                     icon: "triangle",
                     value: $editState.sharpness,
                     range: 0.0...2.0,
                     defaultValue: 0
                 )
                 adjustmentSlider(
-                    label: "Luces",
+                    label: "Highlights",
                     icon: "sun.max.trianglebadge.exclamationmark",
                     value: $editState.highlights,
                     range: -1.0...1.0,
                     defaultValue: 0
                 )
                 adjustmentSlider(
-                    label: "Sombras",
+                    label: "Shadows",
                     icon: "moon.fill",
                     value: $editState.shadows,
                     range: -1.0...1.0,
                     defaultValue: 0
                 )
                 adjustmentSlider(
-                    label: "Claridad",
+                    label: "Clarity",
                     icon: "diamond",
                     value: $editState.clarity,
                     range: 0.0...2.0,
@@ -151,31 +151,31 @@ struct AdjustmentPanelView: View {
 
     private func formattedValue(_ value: Double, label: String) -> String {
         switch label {
-        case "Temperatura":
+        case "Temperature":
             // 6500K is neutral, map to relative scale
             let normalized = Int((value - 6500) / 35)
             return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
-        case "Tinte":
+        case "Tint":
             return value >= 0 ? "+\(Int(value))" : "\(Int(value))"
-        case "Contraste", "Saturación":
+        case "Contrast", "Saturation":
             // 1.0 is neutral (display as 0), range 0-2 maps to -100 to +100
             let normalized = Int((value - 1.0) * 100)
             return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
-        case "Brillo":
+        case "Brightness":
             // 0 is neutral, range -1 to 1 maps to -100 to +100
             let normalized = Int(value * 100)
             return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
-        case "Exposición":
+        case "Exposure":
             // 0 is neutral, show with 1 decimal
             let formatted = String(format: "%+.1f", value)
             return formatted
-        case "Vibrancia", "Nitidez":
+        case "Vibrance", "Sharpness":
             let normalized = Int(value * 100)
             return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
-        case "Luces", "Sombras":
+        case "Highlights", "Shadows":
             let normalized = Int(value * 100)
             return normalized >= 0 ? "+\(normalized)" : "\(normalized)"
-        case "Claridad":
+        case "Clarity":
             let normalized = Int(value * 100)
             return "+\(normalized)"
         default:

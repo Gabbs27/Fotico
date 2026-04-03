@@ -1,10 +1,10 @@
 import Foundation
 
 @MainActor
-class EditClipboard: ObservableObject {
+@Observable class EditClipboard {
     static let shared = EditClipboard()
 
-    @Published var copiedState: EditState?
+    var copiedState: EditState?
 
     var hasContent: Bool { copiedState != nil }
 

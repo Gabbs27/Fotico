@@ -3,9 +3,10 @@ import SwiftData
 
 struct ProjectsGridView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var viewModel = ProjectsViewModel()
+    @State private var viewModel = ProjectsViewModel()
     @State private var showDeleteAlert = false
     @State private var projectToDelete: PhotoProject?
+    @State private var showOpenError = false
 
     var onOpenProject: ((UIImage) -> Void)?
 
@@ -21,17 +22,7 @@ struct ProjectsGridView: View {
                 Color.lumeDark.ignoresSafeArea()
 
                 if viewModel.projects.isEmpty {
-                    VStack(spacing: 16) {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .font(.system(size: 48))
-                            .foregroundColor(.lumeTextSecondary)
-                        Text("Sin proyectos")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Text("Las fotos editadas aparecerán aquí")
-                            .font(.subheadline)
-                            .foregroundColor(.lumeTextSecondary)
-                    }
+                    ContentUnavailableView("No Projects", systemImage: "photo.stack", description: Text("Your saved projects will appear here"))
                 } else {
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 12) {
@@ -46,27 +37,28 @@ struct ProjectsGridView: View {
                     }
                 }
             }
-            .navigationTitle("Proyectos")
+            .navigationTitle("Projects")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .onAppear {
                 viewModel.setModelContext(modelContext)
             }
-            .alert("Eliminar proyecto?", isPresented: $showDeleteAlert) {
-                Button("Eliminar", role: .destructive) {
+            .alert("Delete project?", isPresented: $showDeleteAlert) {
+                Button("Delete", role: .destructive) {
                     if let project = projectToDelete {
                         viewModel.deleteProject(project)
                     }
                 }
-                Button("Cancelar", role: .cancel) {}
+                Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Esta acción no se puede deshacer")
+                Text("This action cannot be undone")
             }
         }
     }
 
     private func openProject(_ project: PhotoProject) {
-        guard let image = ProjectStorageService.shared.loadOriginalImage(fileName: project.originalImagePath) else {
+        guard let image = try? ProjectStorageService.shared.loadOriginalImage(fileName: project.originalImagePath) else {
+            showOpenError = true
             return
         }
         HapticManager.selection()
@@ -82,7 +74,7 @@ struct ProjectsGridView: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(height: 120)
                     .clipped()
-                    .cornerRadius(8)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             } else {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.lumeSurface)
@@ -107,8 +99,13 @@ struct ProjectsGridView: View {
                 projectToDelete = project
                 showDeleteAlert = true
             } label: {
-                Label("Eliminar", systemImage: "trash")
+                Label("Delete", systemImage: "trash")
             }
+        }
+        .alert("Error", isPresented: $showOpenError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Could not open project. The original image may be missing.")
         }
     }
 }

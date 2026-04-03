@@ -7,14 +7,14 @@ struct ColorTonePanelView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 20) {
+            VStack(spacing: LumeTokens.spacingXL) {
                 // Shadows section
-                VStack(spacing: 8) {
+                VStack(spacing: LumeTokens.spacingSM) {
                     HStack {
                         Image(systemName: "moon.fill")
                             .font(.caption)
                             .foregroundColor(.lumePrimary)
-                        Text("Sombras")
+                        Text("Shadows")
                             .font(.caption.weight(.semibold))
                             .foregroundColor(.white)
                         Spacer()
@@ -30,7 +30,7 @@ struct ColorTonePanelView: View {
                         set: { editState.shadowToneHue = $0; onUpdate() }
                     ), isHue: true)
 
-                    toneSlider(label: "Intensidad", value: Binding(
+                    toneSlider(label: "Intensity", value: Binding(
                         get: { editState.shadowToneSaturation },
                         set: { editState.shadowToneSaturation = $0; onUpdate() }
                     ), isHue: false)
@@ -39,12 +39,12 @@ struct ColorTonePanelView: View {
                 Divider().background(Color.lumeTextSecondary.opacity(0.3))
 
                 // Highlights section
-                VStack(spacing: 8) {
+                VStack(spacing: LumeTokens.spacingSM) {
                     HStack {
                         Image(systemName: "sun.max.fill")
                             .font(.caption)
                             .foregroundColor(.lumePrimary)
-                        Text("Luces")
+                        Text("Highlights")
                             .font(.caption.weight(.semibold))
                             .foregroundColor(.white)
                         Spacer()
@@ -60,7 +60,7 @@ struct ColorTonePanelView: View {
                         set: { editState.highlightToneHue = $0; onUpdate() }
                     ), isHue: true)
 
-                    toneSlider(label: "Intensidad", value: Binding(
+                    toneSlider(label: "Intensity", value: Binding(
                         get: { editState.highlightToneSaturation },
                         set: { editState.highlightToneSaturation = $0; onUpdate() }
                     ), isHue: false)
@@ -76,7 +76,7 @@ struct ColorTonePanelView: View {
                         editState.highlightToneSaturation = 0
                         onUpdate()
                     } label: {
-                        Label("Restablecer", systemImage: "arrow.counterclockwise")
+                        Label("Reset", systemImage: "arrow.counterclockwise")
                             .font(.caption)
                             .foregroundColor(.lumeWarning)
                     }
@@ -94,11 +94,15 @@ struct ColorTonePanelView: View {
                 .frame(width: 65, alignment: .leading)
 
             if isHue {
-                Slider(value: value, in: 0...1, step: 0.01)
-                    .tint(Color(hue: value.wrappedValue, saturation: 0.8, brightness: 0.9))
+                Slider(value: value, in: 0...1, step: 0.01) { editing in
+                    if editing { onCommit() }
+                }
+                .tint(Color(hue: value.wrappedValue, saturation: 0.8, brightness: 0.9))
             } else {
-                Slider(value: value, in: 0...1, step: 0.01)
-                    .tint(.lumePrimary)
+                Slider(value: value, in: 0...1, step: 0.01) { editing in
+                    if editing { onCommit() }
+                }
+                .tint(.lumePrimary)
             }
 
             Text("\(Int(value.wrappedValue * 100))")

@@ -2,10 +2,10 @@ import SwiftUI
 import SwiftData
 
 @MainActor
-class ProjectsViewModel: ObservableObject {
-    @Published var projects: [PhotoProject] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String?
+@Observable class ProjectsViewModel {
+    var projects: [PhotoProject] = []
+    var isLoading = false
+    var errorMessage: String?
 
     private var modelContext: ModelContext?
 
@@ -31,8 +31,11 @@ class ProjectsViewModel: ObservableObject {
         guard let context = modelContext else { return }
 
         let projectId = UUID().uuidString
-        guard let imagePath = ProjectStorageService.shared.saveOriginalImage(image, projectId: projectId) else {
-            errorMessage = "No se pudo guardar la imagen"
+        let imagePath: String
+        do {
+            imagePath = try ProjectStorageService.shared.saveOriginalImage(image, projectId: projectId)
+        } catch {
+            errorMessage = error.localizedDescription
             return
         }
 
@@ -54,7 +57,12 @@ class ProjectsViewModel: ObservableObject {
 
     func deleteProject(_ project: PhotoProject) {
         guard let context = modelContext else { return }
-        ProjectStorageService.shared.deleteImage(fileName: project.originalImagePath)
+        do {
+            try ProjectStorageService.shared.deleteImage(fileName: project.originalImagePath)
+        } catch {
+            // Log but don't block project deletion — the DB record matters more
+            print("[ProjectStorageService] Failed to delete image: \(error.localizedDescription)")
+        }
         context.delete(project)
         do {
             try context.save()
@@ -65,6 +73,11 @@ class ProjectsViewModel: ObservableObject {
     }
 
     func loadProjectImage(_ project: PhotoProject) -> UIImage? {
-        return ProjectStorageService.shared.loadOriginalImage(fileName: project.originalImagePath)
+        do {
+            return try ProjectStorageService.shared.loadOriginalImage(fileName: project.originalImagePath)
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
     }
 }

@@ -4,21 +4,21 @@ import CoreImage.CIFilterBuiltins
 import Combine
 
 @MainActor
-class CameraViewModel: ObservableObject {
-    @Published var processedPreviewCIImage: CIImage?   // CIImage for MetalImageView (no CGImage!)
-    @Published var capturedImage: UIImage?
-    @Published var selectedCameraType: CameraType = CameraType.allTypes[0]
-    @Published var showEditor = false
-    @Published var isCapturing = false
-    @Published var showFlashOverlay = false
+@Observable class CameraViewModel {
+    var processedPreviewCIImage: CIImage?   // CIImage for MetalImageView (no CGImage!)
+    var capturedImage: UIImage?
+    var selectedCameraType: CameraType = CameraType.allTypes[0]
+    var showEditor = false
+    var isCapturing = false
+    var showFlashOverlay = false
 
     // Toolbar state
-    @Published var gridMode: GridMode = .off
-    @Published var grainLevel: GrainLevel = .off
-    @Published var toolbarLightLeakOn: Bool = false
-    @Published var toolbarVignetteOn: Bool = false
-    @Published var toolbarBloomOn: Bool = false
-    @Published var selectedToolbarTab: CameraToolbarTab? = nil
+    var gridMode: GridMode = .off
+    var grainLevel: GrainLevel = .off
+    var toolbarLightLeakOn: Bool = false
+    var toolbarVignetteOn: Bool = false
+    var toolbarBloomOn: Bool = false
+    var selectedToolbarTab: CameraToolbarTab? = nil
 
     private(set) var cameraService = CameraService()
 

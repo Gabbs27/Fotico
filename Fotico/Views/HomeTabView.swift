@@ -21,7 +21,7 @@ struct HomeTabView: View {
                 }
                 .tabItem {
                     Image(systemName: "camera.fill")
-                    Text("Cámara")
+                    Text("Camera")
                 }
                 .tag(1)
 
@@ -31,14 +31,14 @@ struct HomeTabView: View {
                 }
                 .tabItem {
                     Image(systemName: "square.grid.2x2.fill")
-                    Text("Proyectos")
+                    Text("Projects")
                 }
                 .tag(2)
 
                 ProfileView()
                     .tabItem {
                         Image(systemName: "person.fill")
-                        Text("Perfil")
+                        Text("Profile")
                     }
                     .tag(3)
             }
@@ -46,7 +46,7 @@ struct HomeTabView: View {
 
             if !hasSeenOnboarding {
                 OnboardingView {
-                    withAnimation {
+                    withAnimation(.easeInOut) {
                         hasSeenOnboarding = true
                     }
                 }

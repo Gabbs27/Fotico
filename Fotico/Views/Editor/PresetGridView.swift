@@ -100,7 +100,7 @@ struct PresetGridView: View {
 
     private var intensitySlider: some View {
         HStack(spacing: 10) {
-            Text("Intensidad")
+            Text("Intensity")
                 .font(.caption2)
                 .foregroundColor(.lumeTextSecondary)
 
@@ -124,7 +124,7 @@ struct PresetGridView: View {
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
-                CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil && !showFavoritesOnly) {
+                CategoryChipView(name: "All", icon: "square.grid.2x2", isSelected: selectedCategory == nil && !showFavoritesOnly) {
                     selectedCategory = nil
                     showFavoritesOnly = false
                 }
@@ -191,9 +191,10 @@ struct PresetGridView: View {
                             Image(systemName: favoritePresetIds.contains(id!) ? "heart.fill" : "heart")
                                 .font(.caption2)
                                 .foregroundColor(favoritePresetIds.contains(id!) ? .red : .white.opacity(0.7))
-                                .padding(4)
+                                .padding(6)
                                 .background(Color.black.opacity(0.4))
                                 .clipShape(Circle())
+                                .contentShape(Circle().inset(by: -4))
                         }
                         .offset(x: 3, y: -3)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)

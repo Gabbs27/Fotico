@@ -3,12 +3,12 @@ import SwiftUI
 import SwiftData
 
 @MainActor
-class AuthService: ObservableObject {
+@Observable class AuthService {
     static let shared = AuthService()
 
-    @Published var isAuthenticated = false
-    @Published var currentUser: UserProfile?
-    @Published var errorMessage: String?
+    var isAuthenticated = false
+    var currentUser: UserProfile?
+    var errorMessage: String?
 
     private let keychainKey = "com.lume.appleUserID"
 

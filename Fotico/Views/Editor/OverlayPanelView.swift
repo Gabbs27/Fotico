@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OverlayPanelView: View {
-    @ObservedObject var editorVM: PhotoEditorViewModel
+    var editorVM: PhotoEditorViewModel
     @State private var selectedCategory: OverlayCategory? = nil  // nil = all
 
     private var filteredOverlays: [OverlayAsset] {
@@ -17,7 +17,7 @@ struct OverlayPanelView: View {
             if editorVM.editState.overlayId != nil {
                 VStack(spacing: 4) {
                     HStack {
-                        Text("Intensidad")
+                        Text("Intensity")
                             .font(.caption)
                             .foregroundColor(.lumeTextSecondary)
                         Spacer()
@@ -40,7 +40,7 @@ struct OverlayPanelView: View {
             // Category chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    CategoryChipView(name: "Todos", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
+                    CategoryChipView(name: "All", icon: "square.grid.2x2", isSelected: selectedCategory == nil) {
                         selectedCategory = nil
                     }
 
@@ -57,7 +57,7 @@ struct OverlayPanelView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     // None option
-                    overlayButton(id: nil, name: "Ninguno", icon: "xmark.circle") {
+                    overlayButton(id: nil, name: "None", icon: "xmark.circle") {
                         editorVM.selectOverlay(nil)
                     }
 
@@ -77,7 +77,7 @@ struct OverlayPanelView: View {
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 88, height: 88)
-                                        .cornerRadius(8)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
                                         .clipped()
                                 }
                                 .overlay(

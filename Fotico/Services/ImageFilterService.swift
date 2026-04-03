@@ -2,6 +2,11 @@ import UIKit
 import CoreImage
 import CoreImage.CIFilterBuiltins
 
+private class CIImageWrapper: NSObject {
+    let image: CIImage
+    init(_ image: CIImage) { self.image = image }
+}
+
 /// Image filter pipeline using CIFilter chains for presets, adjustments, and effects.
 /// Uses shared RenderEngine for GPU-accelerated rendering.
 ///
@@ -47,7 +52,11 @@ final class ImageFilterService: @unchecked Sendable {
     }()
 
     // Cached overlay CIImages (loaded once per overlay ID, reused per render)
-    private var overlayCIImageCache: [String: CIImage] = [:]
+    private let overlayCIImageCache: NSCache<NSString, CIImageWrapper> = {
+        let cache = NSCache<NSString, CIImageWrapper>()
+        cache.countLimit = 10
+        return cache
+    }()
 
     init() {
         self.context = RenderEngine.shared.context
@@ -149,10 +158,6 @@ final class ImageFilterService: @unchecked Sendable {
         guard let filter = cachedFilter(named: filterName) else { return image }
         filter.setValue(image, forKey: kCIInputImageKey)
         return filter.outputImage ?? image
-    }
-
-    private func applyCustomPreset(_ preset: FilterPreset, to image: CIImage) -> CIImage {
-        return image
     }
 
     /// Applies preset parameters, batching ColorControls params (brightness, contrast,
@@ -1005,15 +1010,13 @@ final class ImageFilterService: @unchecked Sendable {
 
             let text = layer.style == .editorial ? layer.text.uppercased() : layer.text
 
-            let attributes: [NSAttributedString.Key: Any] = [
+            var attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: color
             ]
 
             if layer.style == .editorial {
-                // Add tracking for editorial style
-                let mutableAttrs = NSMutableDictionary(dictionary: attributes)
-                mutableAttrs[NSAttributedString.Key.kern] = fontSize * 0.1
+                attributes[.kern] = fontSize * 0.1
             }
 
             let nsString = text as NSString
@@ -1064,13 +1067,13 @@ final class ImageFilterService: @unchecked Sendable {
     func applyOverlay(_ overlayId: String, to image: CIImage, intensity: Double) -> CIImage {
         // Use cached CIImage or load and cache on first access
         var overlayCIImage: CIImage
-        if let cached = overlayCIImageCache[overlayId] {
+        if let cached = overlayCIImageCache.object(forKey: overlayId as NSString)?.image {
             overlayCIImage = cached
         } else {
             guard let asset = OverlayAsset.allOverlays.first(where: { $0.id == overlayId }),
                   let overlayUIImage = UIImage(named: asset.fileName),
                   let ciImage = CIImage(image: overlayUIImage) else { return image }
-            overlayCIImageCache[overlayId] = ciImage
+            overlayCIImageCache.setObject(CIImageWrapper(ciImage), forKey: overlayId as NSString)
             overlayCIImage = ciImage
         }
 

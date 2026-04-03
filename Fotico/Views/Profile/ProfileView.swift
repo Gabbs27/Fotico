@@ -9,7 +9,7 @@ private enum AppLinks {
 
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var authService = AuthService.shared
+    @State private var authService = AuthService.shared
     @State private var showLogin = false
 
     var body: some View {
@@ -24,9 +24,9 @@ struct ProfileView: View {
                             .padding(.top, 20)
 
                         // Account section
-                        settingsSection(title: "Cuenta") {
+                        settingsSection(title: "Account") {
                             if authService.isAuthenticated {
-                                settingsRow(icon: "person.fill", title: authService.currentUser?.displayName ?? "Usuario")
+                                settingsRow(icon: "person.fill", title: authService.currentUser?.displayName ?? "User")
                                 Divider().padding(.leading, 52).overlay(Color.lumeDivider)
                                 if let email = authService.currentUser?.email {
                                     settingsRow(icon: "envelope.fill", title: email)
@@ -37,7 +37,7 @@ struct ProfileView: View {
                                 Button {
                                     showLogin = true
                                 } label: {
-                                    settingsRow(icon: "person.badge.plus", title: "Iniciar sesión", color: Color.lumePrimary)
+                                    settingsRow(icon: "person.badge.plus", title: "Sign in", color: Color.lumePrimary)
                                 }
                             }
                         }
@@ -49,19 +49,19 @@ struct ProfileView: View {
                                     SKStoreReviewController.requestReview(in: scene)
                                 }
                             } label: {
-                                settingsRow(icon: "star.fill", title: "Calificar Lumé", color: .yellow)
+                                settingsRow(icon: "star.fill", title: "Rate Lume", color: .yellow)
                             }
 
                             Divider().padding(.leading, 52).overlay(Color.lumeDivider)
 
                             ShareLink(item: AppLinks.appStore) {
-                                settingsRow(icon: "square.and.arrow.up", title: "Compartir Lumé")
+                                settingsRow(icon: "square.and.arrow.up", title: "Share Lume")
                             }
 
                             Divider().padding(.leading, 52).overlay(Color.lumeDivider)
 
                             Link(destination: AppLinks.support) {
-                                settingsRow(icon: "questionmark.circle.fill", title: "Ayuda")
+                                settingsRow(icon: "questionmark.circle.fill", title: "Help")
                             }
                         }
 
@@ -71,7 +71,7 @@ struct ProfileView: View {
                                 Button {
                                     authService.signOut()
                                 } label: {
-                                    settingsRow(icon: "rectangle.portrait.and.arrow.right", title: "Cerrar sesión", color: .red)
+                                    settingsRow(icon: "rectangle.portrait.and.arrow.right", title: "Sign out", color: .red)
                                 }
                             }
                         }
@@ -85,7 +85,7 @@ struct ProfileView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Perfil")
+            .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $showLogin) {
@@ -110,7 +110,7 @@ struct ProfileView: View {
                         .foregroundColor(authService.isAuthenticated ? Color.lumePrimary : .lumeDisabled)
                 )
 
-            Text(authService.isAuthenticated ? (authService.currentUser?.displayName ?? "Usuario") : "Invitado")
+            Text(authService.isAuthenticated ? (authService.currentUser?.displayName ?? "User") : "Guest")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
@@ -132,7 +132,7 @@ struct ProfileView: View {
                 content()
             }
             .background(Color.lumeCardBg)
-            .cornerRadius(12)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 

@@ -54,6 +54,7 @@ struct BeforeAfterView: View {
                     )
                     .shadow(color: .black.opacity(0.3), radius: 4)
                     .position(x: dividerX, y: geometry.size.height / 2)
+                    .accessibilityLabel("Comparison divider")
 
                 // Labels
                 VStack {
@@ -63,18 +64,18 @@ struct BeforeAfterView: View {
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(Color.black.opacity(0.5))
-                            .cornerRadius(4)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
                             .foregroundColor(.white)
                             .padding(.leading, 12)
 
                         Spacer()
 
-                        Text("EDITADO")
+                        Text("EDITED")
                             .font(.caption2.weight(.bold))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(Color.black.opacity(0.5))
-                            .cornerRadius(4)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
                             .foregroundColor(.white)
                             .padding(.trailing, 12)
                     }
@@ -95,7 +96,7 @@ struct BeforeAfterView: View {
                         }
                         .padding(.trailing, 16)
                     }
-                    .padding(.top, 50)
+                    .padding(.top, geometry.safeAreaInsets.top + 8)
                     Spacer()
                 }
             }

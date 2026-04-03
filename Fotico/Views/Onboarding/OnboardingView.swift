@@ -24,13 +24,13 @@ struct OnboardingView: View {
                         Button {
                             onComplete()
                         } label: {
-                            Text("Omitir")
+                            Text("Skip")
                                 .font(.subheadline)
                                 .foregroundColor(.lumeTextSecondary)
                                 .padding(.horizontal, 16)
                                 .frame(minHeight: 44)
                         }
-                        .accessibilityLabel("Omitir introducción")
+                        .accessibilityLabel("Skip introduction")
                     }
                 }
                 .padding(.top, 8)
@@ -50,7 +50,7 @@ struct OnboardingView: View {
                 .font(.system(size: 80))
                 .foregroundColor(Color.lumePrimary)
 
-            Text("LUMÉ")
+            Text("LUME")
                 .font(.system(size: 48, weight: .bold))
                 .tracking(8)
                 .foregroundColor(.white)
@@ -59,7 +59,7 @@ struct OnboardingView: View {
                 .font(.title3)
                 .foregroundColor(.lumeTextSecondary)
 
-            Text("Tu editor de fotos con estilo de película")
+            Text("Your photo editor with a film-style look")
                 .font(.subheadline)
                 .foregroundColor(.lumeTextSecondary.opacity(0.8))
                 .multilineTextAlignment(.center)
@@ -78,17 +78,17 @@ struct OnboardingView: View {
         VStack(spacing: 24) {
             Spacer()
 
-            Text("Todo lo que necesitas")
+            Text("Everything you need")
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
 
             VStack(spacing: 20) {
-                featureCard(icon: "camera.fill", title: "Cámara con Filtros", description: "Aplica filtros en tiempo real mientras capturas")
+                featureCard(icon: "camera.fill", title: "Camera with Filters", description: "Apply filters in real time while capturing")
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.lumePrimary, lineWidth: 1))
-                featureCard(icon: "camera.filters", title: "40+ Presets", description: "Presets profesionales inspirados en Kodak, Fuji, Polaroid")
-                featureCard(icon: "wand.and.stars", title: "Efectos Avanzados", description: "Grano, light leaks, bloom, viñeta y más")
-                featureCard(icon: "square.on.square", title: "Overlays", description: "Texturas de polvo, luz, marcos y papel")
+                featureCard(icon: "camera.filters", title: "40+ Presets", description: "Professional presets inspired by Kodak, Fuji, Polaroid")
+                featureCard(icon: "wand.and.stars", title: "Advanced Effects", description: "Grain, light leaks, bloom, vignette and more")
+                featureCard(icon: "square.on.square", title: "Overlays", description: "Dust, light, frame and paper textures")
             }
             .padding(.horizontal)
 
@@ -109,12 +109,12 @@ struct OnboardingView: View {
                 .font(.system(size: 60))
                 .foregroundColor(Color.lumePrimary)
 
-            Text("¡Listo para crear!")
+            Text("Ready to create!")
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
 
-            Text("Empieza a editar tus fotos con estilo profesional")
+            Text("Start editing your photos with a professional style")
                 .font(.subheadline)
                 .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
@@ -125,14 +125,14 @@ struct OnboardingView: View {
             Button {
                 onComplete()
             } label: {
-                Text("Comenzar")
+                Text("Get Started")
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(Color.lumePrimary)
-                    .cornerRadius(12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 40)
@@ -142,7 +142,7 @@ struct OnboardingView: View {
 
     // MARK: - Components
 
-    /// "Siguiente" button for pages 0-1 with swipe hint
+    /// "Next" button for pages 0-1 with swipe hint
     private var nextButton: some View {
         VStack(spacing: 8) {
             Button {
@@ -150,17 +150,17 @@ struct OnboardingView: View {
                     currentPage += 1
                 }
             } label: {
-                Text("Siguiente")
+                Text("Next")
                     .font(.headline)
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
                     .background(Color.lumePrimary)
-                    .cornerRadius(12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .padding(.horizontal, 40)
 
-            Text("o desliza para continuar")
+            Text("or swipe to continue")
                 .font(.caption2)
                 .foregroundColor(Color.lumeSecondary.opacity(0.6))
         }
@@ -189,6 +189,6 @@ struct OnboardingView: View {
         }
         .padding()
         .background(Color.lumeCardBg)
-        .cornerRadius(12)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

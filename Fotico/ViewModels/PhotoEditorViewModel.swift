@@ -4,20 +4,20 @@ import CoreImage
 import Combine
 
 @MainActor
-class PhotoEditorViewModel: ObservableObject {
-    @Published var originalImage: UIImage?
-    @Published var editedCIImage: CIImage?         // CIImage for MetalImageView (no CGImage creation!)
-    @Published var editedImage: UIImage?            // UIImage fallback for export preview
-    @Published var editState = EditState()
-    @Published var isProcessing = false
-    @Published var presetThumbnails: [String: UIImage] = [:]
-    @Published var currentTool: EditorTool = .presets
-    @Published var errorMessage: String?
-    @Published var exportSuccess = false
-    @Published var showSaveProjectSheet = false
-    @Published var isMaskPainting: Bool = false
-    @Published var maskBrushMode: MaskBrushMode = .brush
-    @Published var maskBrushSize: CGFloat = 40.0
+@Observable class PhotoEditorViewModel {
+    var originalImage: UIImage?
+    var editedCIImage: CIImage?         // CIImage for MetalImageView (no CGImage creation!)
+    var editedImage: UIImage?            // UIImage fallback for export preview
+    var editState = EditState()
+    var isProcessing = false
+    var presetThumbnails: [String: UIImage] = [:]
+    var currentTool: EditorTool = .presets
+    var errorMessage: String?
+    var exportSuccess = false
+    var showSaveProjectSheet = false
+    var isMaskPainting: Bool = false
+    var maskBrushMode: MaskBrushMode = .brush
+    var maskBrushSize: CGFloat = 40.0
 
     enum MaskBrushMode {
         case brush   // paints white (apply effect)
@@ -42,8 +42,8 @@ class PhotoEditorViewModel: ObservableObject {
     // Undo/Redo
     private var undoStack: [EditState] = []
     private var redoStack: [EditState] = []
-    @Published var canUndo = false
-    @Published var canRedo = false
+    var canUndo = false
+    var canRedo = false
 
     var hasImage: Bool { originalImage != nil }
 
@@ -361,7 +361,15 @@ class PhotoEditorViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Thumbnails (concurrent generation)
+    // MARK: - Thumbnails (bounded concurrent generation)
+
+    private static let thumbnailQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "com.lume.thumbnails"
+        queue.maxConcurrentOperationCount = 4
+        queue.qualityOfService = .utility
+        return queue
+    }()
 
     private func generatePresetThumbnails() {
         guard let ciImage = originalCIImage else { return }
@@ -376,7 +384,7 @@ class PhotoEditorViewModel: ObservableObject {
 
                 for preset in allPresets {
                     group.enter()
-                    DispatchQueue.global(qos: .utility).async {
+                    Self.thumbnailQueue.addOperation {
                         let threadService = ImageFilterService()
                         if let thumbnail = threadService.generateThumbnail(
                             from: ciImage,
@@ -445,8 +453,11 @@ class PhotoEditorViewModel: ObservableObject {
         guard let image = originalImage else { return }
 
         let projectId = UUID().uuidString
-        guard let imagePath = ProjectStorageService.shared.saveOriginalImage(image, projectId: projectId) else {
-            errorMessage = "No se pudo guardar la imagen"
+        let imagePath: String
+        do {
+            imagePath = try ProjectStorageService.shared.saveOriginalImage(image, projectId: projectId)
+        } catch {
+            errorMessage = error.localizedDescription
             return
         }
         guard let editStateData = try? JSONEncoder().encode(editState) else {

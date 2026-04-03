@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TextOverlayView: View {
-    @ObservedObject var viewModel: PhotoEditorViewModel
+    var viewModel: PhotoEditorViewModel
     let displaySize: CGSize
 
     var body: some View {

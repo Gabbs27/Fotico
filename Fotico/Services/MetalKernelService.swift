@@ -4,7 +4,8 @@ import UIKit
 
 /// Metal compute shader service for custom GPU effects.
 /// Uses shared RenderEngine device and command queue.
-@MainActor
+/// Not bound to @MainActor — Metal operations are thread-safe via their own command queue.
+/// The texture pool is only accessed from the render queue, so no main-thread contention.
 class MetalKernelService {
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue

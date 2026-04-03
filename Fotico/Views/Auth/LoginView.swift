@@ -3,7 +3,7 @@ import AuthenticationServices
 
 struct LoginView: View {
     @Environment(\.modelContext) private var modelContext
-    @ObservedObject var authService: AuthService
+    var authService: AuthService
     var onComplete: () -> Void
 
     var body: some View {
@@ -33,13 +33,13 @@ struct LoginView: View {
                 }
                 .signInWithAppleButtonStyle(.white)
                 .frame(height: 50)
-                .cornerRadius(12)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
 
                 // Skip button
                 Button {
                     onComplete()
                 } label: {
-                    Text("Continuar sin cuenta")
+                    Text("Continue without account")
                         .font(.subheadline)
                         .foregroundColor(.lumeTextSecondary)
                 }

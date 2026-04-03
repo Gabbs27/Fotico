@@ -2,7 +2,7 @@ import SwiftUI
 import StoreKit
 
 struct PaywallView: View {
-    @StateObject private var subscriptionService = SubscriptionService.shared
+    @State private var subscriptionService = SubscriptionService.shared
     @Environment(\.dismiss) private var dismiss
     @State private var selectedProduct: Product?
     @State private var isPurchasing = false
@@ -72,7 +72,7 @@ struct PaywallView: View {
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
 
-            Text("Desbloquea todo el potencial creativo")
+            Text("Unlock your full creative potential")
                 .font(.subheadline)
                 .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
@@ -84,14 +84,14 @@ struct PaywallView: View {
 
     private var featuresSection: some View {
         VStack(spacing: 16) {
-            featureRow(icon: "camera.filters", title: "40+ Presets Premium", description: "Kodak, Fuji, Polaroid y más")
-            featureRow(icon: "square.on.square", title: "Overlays Exclusivos", description: "Polvo, luz, marcos, texturas")
-            featureRow(icon: "doc.on.doc", title: "Edición por Lotes", description: "Copia y pega ediciones entre fotos")
-            featureRow(icon: "wand.and.stars", title: "Filtros LUT Profesionales", description: "Color grading cinematográfico")
+            featureRow(icon: "camera.filters", title: "40+ Premium Presets", description: "Kodak, Fuji, Polaroid and more")
+            featureRow(icon: "square.on.square", title: "Exclusive Overlays", description: "Dust, light, frames, textures")
+            featureRow(icon: "doc.on.doc", title: "Batch Editing", description: "Copy and paste edits between photos")
+            featureRow(icon: "wand.and.stars", title: "Professional LUT Filters", description: "Cinematic color grading")
         }
         .padding()
         .background(Color.lumeCardBg)
-        .cornerRadius(16)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func featureRow(icon: String, title: String, description: String) -> some View {
@@ -136,10 +136,10 @@ struct PaywallView: View {
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
                                 .background(Color.lumePrimary)
-                                .cornerRadius(4)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
 
-                        Text(isAnnual ? "Anual" : "Mensual")
+                        Text(isAnnual ? "Annual" : "Monthly")
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
@@ -149,12 +149,12 @@ struct PaywallView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.white)
 
-                        Text(isAnnual ? "por año" : "por mes")
+                        Text(isAnnual ? "per year" : "per month")
                             .font(.caption)
                             .foregroundColor(.lumeTextSecondary)
 
                         if isAnnual {
-                            Text("Ahorra ~50%")
+                            Text("Save ~50%")
                                 .font(.caption2)
                                 .foregroundColor(Color.lumeSuccess)
                         }
@@ -162,7 +162,7 @@ struct PaywallView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(isSelected ? Color.lumeSurface : Color.lumeCardBg)
-                    .cornerRadius(12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(isSelected ? Color.lumePrimary : Color.lumeSurface, lineWidth: isSelected ? 2 : 1)
@@ -186,7 +186,7 @@ struct PaywallView: View {
                         dismiss()
                     }
                 } catch {
-                    errorMessage = "Error al procesar la compra: \(error.localizedDescription)"
+                    errorMessage = "Error processing purchase: \(error.localizedDescription)"
                     HapticManager.notification(.error)
                 }
                 isPurchasing = false
@@ -197,7 +197,7 @@ struct PaywallView: View {
                     ProgressView()
                         .tint(.black)
                 } else {
-                    Text("Suscribirse")
+                    Text("Subscribe")
                         .fontWeight(.bold)
                 }
             }
@@ -205,7 +205,7 @@ struct PaywallView: View {
             .padding(.vertical, 16)
             .background(Color.lumePrimary)
             .foregroundColor(.black)
-            .cornerRadius(12)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .disabled(isPurchasing || selectedProduct == nil)
     }
@@ -225,12 +225,12 @@ struct PaywallView: View {
                     }
                 }
             } label: {
-                Text("Restaurar compras")
+                Text("Restore purchases")
                     .font(.subheadline)
                     .foregroundColor(.lumeTextSecondary)
             }
 
-            Text("La suscripción se renueva automáticamente. Puedes cancelar en cualquier momento desde Ajustes.")
+            Text("Subscription renews automatically. You can cancel anytime from Settings.")
                 .font(.caption2)
                 .foregroundColor(.lumeTextSecondary)
                 .multilineTextAlignment(.center)
